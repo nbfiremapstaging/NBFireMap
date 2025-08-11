@@ -500,8 +500,8 @@
           const heading = st[10] || 0;
           if (lat == null || lon == null) return;
 
-          // Only show flights with callsign THY4 or DLH478 (case-insensitive)
-          if (!["THY4", "DLH478"].includes(callsign.toUpperCase())) return;
+          // CALLSIGN FILTER
+          if (!["THY4", "DLH478", "PVL924"].includes(callsign.toUpperCase())) return;
 
           // Only show flights within NB bounds + 100km buffer
           if (
@@ -572,3 +572,4 @@
   </div>
 </body>
 </html>
+
