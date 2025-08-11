@@ -464,16 +464,15 @@
       interactive: false
     }).addTo(map);
 
-    // --- FLIGHT TRACKING FOR NB, rotate planes, NO history lines ---
+    // --- FLIGHT TRACKING FOR NB, filter to EIN989 and PVL924, NB bounds only ---
 
-    // Define NB bounds and buffer (approximate, for OpenSky API)
+    // Replace your nbFlightBbox definition with this (tight to NB):
     const nbFlightBbox = {
-      lamin: 44.0 - 0.9, // ~100km south of NB
-      lomin: -69.5 - 1.2, // ~100km west of NB
-      lamax: 48.5 + 0.9,  // ~100km north of NB
-      lomax: -62.0 + 1.2  // ~100km east of NB
+      lamin: 44.0,
+      lomin: -69.5,
+      lamax: 48.5,
+      lomax: -62.0
     };
-
     const flightUrl = `https://opensky-network.org/api/states/all?lamin=${nbFlightBbox.lamin}&lomin=${nbFlightBbox.lomin}&lamax=${nbFlightBbox.lamax}&lomax=${nbFlightBbox.lomax}`;
 
     const flightMarkers = new Map();
@@ -495,18 +494,19 @@
 
         (data.states || []).forEach(st => {
           const icao24 = st[0];
-          const callsign = (st[1] || '').trim();
+          const callsign = (st[1] || '').trim().toUpperCase();
           const lat = st[6], lon = st[5];
           const heading = st[10] || 0;
           if (lat == null || lon == null) return;
 
-          // Only show flights within NB bounds + 100km buffer
+          // Only show flights with callsign EIN989 or PVL924
+          if (!(callsign === "EIN989" || callsign === "PVL924")) return;
+
+          // Only show flights within NB bounds (already clipped by bbox, but keep for clarity)
           if (
             lat < nbFlightBbox.lamin || lat > nbFlightBbox.lamax ||
             lon < nbFlightBbox.lomin || lon > nbFlightBbox.lomax
           ) return;
-
-          seen.add(icao24);
 
           // Rotated SVG plane icon
           const icon = L.divIcon({
