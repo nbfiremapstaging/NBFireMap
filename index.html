@@ -500,22 +500,30 @@
           const heading = st[10] || 0;
           if (lat == null || lon == null) return;
 
+          // Only show flights with callsign THY4 or DLH478 (case-insensitive)
+          if (!["THY4", "DLH478"].includes(callsign.toUpperCase())) return;
+
           // Only show flights within NB bounds + 100km buffer
           if (
             lat < nbFlightBbox.lamin || lat > nbFlightBbox.lamax ||
             lon < nbFlightBbox.lomin || lon > nbFlightBbox.lomax
           ) return;
 
-          seen.add(icao24);
+          // Make THY4 and DLH478 bigger
+          let iconSize = 28, iconAnchor = 14;
+          if (["THY4", "DLH478"].includes(callsign.toUpperCase())) {
+            iconSize = 44;
+            iconAnchor = 22;
+          }
 
           // Rotated SVG plane icon
           const icon = L.divIcon({
             className: 'plane',
-            html: `<svg width="28" height="28" style="transform:rotate(${heading}deg);display:block;" viewBox="0 0 28 28">
-              <text x="14" y="21" text-anchor="middle" font-size="24" font-family="Segoe UI,Arial,sans-serif">✈️</text>
+            html: `<svg width="${iconSize}" height="${iconSize}" style="transform:rotate(${heading}deg);display:block;" viewBox="0 0 ${iconSize} ${iconSize}">
+              <text x="${iconAnchor}" y="${iconSize - 7}" text-anchor="middle" font-size="${iconSize - 4}" font-family="Segoe UI,Arial,sans-serif">✈️</text>
             </svg>`,
-            iconSize: [28,28],
-            iconAnchor: [14,14]
+            iconSize: [iconSize, iconSize],
+            iconAnchor: [iconAnchor, iconAnchor]
           });
 
           const title = `${callsign || icao24}`;
