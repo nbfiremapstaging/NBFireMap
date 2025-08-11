@@ -44,10 +44,13 @@
     }
     /* Move the Leaflet layers control down so it doesn't overlap the toggle button */
     .leaflet-top.leaflet-right {
-      top: 60px !important; /* or more if needed */
+      top: 60px !important;
     }
-
-    /* Modern city label style with text shadow for readability */
+    /* Move legend up so it doesn't overlap bottom link */
+    .info.legend {
+      bottom: 70px !important;
+    }
+    /* Modern city label style, white bold with black halo, no arrow, no bg */
     .city-label-tooltip {
       background: none !important;
       border: none !important;
@@ -83,23 +86,28 @@
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
   <script>
-    // Center and restrict map to a much looser view of New Brunswick (2x NB size)
+    // Allow panning at least 2x outside NB, but keep NB visible on mobile
     var nbBounds = [
-      [41.0, -73.6], // Southwest corner (expanded further out)
-      [52.0, -58.4]  // Northeast corner (expanded further out)
+      [44.0, -69.5], // Southwest corner (a bit outside NB)
+      [48.5, -62.0]  // Northeast corner (a bit outside NB)
     ];
 
     var map = L.map('map', {
-      center: [46.7, -66.2], // Still zoomed on NB
+      center: [46.7, -66.2],
       zoom: 8,
       minZoom: 7,
       maxBounds: nbBounds,
-      maxBoundsViscosity: 0.5 // Even looser "bounce" at the edge
+      maxBoundsViscosity: 0.5
     });
+
+    // On mobile, fit bounds to show all of NB
+    if (window.innerWidth < 768) {
+      map.fitBounds(nbBounds, { padding: [10, 10] });
+    }
 
     // Create a custom pane for the NB border with high zIndex
     map.createPane('nbBorderPane');
-    map.getPane('nbBorderPane').style.zIndex = 420; // Higher than imagery (default 200), lower than markers
+    map.getPane('nbBorderPane').style.zIndex = 420;
 
     // Esri World Imagery as basemap
     var esriImagery = L.esri.basemapLayer('Imagery');
@@ -153,7 +161,7 @@
       return popup;
     });
 
-    // VIIRS Hotspots (on by default, light blue, draws under NB Active Wild Fires)
+    // VIIRS Hotspots (on by default, light yellow, draws under NB Active Wild Fires)
     map.createPane('viirsPane');
     map.getPane('viirsPane').style.zIndex = 410;
 
@@ -163,8 +171,8 @@
       pointToLayer: function(geojson, latlng) {
         return L.circleMarker(latlng, {
           radius: 5,
-          color: '#ffe066',      // light yellow border
-          fillColor: '#ffe066',  // light yellow fill
+          color: '#ffe066',
+          fillColor: '#ffe066',
           fillOpacity: 0.7
         });
       }
@@ -186,7 +194,6 @@
         }
       } else {
         if (map.getZoom() >= 10 && map._layersControl && map._layersControl._layers) {
-          // Only add if toggled on in the control
           var overlays = map._layersControl._layers;
           for (var i in overlays) {
             if (overlays[i].name === "NB Crown Lands" && overlays[i].layer === nbCrownLands && overlays[i].overlay && overlays[i].active) {
@@ -237,7 +244,7 @@
       }
     }).addTo(map);
 
-    // Cities (off by default, simple blue markers)
+    // Cities (off by default, names only, no marker icon)
     var nbCities = [
       { name: "Fredericton", lat: 45.9636, lng: -66.6431 },
       { name: "Saint John", lat: 45.2733, lng: -66.0633 },
@@ -251,8 +258,36 @@
       { name: "Quispamsis", lat: 45.4319, lng: -65.9469 },
       { name: "Oromocto", lat: 45.8491, lng: -66.4828 },
       { name: "Woodstock", lat: 46.1527, lng: -67.6016 }
-      // Add more as needed
     ];
+
+    var cityMarkers = L.layerGroup(
+      nbCities.map(function(city) {
+        var transparentIcon = L.divIcon({ html: '', iconSize: [0, 0] });
+        return L.marker([city.lat, city.lng], {
+          icon: transparentIcon,
+          interactive: false,
+          zIndexOffset: 1000
+        }).bindTooltip(
+          `<span class="city-label">${city.name}</span>`,
+          { permanent: true, direction: 'top', offset: [0, 0], className: 'city-label-tooltip' }
+        );
+      })
+    );
+
+    // Layer controls
+    var overlays = {
+      "NB Active Wild Fires": nbActiveWildFires,
+      "Weather Stations": weatherStations,
+      "VIIRS Hotspots": viirsHotspots,
+      "Major Cities & Towns": cityMarkers,
+      "NB Crown Lands (zoom in to view)": nbCrownLands,
+      "NB Burn Bans": nbBurnBans,
+      "Sentinel-2C Imagery": sentinel2c
+    };
+    // cityMarkers.addTo(map); // Off by default
+
+    var layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+    map._layersControl = layersControl;
 
     // Custom Legend Control
     var legend = L.control({ position: 'bottomright' });
@@ -325,52 +360,7 @@
 
     legend.addTo(map);
 
-    // Major Cities & Towns Layer (names only, no marker icon)
-    var cityMarkers = L.layerGroup(
-      nbCities.map(function(city) {
-        // Use a transparent icon so only the label shows
-        var transparentIcon = L.divIcon({ html: '', iconSize: [0, 0] });
-        return L.marker([city.lat, city.lng], {
-          icon: transparentIcon,
-          interactive: false,
-          zIndexOffset: 1000
-        }).bindTooltip(
-          `<span class="city-label">${city.name}</span>`,
-          { permanent: true, direction: 'top', offset: [0, 0], className: 'city-label-tooltip' }
-        );
-      })
-    );
-
-    // Layer controls
-    var overlays = {
-      "NB Active Wild Fires": nbActiveWildFires,
-      "Weather Stations": weatherStations,
-      "VIIRS Hotspots": viirsHotspots,
-      "Major Cities & Towns": cityMarkers,
-      "NB Crown Lands (zoom in to view)": nbCrownLands,
-      "NB Burn Bans": nbBurnBans,
-      "Sentinel-2C Imagery": sentinel2c
-    };
-    // cityMarkers.addTo(map); // Remove or comment out this line
-
-    var layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
-    map._layersControl = layersControl; // Store for later reference
-
     // Toggle button for legend and layers control
-    var mapToggleBtn = document.getElementById('mapToggleBtn');
-    var isLayersControlVisible = true;
-
-    mapToggleBtn.addEventListener('click', function() {
-      isLayersControlVisible = !isLayersControlVisible;
-      if (isLayersControlVisible) {
-        layersControl.addTo(map);
-        mapToggleBtn.innerHTML = 'Hide Legend & Layers';
-      } else {
-        map.removeControl(layersControl);
-        mapToggleBtn.innerHTML = 'Show Legend & Layers';
-      }
-    });
-
     function isMobile() {
       return window.innerWidth < 768;
     }
@@ -389,10 +379,10 @@
     // Initial state: hidden on mobile, shown on desktop
     setMapUIHidden(isMobile());
 
-    document.getElementById('mapToggleBtn').onclick = function() {
+    document.getElementById('mapToggleBtn').addEventListener('click', function() {
       var mapDiv = document.getElementById('map');
       setMapUIHidden(!mapDiv.classList.contains('map-ui-hidden'));
-    };
+    });
 
     // Add NB border from GeoNB ArcGIS REST service
     L.esri.featureLayer({
