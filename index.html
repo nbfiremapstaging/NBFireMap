@@ -83,18 +83,18 @@
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
   <script>
-    // Center and restrict map to a tighter view of New Brunswick
+    // Center and restrict map to a much looser view of New Brunswick (2x NB size)
     var nbBounds = [
-      [44.95, -68.5], // Southwest corner (lat, lng) - slightly tighter
-      [48.05, -63.8]  // Northeast corner (lat, lng)
+      [41.0, -73.6], // Southwest corner (expanded further out)
+      [52.0, -58.4]  // Northeast corner (expanded further out)
     ];
 
     var map = L.map('map', {
-      center: [46.7, -66.2], // More centered on NB
+      center: [46.7, -66.2], // Still zoomed on NB
       zoom: 8,
       minZoom: 7,
       maxBounds: nbBounds,
-      maxBoundsViscosity: 1.0 // Prevents panning outside bounds
+      maxBoundsViscosity: 0.5 // Even looser "bounce" at the edge
     });
 
     // Esri World Imagery as basemap
