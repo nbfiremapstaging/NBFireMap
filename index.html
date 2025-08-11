@@ -15,10 +15,69 @@
       max-height: 300px;
       overflow-y: auto;
     }
+    .map-toggle-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1001;
+      background: #fff;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+      transition: background 0.2s;
+    }
+    .map-toggle-btn:hover {
+      background: #f0f0f0;
+    }
+    .leaflet-control-layers,
+    .info.legend {
+      transition: opacity 0.2s;
+    }
+    .map-ui-hidden .leaflet-control-layers,
+    .map-ui-hidden .info.legend {
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* Move the Leaflet layers control down so it doesn't overlap the toggle button */
+    .leaflet-top.leaflet-right {
+      top: 60px !important; /* or more if needed */
+    }
+
+    /* Modern city label style with text shadow for readability */
+    .city-label-tooltip {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      pointer-events: none;
+    }
+    .city-label-tooltip::before {
+      display: none !important;
+    }
+    .city-label {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
+      background: none;
+      padding: 0;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <button id="mapToggleBtn" class="map-toggle-btn">Show Legend & Layers</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
@@ -100,8 +159,8 @@
       pointToLayer: function(geojson, latlng) {
         return L.circleMarker(latlng, {
           radius: 5,
-          color: '#00bfff',
-          fillColor: '#00bfff',
+          color: '#ffe066',      // light yellow border
+          fillColor: '#ffe066',  // light yellow fill
           fillOpacity: 0.7
         });
       }
@@ -174,6 +233,23 @@
       }
     }).addTo(map);
 
+    // Cities (off by default, simple blue markers)
+    var nbCities = [
+      { name: "Fredericton", lat: 45.9636, lng: -66.6431 },
+      { name: "Saint John", lat: 45.2733, lng: -66.0633 },
+      { name: "Moncton", lat: 46.0878, lng: -64.7782 },
+      { name: "Bathurst", lat: 47.6186, lng: -65.6517 },
+      { name: "Miramichi", lat: 47.0281, lng: -65.5019 },
+      { name: "Edmundston", lat: 47.3730, lng: -68.3251 },
+      { name: "Campbellton", lat: 48.0075, lng: -66.6731 },
+      { name: "Dieppe", lat: 46.0842, lng: -64.6877 },
+      { name: "Riverview", lat: 46.0617, lng: -64.8052 },
+      { name: "Quispamsis", lat: 45.4319, lng: -65.9469 },
+      { name: "Oromocto", lat: 45.8491, lng: -66.4828 },
+      { name: "Woodstock", lat: 46.1527, lng: -67.6016 }
+      // Add more as needed
+    ];
+
     // Custom Legend Control
     var legend = L.control({ position: 'bottomright' });
 
@@ -208,19 +284,36 @@
         </div>
         <div style="margin-bottom:8px;">
           <svg width="24" height="24" style="vertical-align:middle;">
-            <polygon points="12,3 22,21 2,21" style="fill:#bbb;stroke:#111;stroke-width:2" />
+            <polygon points="12,4 20,20 12,16 4,20" style="fill:#bbb;stroke:#111;stroke-width:2" />
           </svg>
-          <span style="margin-left:6px;">Weather Station Wind Direction</span>
+          <a href="https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a" target="_blank" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">
+            Weather Station Wind Direction
+          </a>
           <br>
           <span style="display:inline-block;width:24px;"></span>
-          <span style="font-size:12px; font-weight:bold;">12 <span style="font-size:10px;">km/h</span>, 20<span style="font-size:10px;">°C</span>, 60<span style="font-size:10px;">%</span></span>
+          <span style="font-size:12px; font-weight:bold; white-space:nowrap;">
+            12 <span style="font-size:10px;">km/h</span>, 20<span style="font-size:10px;">°C</span>, 60<span style="font-size:10px;">%</span>
+          </span>
           <span style="margin-left:6px;">Wind Speed, Temp, Humidity</span>
         </div>
         <div>
           <svg width="18" height="18" style="vertical-align:middle;">
-            <circle cx="9" cy="9" r="6" fill="#00bfff" stroke="#00bfff" stroke-width="2"/>
+            <circle cx="9" cy="9" r="6" fill="#ffe066" stroke="#ffe066" stroke-width="2"/>
           </svg>
-          <span style="margin-left:6px;">VIIRS Hotspot</span>
+          <a href="https://www.arcgis.com/home/item.html?id=dece90af1a0242dcbf0ca36d30276aa3" target="_blank" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">
+            VIIRS Hotspot
+          </a>
+        </div>
+        <div>
+          <a href="https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer" target="_blank" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">
+            Sentinel-2C Imagery
+          </a>
+        </div>
+        <div style="margin-top:12px; font-size:12px;">
+          Fires and Crown Land info are from 
+          <a href="https://www.snb.ca/geonb1/e/dc/catalogue-E.asp" target="_blank" style="color:#0074d9; text-decoration:underline; font-weight:bold;">
+            GeoNB
+          </a>
         </div>
       `;
       return div;
@@ -228,19 +321,74 @@
 
     legend.addTo(map);
 
+    // Major Cities & Towns Layer (names only, no marker icon)
+    var cityMarkers = L.layerGroup(
+      nbCities.map(function(city) {
+        // Use a transparent icon so only the label shows
+        var transparentIcon = L.divIcon({ html: '', iconSize: [0, 0] });
+        return L.marker([city.lat, city.lng], {
+          icon: transparentIcon,
+          interactive: false,
+          zIndexOffset: 1000
+        }).bindTooltip(
+          `<span class="city-label">${city.name}</span>`,
+          { permanent: true, direction: 'top', offset: [0, 0], className: 'city-label-tooltip' }
+        );
+      })
+    );
+
     // Layer controls
-    // Add to overlays (default off)
     var overlays = {
       "NB Active Wild Fires": nbActiveWildFires,
       "Weather Stations": weatherStations,
       "VIIRS Hotspots": viirsHotspots,
+      "Major Cities & Towns": cityMarkers,
       "NB Crown Lands (zoom in to view)": nbCrownLands,
       "NB Burn Bans": nbBurnBans,
       "Sentinel-2C Imagery": sentinel2c
     };
+    // cityMarkers.addTo(map); // Remove or comment out this line
 
     var layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
     map._layersControl = layersControl; // Store for later reference
+
+    // Toggle button for legend and layers control
+    var mapToggleBtn = document.getElementById('mapToggleBtn');
+    var isLayersControlVisible = true;
+
+    mapToggleBtn.addEventListener('click', function() {
+      isLayersControlVisible = !isLayersControlVisible;
+      if (isLayersControlVisible) {
+        layersControl.addTo(map);
+        mapToggleBtn.innerHTML = 'Hide Legend & Layers';
+      } else {
+        map.removeControl(layersControl);
+        mapToggleBtn.innerHTML = 'Show Legend & Layers';
+      }
+    });
+
+    function isMobile() {
+      return window.innerWidth < 768;
+    }
+
+    function setMapUIHidden(hidden) {
+      var mapDiv = document.getElementById('map');
+      if (hidden) {
+        mapDiv.classList.add('map-ui-hidden');
+        document.getElementById('mapToggleBtn').innerText = 'Show Legend & Layers';
+      } else {
+        mapDiv.classList.remove('map-ui-hidden');
+        document.getElementById('mapToggleBtn').innerText = 'Hide Legend & Layers';
+      }
+    }
+
+    // Initial state: hidden on mobile, shown on desktop
+    setMapUIHidden(isMobile());
+
+    document.getElementById('mapToggleBtn').onclick = function() {
+      var mapDiv = document.getElementById('map');
+      setMapUIHidden(!mapDiv.classList.contains('map-ui-hidden'));
+    };
   </script>
 </body>
 </html>
