@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     html, body, #map {
       height: 100%;
@@ -52,8 +53,9 @@
     .reset-view-btn:hover {
       background: #f0f0f0;
     }
+    /* Move zoom and GPS controls up a bit, but still below the reset button */
     .leaflet-top.leaflet-left {
-      top: 70px !important; /* Lower zoom and GPS controls to avoid overlap with reset */
+      top: 40px !important;
     }
     .leaflet-control-layers,
     .info.legend {
@@ -169,7 +171,7 @@
         flyTo: true,
         showPopup: false,
         keepCurrentZoomLevel: true,
-        icon: 'fa fa-location-arrow',
+        icon: 'fa fa-location-crosshairs', // Font Awesome 6+ "crosshairs" icon
         strings: { title: "Show me where I am" }
       }).addTo(map);
       // Optionally, fit bounds again if you want to ensure NB is visible
@@ -444,20 +446,25 @@
       localStorage.removeItem('nbMapView');
     };
 
-    // Add NB border from GeoNB ArcGIS REST service
+    // Create the custom pane BEFORE adding any boundary layers
+    map.createPane('nbBoundaryPane');
+    map.getPane('nbBoundaryPane').style.zIndex = 405;
+
+    // Add thick black NB boundary from NRCan service, no fill, only for New Brunswick
     L.esri.featureLayer({
-      url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Administrative_Boundaries/FeatureServer/0',
-      where: "ENGLISH_NAME = 'New Brunswick'",
+      url: 'https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Provinces/MapServer/0',
+      where: "POLITICALDIV = 4",
+      pane: 'nbBoundaryPane',
       style: function() {
         return {
           color: 'black',
-          weight: 6,
+          weight: 5,
           fill: false
         };
       },
-      pane: 'nbBorderPane',
       interactive: false
     }).addTo(map);
+
   </script>
   <div style="position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000;">
     <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html"
