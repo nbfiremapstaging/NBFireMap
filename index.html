@@ -97,6 +97,10 @@
       maxBoundsViscosity: 0.5 // Even looser "bounce" at the edge
     });
 
+    // Create a custom pane for the NB border with high zIndex
+    map.createPane('nbBorderPane');
+    map.getPane('nbBorderPane').style.zIndex = 420; // Higher than imagery (default 200), lower than markers
+
     // Esri World Imagery as basemap
     var esriImagery = L.esri.basemapLayer('Imagery');
 
@@ -389,6 +393,28 @@
       var mapDiv = document.getElementById('map');
       setMapUIHidden(!mapDiv.classList.contains('map-ui-hidden'));
     };
+
+    // Add NB border from GeoNB ArcGIS REST service
+    L.esri.featureLayer({
+      url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Administrative_Boundaries/FeatureServer/0',
+      where: "ENGLISH_NAME = 'New Brunswick'",
+      style: function() {
+        return {
+          color: 'black',
+          weight: 6,
+          fill: false
+        };
+      },
+      pane: 'nbBorderPane',
+      interactive: false
+    }).addTo(map);
   </script>
+  <div style="position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000;">
+    <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html"
+       target="_blank"
+       style="background:#fff;border-radius:6px;padding:8px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.13);color:#0074d9;font-weight:bold;text-decoration:underline;font-family:'Segoe UI',Arial,sans-serif;">
+      NB Fire Watch &amp; Burn Restrictions
+    </a>
+  </div>
 </body>
 </html>
