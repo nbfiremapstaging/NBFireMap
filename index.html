@@ -186,6 +186,7 @@
         if (label === 'Out of Control') color = 'red';
         else if (label === 'Contained') color = 'orange';
         else if (label === 'Under control') color = 'yellow';
+        else if (label === 'Under Control') color = 'yellow';
         else if (label === 'Being patrolled') color = 'green';
         else if (label === 'Being Patrolled') color = 'green';
 
@@ -467,7 +468,7 @@
     // --- FLIGHT TRACKING FOR NB, rotate planes, NO history lines ---
 
     // List of callsigns to show (add more as needed)
-    const allowedCallsigns = ['WJA408', 'KLM671'];
+    const allowedCallsigns = ['CGJJX'];
 
     // Define NB bounds and buffer (approximate, for OpenSky API)
     const nbFlightBbox = {
@@ -571,4 +572,5 @@
   </div>
 </body>
 </html>
+
 
