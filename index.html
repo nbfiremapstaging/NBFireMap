@@ -34,6 +34,27 @@
     .map-toggle-btn:hover {
       background: #f0f0f0;
     }
+    .reset-view-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 1002;
+      background: #fff;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+      transition: background 0.2s;
+    }
+    .reset-view-btn:hover {
+      background: #f0f0f0;
+    }
+    .leaflet-top.leaflet-left {
+      top: 70px !important; /* Lower zoom and GPS controls to avoid overlap with reset */
+    }
     .leaflet-control-layers,
     .info.legend {
       transition: opacity 0.2s;
@@ -43,11 +64,9 @@
       opacity: 0;
       pointer-events: none;
     }
-    /* Move the Leaflet layers control down so it doesn't overlap the toggle button */
     .leaflet-top.leaflet-right {
       top: 60px !important;
     }
-    /* Move legend up so it doesn't overlap bottom link */
     .info.legend {
       bottom: 70px !important;
     }
@@ -82,6 +101,7 @@
 <body>
   <div id="map"></div>
   <button id="mapToggleBtn" class="map-toggle-btn">Show Legend & Layers</button>
+  <button id="resetViewBtn" class="reset-view-btn" title="Reset map view">Reset Map View</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
@@ -93,11 +113,16 @@
       [44.0, -69.5], // Southwest corner (a bit outside NB)
       [48.5, -62.0]  // Northeast corner (a bit outside NB)
     ];
+    // Save initial view for reset
+    var initialView = {
+      center: [46.7, -66.2],
+      zoom: window.innerWidth < 768 ? 7 : 8
+    };
 
     // Try to restore previous view
     var savedView = localStorage.getItem('nbMapView');
-    var initialCenter = [46.7, -66.2];
-    var initialZoom = window.innerWidth < 768 ? 7 : 8; // More zoomed out on mobile
+    var initialCenter = initialView.center.slice();
+    var initialZoom = initialView.zoom;
 
     if (savedView) {
       try {
@@ -412,6 +437,12 @@
       var mapDiv = document.getElementById('map');
       setMapUIHidden(!mapDiv.classList.contains('map-ui-hidden'));
     });
+
+    // Reset map view button logic
+    document.getElementById('resetViewBtn').onclick = function() {
+      map.setView(initialView.center, initialView.zoom);
+      localStorage.removeItem('nbMapView');
+    };
 
     // Add NB border from GeoNB ArcGIS REST service
     L.esri.featureLayer({
