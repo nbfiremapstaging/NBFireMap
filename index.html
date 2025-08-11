@@ -500,14 +500,13 @@
           const heading = st[10] || 0;
           if (lat == null || lon == null) return;
 
-          // Only show flights with callsign EIN989 or PVL924 (case-insensitive)
-          if (!["EIN989", "PVL924"].includes(callsign.toUpperCase())) return;
-
-          // Only show flights within NB bounds (tight NB bbox)
+          // Only show flights within NB bounds + 100km buffer
           if (
-            lat < 44.0 || lat > 48.5 ||
-            lon < -69.5 || lon > -62.0
+            lat < nbFlightBbox.lamin || lat > nbFlightBbox.lamax ||
+            lon < nbFlightBbox.lomin || lon > nbFlightBbox.lomax
           ) return;
+
+          seen.add(icao24);
 
           // Rotated SVG plane icon
           const icon = L.divIcon({
