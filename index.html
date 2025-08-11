@@ -464,6 +464,96 @@
       interactive: false
     }).addTo(map);
 
+    // --- FLIGHT TRACKING FOR NB, rotate planes, NO history lines ---
+
+    // Define NB bounds and buffer (approximate, for OpenSky API)
+    const nbFlightBbox = {
+      lamin: 44.0 - 0.9, // ~100km south of NB
+      lomin: -69.5 - 1.2, // ~100km west of NB
+      lamax: 48.5 + 0.9,  // ~100km north of NB
+      lomax: -62.0 + 1.2  // ~100km east of NB
+    };
+
+    const flightUrl = `https://opensky-network.org/api/states/all?lamin=${nbFlightBbox.lamin}&lomin=${nbFlightBbox.lomin}&lamax=${nbFlightBbox.lamax}&lomax=${nbFlightBbox.lomax}`;
+
+    const flightMarkers = new Map();
+
+    function flightFriendlyAlt(m) {
+      return m == null ? '—' : `${Math.round(m)} m`;
+    }
+    function flightFriendlySpd(ms) {
+      return ms == null ? '—' : `${Math.round(ms*3.6)} km/h`;
+    }
+
+    async function fetchAndRenderFlights() {
+      try {
+        const res = await fetch(flightUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const seen = new Set();
+
+        (data.states || []).forEach(st => {
+          const icao24 = st[0];
+          const callsign = (st[1] || '').trim();
+          const lat = st[6], lon = st[5];
+          const heading = st[10] || 0;
+          if (lat == null || lon == null) return;
+
+          // Only show flights within NB bounds + 100km buffer
+          if (
+            lat < nbFlightBbox.lamin || lat > nbFlightBbox.lamax ||
+            lon < nbFlightBbox.lomin || lon > nbFlightBbox.lomax
+          ) return;
+
+          seen.add(icao24);
+
+          // Rotated SVG plane icon
+          const icon = L.divIcon({
+            className: 'plane',
+            html: `<svg width="28" height="28" style="transform:rotate(${heading}deg);display:block;" viewBox="0 0 28 28">
+              <text x="14" y="21" text-anchor="middle" font-size="24" font-family="Segoe UI,Arial,sans-serif">✈️</text>
+            </svg>`,
+            iconSize: [28,28],
+            iconAnchor: [14,14]
+          });
+
+          const title = `${callsign || icao24}`;
+          const popup = `
+            <div style="min-width:200px">
+              <div><strong>${title}</strong></div>
+              <div>${st[2] || ''}</div>
+              <div>Alt: ${flightFriendlyAlt(st[13])}</div>
+              <div>Speed: ${flightFriendlySpd(st[9])}</div>
+              <div>Track: ${heading == null ? '—' : Math.round(heading) + '°'}</div>
+            </div>
+          `;
+
+          if (flightMarkers.has(icao24)) {
+            const m = flightMarkers.get(icao24);
+            m.setLatLng([lat, lon]).setPopupContent(popup).setIcon(icon).bindTooltip(title);
+          } else {
+            const m = L.marker([lat, lon], { icon }).addTo(map);
+            m.bindPopup(popup).bindTooltip(title);
+            flightMarkers.set(icao24, m);
+          }
+        });
+
+        // Remove stale markers
+        for (const [key, m] of flightMarkers.entries()) {
+          if (!seen.has(key)) {
+            map.removeLayer(m);
+            flightMarkers.delete(key);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Poll every 15s (OpenSky free API limit)
+    fetchAndRenderFlights();
+    setInterval(fetchAndRenderFlights, 15000);
   </script>
   <div style="position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000;">
     <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html"
@@ -474,4 +564,3 @@
   </div>
 </body>
 </html>
-
