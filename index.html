@@ -5,6 +5,7 @@
   <title>New Brunswick Wildfire Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
   <style>
     html, body, #map {
       height: 100%;
@@ -85,6 +86,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
+  <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
   <script>
     // Allow panning at least 2x outside NB, but keep NB visible on mobile
     var nbBounds = [
@@ -92,22 +94,34 @@
       [48.5, -62.0]  // Northeast corner (a bit outside NB)
     ];
 
+    // Try to restore previous view
+    var savedView = localStorage.getItem('nbMapView');
+    var initialCenter = [46.7, -66.2];
+    var initialZoom = window.innerWidth < 768 ? 7 : 8; // More zoomed out on mobile
+
+    if (savedView) {
+      try {
+        var view = JSON.parse(savedView);
+        initialCenter = view.center;
+        initialZoom = view.zoom;
+      } catch (e) {}
+    }
+
     var map = L.map('map', {
-      center: [46.7, -66.2],
-      zoom: 8,
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 7,
       maxBounds: nbBounds,
       maxBoundsViscosity: 0.5
     });
 
-    // On mobile, fit bounds to show all of NB
-    if (window.innerWidth < 768) {
-      map.fitBounds(nbBounds, { padding: [10, 10] });
-    }
-
-    // Create a custom pane for the NB border with high zIndex
-    map.createPane('nbBorderPane');
-    map.getPane('nbBorderPane').style.zIndex = 420;
+    // Save view on move
+    map.on('moveend', function() {
+      localStorage.setItem('nbMapView', JSON.stringify({
+        center: map.getCenter(),
+        zoom: map.getZoom()
+      }));
+    });
 
     // Esri World Imagery as basemap
     var esriImagery = L.esri.basemapLayer('Imagery');
@@ -121,6 +135,21 @@
     // Add only one basemap at a time
     esriImagery.addTo(map);
     sentinel2c.addTo(map);
+
+    // On mobile, remove Sentinel-2C and add GPS
+    if (window.innerWidth < 768) {
+      map.removeLayer(sentinel2c);
+      L.control.locate({
+        position: 'topleft',
+        flyTo: true,
+        showPopup: false,
+        keepCurrentZoomLevel: true,
+        icon: 'fa fa-location-arrow',
+        strings: { title: "Show me where I am" }
+      }).addTo(map);
+      // Optionally, fit bounds again if you want to ensure NB is visible
+      map.fitBounds(nbBounds, { padding: [10, 10] });
+    }
 
     // NB Active Wild Fires (on by default, styled by label)
     var nbActiveWildFires = L.esri.featureLayer({
