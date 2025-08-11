@@ -466,6 +466,9 @@
 
     // --- FLIGHT TRACKING FOR NB, rotate planes, NO history lines ---
 
+    // List of callsigns to show (add more as needed)
+    const allowedCallsigns = ['WJA408', 'KLM671'];
+
     // Define NB bounds and buffer (approximate, for OpenSky API)
     const nbFlightBbox = {
       lamin: 44.0 - 0.9, // ~100km south of NB
@@ -498,6 +501,10 @@
           const callsign = (st[1] || '').trim();
           const lat = st[6], lon = st[5];
           const heading = st[10] || 0;
+
+          // Only show flights in allowedCallsigns list
+          if (!allowedCallsigns.includes(callsign)) return;
+
           if (lat == null || lon == null) return;
 
           // Only show flights within NB bounds + 100km buffer
