@@ -468,8 +468,8 @@
     // --- FLIGHT TRACKING FOR NB, rotate planes, NO history lines ---
 
     // List of callsigns to show (add more as needed)
-    const allowedCallsigns = ['CFPXD', 'CFFIF', 'CFFPL', 'CFIRS', 'CFPXN', 'CFPXR', 'CFPXW' ,'CFPXY', 'CFPXZ', 'CFZPV', 'CGFPI', 'CGFPL', 'CGFPZ', 'CGJJK', 'CGMGZ', 'CGNTM', 'CGOSX', 'CGRIK', 'CGUHK', 'CGUSZ', 'CGZRH', 'CGZUE'];
-
+    //const allowedCallsigns = ['CFPXD', 'CFFIF', 'CFFPL', 'CFIRS', 'CFPXN', 'CFPXR', 'CFPXW' ,'CFPXY', 'CFPXZ', 'CFZPV', 'CGFPI', 'CGFPL', 'CGFPZ', 'CGJJK', 'CGMGZ', 'CGNTM', 'CGOSX', 'CGRIK', 'CGUHK', 'CGUSZ', 'CGZRH', 'CGZUE'];
+    const allowedCallsigns = [*]
     // Define NB bounds and buffer (approximate, for OpenSky API)
     const nbFlightBbox = {
       lamin: 44.0 - 0.9, // ~100km south of NB
@@ -572,6 +572,7 @@
   </div>
 </body>
 </html>
+
 
 
 
