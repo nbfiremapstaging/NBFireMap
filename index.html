@@ -68,7 +68,7 @@
       padding: 0; margin: 0;
     }
 
-    /* Perimeter labels (centered, color-matched, with mask-like halo) */
+    /* Perimeter labels */
     .perimeter-label-tooltip {
       background: none !important;
       border: none !important;
@@ -81,6 +81,61 @@
       font-size: 12px;
       font-weight: 800;
       pointer-events: none;
+    }
+
+    /* ===== Fire Summary panel ===== */
+    .fire-summary-btn {
+      position: fixed;
+      left: 12px;
+      bottom: 64px;           /* sits a little above the NB Fire Watch link */
+      z-index: 2001;
+      background: #fff;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font: 15px 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .fire-summary-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      display: none;
+      align-items: start;
+      justify-content: center;
+      z-index: 3000;
+    }
+    .fire-summary {
+      margin-top: 14px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      width: min(520px, calc(100% - 24px));
+      font: 14px 'Segoe UI', Arial, sans-serif;
+      color: #111;
+    }
+    .fire-summary header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px 6px;
+      font-weight: 800; font-size: 18px;
+    }
+    .fire-summary .body {
+      padding: 0 14px 12px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #f6f6f6; border-radius: 999px; padding: 6px 10px;
+      margin-right: 8px; margin-bottom: 8px; font-weight: 700;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+    .summary-list { margin: 8px 0 0; padding-left: 20px; }
+    .summary-list a { color: #0066cc; text-decoration: underline; }
+    .summary-tools { margin: 6px 0 8px; }
+    .summary-tools a { color: #0066cc; text-decoration: underline; font-weight: 700; cursor: pointer; }
+    .close-summary {
+      background:#eee;border:1px solid #bbb;border-radius:6px;padding:6px 10px;cursor:pointer;
+      font: 14px 'Segoe UI', Arial, sans-serif;
     }
   </style>
 </head>
@@ -101,8 +156,8 @@
     var LS_KEY = 'nbMapView';
 
     var nbBounds = [
-      [44.0, -69.5], // Southwest corner (a bit outside NB)
-      [48.5, -62.0]  // Northeast corner (a bit outside NB)
+      [44.0, -69.5],
+      [48.5, -62.0]
     ];
 
     var initialView = {
@@ -195,31 +250,32 @@
        Layers
     ========================== */
 
-    // NB Active Wild Fires (on by default) — buffered hitbox + debounced hover
+    // Storage for fire features so the summary can use the same data as popups
+    const fireStore = new Map(); // id -> {props, latlng, layer}
+
+    // NB Active Wild Fires
     var nbActiveWildFires = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
       pointToLayer: function(feature, latlng) {
-  var color = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
-
-  var icon = L.divIcon({
-    className: 'fire-triangle-icon',
-    html: `
-      <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
-        <svg width="32" height="32" viewBox="0 0 32 32" style="display:block; margin-top:4px;">
-          <polygon points="16,4 28,28 4,28" style="fill:${color};stroke:#222;stroke-width:2" />
-        </svg>
-      </div>
-    `,
-    iconSize: [44, 44],
-    iconAnchor: [22, 30] // X=half width, Y = triangle tip in box
-  });
-
-  return L.marker(latlng, { icon });
-},
+        var color = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
+        var icon = L.divIcon({
+          className: 'fire-triangle-icon',
+          html: `
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <svg width="32" height="32" viewBox="0 0 32 32" style="display:block; margin-top:4px;">
+                <polygon points="16,4 28,28 4,28" style="fill:${color};stroke:#222;stroke-width:2" />
+              </svg>
+            </div>
+          `,
+          iconSize: [44, 44],
+          iconAnchor: [22, 30]
+        });
+        return L.marker(latlng, { icon });
+      },
       onEachFeature: function (feature, layer) {
         const p = feature.properties || {};
         const status = p.FIRE_STAT_DESC_E || '—';
-        const sizeHa = p.FIRE_SIZE; // likely hectares from source
+        const sizeHa = p.FIRE_SIZE;
         const detected = formatEsriDate(p.TIME_DETECTED);
         const statusDate = formatEsriDate(p.FIRE_STAT_DATE);
         const statusColor = fireStatusColor(status);
@@ -241,51 +297,32 @@
         `;
         layer.bindPopup(popupHTML, { maxWidth: 320 });
 
-        // --- Debounced hover handlers (snappier)
-let clickedOpen = false;
-let openT = null, closeT = null;
-const OPEN_DELAY = 150;  // was 250
-const CLOSE_DELAY = 60;  // was 150
+        // keep for summary
+        const id = feature.id || p.OBJECTID || p.OBJECTID_1 || Math.random();
+        fireStore.set(id, { id, props: p, latlng: layer.getLatLng(), layer });
 
-function clearTimers() {
-  if (openT) { clearTimeout(openT); openT = null; }
-  if (closeT) { clearTimeout(closeT); closeT = null; }
-}
+        // Debounced hover handlers
+        let clickedOpen = false;
+        let openT = null, closeT = null;
+        const OPEN_DELAY = 150, CLOSE_DELAY = 60;
+        function clearTimers(){ if(openT){clearTimeout(openT);openT=null;} if(closeT){clearTimeout(closeT);closeT=null;} }
 
-layer.on('mouseover', function() {
-  if (clickedOpen) return;
-  if (closeT) { clearTimeout(closeT); closeT = null; }
-  if (!openT) {
-    openT = setTimeout(() => {
-      openT = null;
-      this.openPopup();
-    }, OPEN_DELAY);
-  }
-});
-
-layer.on('mouseout', function() {
-  if (clickedOpen) return;
-  if (openT) { clearTimeout(openT); openT = null; }
-  if (!closeT) {
-    closeT = setTimeout(() => {
-      closeT = null;
-      this.closePopup();
-    }, CLOSE_DELAY);
-  }
-});
-
-layer.on('click', function() {
-  clickedOpen = !clickedOpen;
-  clearTimers();
-  if (clickedOpen) this.openPopup(); else this.closePopup();
-});
-
-layer.on('remove', clearTimers);
-
+        layer.on('mouseover', function(){ if(clickedOpen) return; if(closeT){clearTimeout(closeT);closeT=null;} if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup(); }, OPEN_DELAY);} });
+        layer.on('mouseout', function(){ if(clickedOpen) return; if(openT){clearTimeout(openT);openT=null;} if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup(); }, CLOSE_DELAY);} });
+        layer.on('click', function(){ clickedOpen = !clickedOpen; clearTimers(); if(clickedOpen) this.openPopup(); else this.closePopup(); });
+        layer.on('remove', clearTimers);
       }
     }).addTo(map);
 
-    // VIIRS Hotspots (on by default, draws under NB Active Wild Fires)
+    // Keep store in sync on remove/update
+    nbActiveWildFires.on('removefeature', function(e){
+      const p = e.feature && e.feature.properties || {};
+      const id = e.feature && (e.feature.id || p.OBJECTID || p.OBJECTID_1);
+      if (id!=null) fireStore.delete(id);
+    });
+    nbActiveWildFires.on('load', function(){ /* no-op; store already filled via onEachFeature */ });
+
+    // VIIRS Hotspots
     var viirsHotspots = L.esri.featureLayer({
       url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/ArcGIS/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0',
       pane: 'viirsPane',
@@ -307,22 +344,15 @@ layer.on('remove', clearTimers);
       url: 'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
       style: function(){ return { color: PERIMETER_COLOR, weight: 1, fillOpacity: 0.20 }; },
       onEachFeature: function (feature, layer) {
-        const ha = feature?.properties?.AREA; // already hectares on this service
-        const html = `<span class="perimeter-label" style="color:${PERIMETER_COLOR}">
-          ${numberFmt(ha,1)} ha
-        </span>`;
-        layer.bindTooltip(html, {
-          permanent: true,
-          className: 'perimeter-label-tooltip',
-          direction: 'center',
-          opacity: 0 // managed by zoom
-        });
+        const ha = feature?.properties?.AREA;
+        const html = `<span class="perimeter-label" style="color:${PERIMETER_COLOR}">${numberFmt(ha,1)} ha</span>`;
+        layer.bindTooltip(html, { permanent: true, className: 'perimeter-label-tooltip', direction: 'center', opacity: 0 });
         perimeterLabelLayers.add(layer);
       }
     }).addTo(map);
 
     function updatePerimeterLabelVisibility() {
-      const show = map.getZoom() >= 11; // adjust to taste
+      const show = map.getZoom() >= 11;
       perimeterLabelLayers.forEach(l => {
         const tt = l.getTooltip && l.getTooltip();
         if (!tt) return;
@@ -423,9 +453,8 @@ layer.on('remove', clearTimers);
        OpenSky Flights (planes)
     ========================== */
     const OPEN_SKY_URL = "https://opensky-network.org/api/states/all";
-    const PROXY_URL = ""; // set to your proxy if you hit CORS
+    const PROXY_URL = "";
 
-    // Use the Set defined in callsigns.js (fallback to empty set if script missing)
     const WHITELIST_CALLSIGNS = window.WHITELIST_CALLSIGNS || new Set();
 
     map.createPane('planesPane');
@@ -443,9 +472,7 @@ layer.on('remove', clearTimers);
         className: 'plane-div-icon',
         html: `
           <div style="transform: rotate(${ICON_OFFSET}deg); transform-origin:center; display:inline-block;">
-            <div style="font-size:26px; ${emojiStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block;">
-              ✈️
-            </div>
+            <div style="${emojiStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block;font-size:26px;">✈️</div>
           </div>
         `,
         iconSize: [30, 46],
@@ -473,15 +500,9 @@ layer.on('remove', clearTimers);
 
         m.bindPopup(popupContent);
 
-        // Hover to show popup
         m.on('mouseover', function () { if (!clickedOpen) this.openPopup(); });
-        // Hover out to hide popup unless clicked open
         m.on('mouseout',  function () { if (!clickedOpen) this.closePopup(); });
-        // Click toggles permanent open/close state
-        m.on('click',     function () {
-          clickedOpen = !clickedOpen;
-          if (clickedOpen) this.openPopup(); else this.closePopup();
-        });
+        m.on('click',     function () { clickedOpen = !clickedOpen; if (clickedOpen) this.openPopup(); else this.closePopup(); });
 
         m.addTo(planesLayer);
         planeMarkers.set(icao24, m);
@@ -535,21 +556,12 @@ layer.on('remove', clearTimers);
 
     // Start polling
     fetchOpenSkyStates();
-    const OPEN_SKY_INTERVAL_MS = 250000; // 250s
+    const OPEN_SKY_INTERVAL_MS = 250000;
     let planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS);
-
-    // Pause polling when layer is hidden (optional)
-    function onPlanesAdded() {
-      if (!planesTimer) planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS);
-    }
-    function onPlanesRemoved() {
-      if (planesTimer) { clearInterval(planesTimer); planesTimer = null; }
-    }
+    function onPlanesAdded() { if (!planesTimer) planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS); }
+    function onPlanesRemoved() { if (planesTimer) { clearInterval(planesTimer); planesTimer = null; } }
     planesLayer.on('add', onPlanesAdded);
     planesLayer.on('remove', onPlanesRemoved);
-
-    // Major Cities group already defined above
-    // NB boundary outline (thick black) already added above
 
     /* =========================
        Controls (Layers & Legend)
@@ -648,7 +660,6 @@ layer.on('remove', clearTimers);
       }
     }
 
-    // Initial state: hidden on mobile, shown on desktop
     setMapUIHidden(isMobile());
 
     document.getElementById('mapToggleBtn').addEventListener('click', function() {
@@ -661,6 +672,119 @@ layer.on('remove', clearTimers);
       localStorage.removeItem(LS_KEY);
     };
 
+    /* =========================
+       Fire Summary (panel)
+    ========================== */
+
+    // Create button + overlay DOM
+    const summaryBtn = document.createElement('button');
+    summaryBtn.className = 'fire-summary-btn';
+    summaryBtn.id = 'fireSummaryBtn';
+    summaryBtn.textContent = 'Fire Summary';
+    document.body.appendChild(summaryBtn);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fire-summary-overlay';
+    overlay.id = 'fireSummaryOverlay';
+    overlay.innerHTML = `
+      <div class="fire-summary" role="dialog" aria-modal="true" aria-labelledby="fs-title">
+        <header>
+          <div id="fs-title">New Brunswick Fire Summary</div>
+          <button class="close-summary" id="fs-close">Close</button>
+        </header>
+        <div class="body" id="fs-body">
+          <!-- filled at open time -->
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    function buildSummaryHTML() {
+      // Use current fireStore snapshot
+      const items = Array.from(fireStore.values());
+
+      let totalArea = 0;
+      const counts = { 'out of control':0, 'contained':0, 'under control':0, 'being patrolled':0, 'other':0 };
+
+      items.forEach(it => {
+        const p = it.props || {};
+        const sz = Number(p.FIRE_SIZE);
+        if (isFinite(sz)) totalArea += sz;
+
+        const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
+        if (counts.hasOwnProperty(key)) counts[key]++; else counts.other++;
+      });
+
+      const top5 = items
+        .slice()
+        .sort((a,b) => (Number(b.props.FIRE_SIZE)||0) - (Number(a.props.FIRE_SIZE)||0))
+        .slice(0,5);
+
+      const chip = (label) => {
+        const color = fireStatusColor(label);
+        const key = normalizeFireStatus(label);
+        const n = key==='out of control'?counts['out of control']
+               : key==='contained'?counts['contained']
+               : key==='under control'?counts['under control']
+               : key==='being patrolled'?counts['being patrolled']
+               : counts.other;
+        return `<span class="chip"><span class="dot" style="background:${color}"></span>${label} <span style="font-weight:700;margin-left:6px;">${n}</span></span>`;
+      };
+
+      const list = top5.map((it, i) => {
+        const p = it.props || {};
+        const name = p.FIRE_NAME || 'Unnamed Fire';
+        const area = numberFmt(p.FIRE_SIZE, 0);
+        return `<li><a href="#" data-fireid="${it.id}">${name} — ${area} ha</a></li>`;
+      }).join('');
+
+      return `
+        <div><b>Total area burned:</b> ${numberFmt(totalArea,0)} ha</div>
+        <div style="margin-top:10px;"><b>Fires by status:</b></div>
+        <div style="margin-top:6px;">
+          ${chip('Out of Control')}
+          ${chip('Contained')}
+          ${chip('Being Patrolled')}
+          ${chip('Under Control')}
+        </div>
+        <div><b>Top 5 largest fires <span style="font-weight:400">(largest → smallest)</span></b></div>
+        <ol class="summary-list" id="fs-top5">
+          ${list || '<li>No active fires</li>'}
+        </ol>
+        <div style="margin-top:10px;font-size:12px;color:#666;">Source: NB Active Fires (Public_Fires/MapServer/0).</div>
+      `;
+    }
+
+    function openSummary() {
+      document.getElementById('fs-body').innerHTML = buildSummaryHTML();
+      overlay.style.display = 'flex';
+
+      // link handlers
+      const listEl = document.getElementById('fs-top5');
+      if (listEl) {
+        listEl.querySelectorAll('a[data-fireid]').forEach(a => {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = a.getAttribute('data-fireid');
+            const rec = fireStore.get(id);
+            if (rec) {
+              overlay.style.display = 'none';
+              map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
+              // Open the marker popup shortly after moving
+              setTimeout(() => { rec.layer && rec.layer.openPopup && rec.layer.openPopup(); }, 650);
+            }
+          });
+        });
+      }
+
+      
+    }
+
+    summaryBtn.addEventListener('click', openSummary);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+    document.getElementById('fs-close').addEventListener('click', () => overlay.style.display = 'none');
   </script>
 
   <div style="position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000;">
@@ -672,6 +796,3 @@ layer.on('remove', clearTimers);
   </div>
 </body>
 </html>
-
-
-
