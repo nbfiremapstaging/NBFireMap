@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <title>New Brunswick Wildfire Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Hint browsers to use light form controls/scrollbars -->
+  <meta name="color-scheme" content="light">
 
   <!-- Fonts / Leaflet / Plugins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,7 +17,9 @@
 
   <!-- ============================ CSS ============================ -->
   <style>
+    /* Force light mode across devices */
     :root {
+      color-scheme: light;
       --bg: #f7f8fc;
       --text: #0f172a;
       --muted: #5b6474;
@@ -48,21 +52,9 @@
       --fs-16: 16px;
       --fs-18: 18px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b0f19;
-        --text: #e5e7eb;
-        --muted: #98a2b3;
-        --panel: rgba(17, 24, 39, 0.8);
-        --panel-strong: #111827;
-        --border: #1f2937;
-        --btn-bg: #111827;
-        --btn-border: #374151;
-        --btn-hover: #1f2937;
-        --link: #60a5fa;
-        --boundary: #ffffff;
-      }
-    }
+
+    /* NOTE: dark-mode override removed to keep light theme everywhere
+    @media (prefers-color-scheme: dark) { ... } */
 
     /* Base layout */
     html, body, #map { height: 100%; margin: 0; padding: 0; }
@@ -90,9 +82,7 @@
       color: var(--text);
       box-shadow: var(--shadow-soft);
     }
-    .leaflet-bar a {
-      width: 34px; height: 34px; line-height: 34px; font-size: 16px;
-    }
+    .leaflet-bar a { width: 34px; height: 34px; line-height: 34px; font-size: 16px; }
     .leaflet-control-layers {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -174,9 +164,7 @@
     }
 
     /* Fire Summary panel */
-    .fire-summary-btn {
-      position: fixed; left: 12px; bottom: 86px; z-index: 2001;
-    }
+    .fire-summary-btn { position: fixed; left: 12px; bottom: 86px; z-index: 2001; }
     .fire-summary-overlay {
       position: fixed; inset: 0; display: none;
       align-items: start; justify-content: center; z-index: 3000;
@@ -195,10 +183,7 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 16px 8px; gap: 8px;
     }
-    .fire-summary h2 {
-      font-size: var(--fs-18); font-weight: 800; margin: 0;
-      letter-spacing: 0.2px;
-    }
+    .fire-summary h2 { font-size: var(--fs-18); font-weight: 800; margin: 0; letter-spacing: 0.2px; }
     .fire-summary .body { padding: 0 16px 16px; line-height: 1.5; }
     .close-summary {
       background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
@@ -239,9 +224,7 @@
     .legend-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
     .legend-link { color: var(--link); text-decoration: none; font-weight: 700; }
     .legend-link:hover { text-decoration: underline; }
-    .legend-icon {
-      width: 22px; height: 22px; display: inline-grid; place-items: center;
-    }
+    .legend-icon { width: 22px; height: 22px; display: inline-grid; place-items: center; }
 
     /* Unified map markers */
     .marker-badge {
@@ -259,19 +242,9 @@
 
     /* ---------------- Mobile-only sizing for layers control + legend ---------------- */
     @media (max-width: 767.98px) {
-      .leaflet-control-layers {
-        font-size: var(--fs-12);
-        padding: 6px 8px;
-        max-width: 220px;
-      }
-      .leaflet-control-layers-expanded {
-        max-height: 220px;
-      }
-      .info.legend.legend-box {
-        padding: 8px 10px;
-        font-size: var(--fs-12);
-        max-width: 220px;
-      }
+      .leaflet-control-layers { font-size: var(--fs-12); padding: 6px 8px; max-width: 220px; }
+      .leaflet-control-layers-expanded { max-height: 220px; }
+      .info.legend.legend-box { padding: 8px 10px; font-size: var(--fs-12); max-width: 220px; }
       .legend-title { font-size: var(--fs-12); margin-bottom: 6px; }
       .legend-row { gap: 6px; margin: 4px 0; }
       .legend-icon { width: 18px; height: 18px; }
@@ -836,7 +809,7 @@
         const sz = Number(p.FIRE_SIZE);
         if (isFinite(sz)) totalArea += sz;
 
-      const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
+        const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
         if (counts.hasOwnProperty(key)) counts[key]++; else counts.other++;
       });
 
