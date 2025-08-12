@@ -8,19 +8,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    html, body, #map {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    .leaflet-control-layers-expanded {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .map-toggle-btn {
+    /* Layout */
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+
+    /* Controls container scroll */
+    .leaflet-control-layers-expanded { max-height: 300px; overflow-y: auto; }
+
+    /* Shared button style */
+    .map-btn {
       position: absolute;
-      top: 12px;
-      right: 12px;
       z-index: 1001;
       background: #fff;
       border: 1px solid #bbb;
@@ -32,46 +28,24 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.13);
       transition: background 0.2s;
     }
-    .map-toggle-btn:hover {
-      background: #f0f0f0;
-    }
-    .reset-view-btn {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 1002;
-      background: #fff;
-      border: 1px solid #bbb;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-size: 15px;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.13);
-      transition: background 0.2s;
-    }
-    .reset-view-btn:hover {
-      background: #f0f0f0;
-    }
-    /* Move zoom and GPS controls up a bit, but still below the reset button */
-    .leaflet-top.leaflet-left {
-      top: 40px !important;
-    }
-    .leaflet-control-layers,
-    .info.legend {
-      transition: opacity 0.2s;
-    }
+    .map-btn:hover { background: #f0f0f0; }
+
+    /* Specific button positions (keeps identical look) */
+    .map-toggle-btn { top: 12px; right: 12px; }
+    .reset-view-btn { top: 12px; left: 12px; z-index: 1002; }
+
+    /* Move zoom/GPS controls down a touch (still below reset button) */
+    .leaflet-top.leaflet-left { top: 40px !important; }
+    .leaflet-top.leaflet-right { top: 60px !important; }
+    .info.legend { bottom: 70px !important; }
+
+    /* Toggle opacity for legend/layers as a group */
+    .leaflet-control-layers, .info.legend { transition: opacity 0.2s; }
     .map-ui-hidden .leaflet-control-layers,
     .map-ui-hidden .info.legend {
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
     }
-    .leaflet-top.leaflet-right {
-      top: 60px !important;
-    }
-    .info.legend {
-      bottom: 70px !important;
-    }
+
     /* Modern city label style, white bold with black halo, no arrow, no bg */
     .city-label-tooltip {
       background: none !important;
@@ -81,116 +55,120 @@
       margin: 0 !important;
       pointer-events: none;
     }
-    .city-label-tooltip::before {
-      display: none !important;
-    }
+    .city-label-tooltip::before { display: none !important; }
     .city-label {
       font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 15px;
       font-weight: 700;
       color: #fff;
       text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-         1px  1px 0 #000;
+        -1px -1px 0 #000,  1px -1px 0 #000,
+        -1px  1px 0 #000,  1px  1px 0 #000;
       background: none;
-      padding: 0;
-      margin: 0;
+      padding: 0; margin: 0;
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <button id="mapToggleBtn" class="map-toggle-btn">Show Legend & Layers</button>
-  <button id="resetViewBtn" class="reset-view-btn" title="Reset map view">Reset Map View</button>
+  <button id="mapToggleBtn" class="map-btn map-toggle-btn">Show Legend & Layers</button>
+  <button id="resetViewBtn" class="map-btn reset-view-btn" title="Reset map view">Reset Map View</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
   <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
   <script>
-    // Allow panning at least 2x outside NB, but keep NB visible on mobile
+    /* =========================
+       Constants & Utilities
+    ========================== */
+    var LS_KEY = 'nbMapView';
+
     var nbBounds = [
       [44.0, -69.5], // Southwest corner (a bit outside NB)
       [48.5, -62.0]  // Northeast corner (a bit outside NB)
     ];
-    // Save initial view for reset
+
     var initialView = {
       center: [46.7, -66.2],
       zoom: window.innerWidth < 768 ? 7 : 8
     };
 
-    // Try to restore previous view
-    var savedView = localStorage.getItem('nbMapView');
-    var initialCenter = initialView.center.slice();
-    var initialZoom = initialView.zoom;
+    function isMobile() { return window.innerWidth < 768; }
 
-    if (savedView) {
-      try {
-        var view = JSON.parse(savedView);
-        initialCenter = view.center;
-        initialZoom = view.zoom;
-      } catch (e) {}
+    function getSavedView() {
+      var saved = localStorage.getItem(LS_KEY);
+      if (!saved) return null;
+      try { return JSON.parse(saved); } catch(e) { return null; }
     }
 
-    var map = L.map('map', {
-      center: initialCenter,
-      zoom: initialZoom,
-      minZoom: 7,
-      maxBounds: nbBounds,
-      maxBoundsViscosity: 0.5
-    });
-
-    // Save view on move
-    map.on('moveend', function() {
-      localStorage.setItem('nbMapView', JSON.stringify({
+    function saveView(map) {
+      localStorage.setItem(LS_KEY, JSON.stringify({
         center: map.getCenter(),
         zoom: map.getZoom()
       }));
-    });
+    }
 
-    // Esri World Imagery as basemap
-    var esriImagery = L.esri.basemapLayer('Imagery');
+    function normalizeFireStatus(label) {
+      return (label || '').toString().trim().toLowerCase();
+    }
 
-    // Sentinel-2C Imagery (on by default)
+    function fireStatusColor(label) {
+      switch (normalizeFireStatus(label)) {
+        case 'out of control': return 'red';
+        case 'contained': return 'orange';
+        case 'under control': return 'yellow';
+        case 'being patrolled': return 'green';
+        default: return 'gray';
+      }
+    }
+
+    /* =========================
+       Map Init & Basemaps
+    ========================== */
+    var restored = getSavedView();
+    var map = L.map('map', {
+      center: restored ? restored.center : initialView.center,
+      zoom: restored ? restored.zoom : initialView.zoom,
+      minZoom: 7,
+      maxBounds: nbBounds,
+      maxBoundsViscosity: 0.5
+    }).on('moveend', function(){ saveView(map); });
+
+    var esriImagery = L.esri.basemapLayer('Imagery').addTo(map);
+
     var sentinel2c = L.esri.imageMapLayer({
       url: 'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer',
       opacity: 0.7
     });
 
-    // Add only one basemap at a time
-    esriImagery.addTo(map);
-
-    // On mobile, remove Sentinel-2C and add GPS
-    if (window.innerWidth < 768) {
-      map.removeLayer(sentinel2c);
+    if (isMobile()) {
+      // Remove Sentinel-2C on mobile, add GPS, keep NB in view
       L.control.locate({
         position: 'topleft',
         flyTo: true,
         showPopup: false,
         keepCurrentZoomLevel: true,
-        icon: 'fa fa-location-crosshairs', // Font Awesome 6+ "crosshairs" icon
+        icon: 'fa fa-location-crosshairs',
         strings: { title: "Show me where I am" }
       }).addTo(map);
-      // Optionally, fit bounds again if you want to ensure NB is visible
       map.fitBounds(nbBounds, { padding: [10, 10] });
     }
 
-    // NB Active Wild Fires (on by default, styled by label)
+    /* =========================
+       Panes (z-ordering)
+    ========================== */
+    map.createPane('viirsPane');         map.getPane('viirsPane').style.zIndex = 410;
+    map.createPane('nbBoundaryPane');    map.getPane('nbBoundaryPane').style.zIndex = 405;
+
+    /* =========================
+       Layers
+    ========================== */
+    // NB Active Wild Fires (on by default)
     var nbActiveWildFires = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
       pointToLayer: function(feature, latlng) {
-        var label = feature.properties.FIRE_STAT_DESC_E || '';
-        var color = 'gray';
-        if (label === 'Out of Control') color = 'red';
-        else if (label === 'Contained') color = 'orange';
-        else if (label === 'Under control') color = 'yellow';
-        else if (label === 'Under Control') color = 'yellow';
-        else if (label === 'Being patrolled') color = 'green';
-        else if (label === 'Being Patrolled') color = 'green';
-
-        // SVG triangle as a divIcon (screen-size, not map-size)
+        var color = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
         var triangleIcon = L.divIcon({
           className: 'fire-triangle-icon',
           html: `
@@ -201,30 +179,23 @@
           iconSize: [32, 32],
           iconAnchor: [16, 28]
         });
-
         return L.marker(latlng, { icon: triangleIcon });
       }
     }).addTo(map);
 
     nbActiveWildFires.bindPopup(function (layer) {
-      var props = layer.feature.properties;
-      var popup = '<b>NB Active Wild Fire</b><br>';
-      for (var key in props) {
-        if (props.hasOwnProperty(key)) {
-          popup += '<b>' + key + ':</b> ' + props[key] + '<br>';
-        }
+      var props = layer.feature.properties, popup = '<b>NB Active Wild Fire</b><br>';
+      for (var k in props) if (Object.prototype.hasOwnProperty.call(props, k)) {
+        popup += '<b>' + k + ':</b> ' + props[k] + '<br>';
       }
       return popup;
     });
 
-    // VIIRS Hotspots (on by default, light yellow, draws under NB Active Wild Fires)
-    map.createPane('viirsPane');
-    map.getPane('viirsPane').style.zIndex = 410;
-
+    // VIIRS Hotspots (on by default, draws under NB Active Wild Fires)
     var viirsHotspots = L.esri.featureLayer({
       url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/ArcGIS/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0',
       pane: 'viirsPane',
-      pointToLayer: function(geojson, latlng) {
+      pointToLayer: function(_, latlng) {
         return L.circleMarker(latlng, {
           radius: 5,
           color: '#ffe066',
@@ -234,48 +205,41 @@
       }
     }).addTo(map);
 
-    // NB Crown Lands (off by default, styled client-side)
+    // activefires boundaries
+    var activefires = L.esri.featureLayer({
+      url: 'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
+      style: function(){ return { color: 'red', weight: 1, fillOpacity: 0.2 }; }
+    }).addTo(map);
+
+    // NB Crown Lands (off by default)
     var nbCrownLands = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Crown_Lands/FeatureServer/0',
-      style: function() {
-        return { color: 'purple', weight: 1, fillOpacity: 0.2 };
-      }
+      style: function(){ return { color: 'purple', weight: 1, fillOpacity: 0.2 }; }
     });
 
-    // Only show Crown Lands at zoom 10+
-    map.on('zoomend', function() {
-      if (map.hasLayer(nbCrownLands)) {
-        if (map.getZoom() < 10) {
-          map.removeLayer(nbCrownLands);
-        }
-      } else {
-        if (map.getZoom() >= 10 && map._layersControl && map._layersControl._layers) {
-          var overlays = map._layersControl._layers;
-          for (var i in overlays) {
-            if (overlays[i].name === "NB Crown Lands" && overlays[i].layer === nbCrownLands && overlays[i].overlay && overlays[i].active) {
-              map.addLayer(nbCrownLands);
-            }
-          }
-        }
-      }
-    });
+    // Show Crown Lands only at zoom 10+
+    function updateCrownLandsVisibility() {
+      var shouldShow = map.getZoom() >= 10 && map.hasLayer(nbCrownLands);
+      if (map.getZoom() < 10 && map.hasLayer(nbCrownLands)) map.removeLayer(nbCrownLands);
+    }
+    map.on('zoomend', updateCrownLandsVisibility);
 
-    // NB Burn Bans (off by default, uses server symbology)
+    // NB Burn Bans (off by default)
     var nbBurnBans = L.esri.dynamicMapLayer({
       url: 'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
       opacity: 0.7
     });
 
-    // Weather Stations (on by default, arrow shows wind direction, label shows wind speed/temp/humidity)
+    // Weather Stations (on by default)
     var weatherStations = L.esri.featureLayer({
       url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
       pointToLayer: function(feature, latlng) {
-        var windDir = feature.properties.WindDirection || 0;
-        var windSpeed = feature.properties.WindSpeed_kmh;
-        var temp = feature.properties.Temperature_C;
-        var humidity = feature.properties.Humidity_Percent;
+        var p = feature.properties || {};
+        var windDir = p.WindDirection || 0;
+        var windSpeed = p.WindSpeed_kmh;
+        var temp = p.Temperature_C;
+        var humidity = p.Humidity_Percent;
 
-        // Large, modern, bold arrow SVG
         var arrowIcon = L.divIcon({
           className: 'weather-arrow-icon',
           html: `
@@ -295,12 +259,11 @@
           iconSize: [38, 54],
           iconAnchor: [19, 32]
         });
-
         return L.marker(latlng, { icon: arrowIcon });
       }
     }).addTo(map);
 
-    // Cities (off by default, names only, no marker icon)
+    // Major Cities & Towns (off by default)
     var nbCities = [
       { name: "Fredericton", lat: 45.9636, lng: -66.6431 },
       { name: "Saint John", lat: 45.2733, lng: -66.0633 },
@@ -316,39 +279,47 @@
       { name: "Woodstock", lat: 46.1527, lng: -67.6016 }
     ];
 
-    var cityMarkers = L.layerGroup(
-      nbCities.map(function(city) {
-        var transparentIcon = L.divIcon({ html: '', iconSize: [0, 0] });
-        return L.marker([city.lat, city.lng], {
-          icon: transparentIcon,
-          interactive: false,
-          zIndexOffset: 1000
-        }).bindTooltip(
-          `<span class="city-label">${city.name}</span>`,
-          { permanent: true, direction: 'top', offset: [0, 0], className: 'city-label-tooltip' }
-        );
-      })
-    );
+    var cityMarkers = L.layerGroup(nbCities.map(function(city) {
+      var transparentIcon = L.divIcon({ html: '', iconSize: [0, 0] });
+      return L.marker([city.lat, city.lng], {
+        icon: transparentIcon,
+        interactive: false,
+        zIndexOffset: 1000
+      }).bindTooltip(
+        `<span class="city-label">${city.name}</span>`,
+        { permanent: true, direction: 'top', offset: [0, 0], className: 'city-label-tooltip' }
+      );
+    }));
 
-    // Layer controls
+    // NB boundary outline (thick black)
+    L.esri.featureLayer({
+      url: 'https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Provinces/MapServer/0',
+      where: "POLITICALDIV = 4",
+      pane: 'nbBoundaryPane',
+      style: function(){ return { color: 'black', weight: 5, fill: false }; },
+      interactive: false
+    }).addTo(map);
+
+    /* =========================
+       Controls (Layers & Legend)
+    ========================== */
     var overlays = {
       "NB Active Wild Fires": nbActiveWildFires,
       "Weather Stations": weatherStations,
       "VIIRS Hotspots": viirsHotspots,
+      "Fire Perimeters": activefires,
       "Major Cities & Towns": cityMarkers,
       "NB Crown Lands (zoom in to view)": nbCrownLands,
       "NB Burn Bans": nbBurnBans,
       "Sentinel-2C Imagery": sentinel2c
     };
-    // cityMarkers.addTo(map); // Off by default
 
     var layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
     map._layersControl = layersControl;
 
-    // Custom Legend Control
+    // Custom Legend
     var legend = L.control({ position: 'bottomright' });
-
-    legend.onAdd = function (map) {
+    legend.onAdd = function() {
       var div = L.DomUtil.create('div', 'info legend');
       div.style.background = 'rgba(255,255,255,0.95)';
       div.style.padding = '10px 14px';
@@ -360,18 +331,15 @@
           <svg width="24" height="24" style="vertical-align:middle;">
             <polygon points="12,3 22,21 2,21" style="fill:red;stroke:#222;stroke-width:2" />
           </svg>
-          <span style="margin-left:6px;">Out of Control Fire</span>
-          <br>
+          <span style="margin-left:6px;">Out of Control Fire</span><br>
           <svg width="24" height="24" style="vertical-align:middle;">
             <polygon points="12,3 22,21 2,21" style="fill:orange;stroke:#222;stroke-width:2" />
           </svg>
-          <span style="margin-left:6px;">Contained Fire</span>
-          <br>
+          <span style="margin-left:6px;">Contained Fire</span><br>
           <svg width="24" height="24" style="vertical-align:middle;">
             <polygon points="12,3 22,21 2,21" style="fill:yellow;stroke:#222;stroke-width:2" />
           </svg>
-          <span style="margin-left:6px;">Under Control Fire</span>
-          <br>
+          <span style="margin-left:6px;">Under Control Fire</span><br>
           <svg width="24" height="24" style="vertical-align:middle;">
             <polygon points="12,3 22,21 2,21" style="fill:green;stroke:#222;stroke-width:2" />
           </svg>
@@ -383,8 +351,7 @@
           </svg>
           <a href="https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a" target="_blank" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">
             Weather Station Wind Direction
-          </a>
-          <br>
+          </a><br>
           <span style="display:inline-block;width:24px;"></span>
           <span style="font-size:12px; font-weight:bold; white-space:nowrap;">
             12 <span style="font-size:10px;">km/h</span>, 20<span style="font-size:10px;">°C</span>, 60<span style="font-size:10px;">%</span>
@@ -413,14 +380,11 @@
       `;
       return div;
     };
-
     legend.addTo(map);
 
-    // Toggle button for legend and layers control
-    function isMobile() {
-      return window.innerWidth < 768;
-    }
-
+    /* =========================
+       UI Toggles & Buttons
+    ========================== */
     function setMapUIHidden(hidden) {
       var mapDiv = document.getElementById('map');
       if (hidden) {
@@ -440,33 +404,12 @@
       setMapUIHidden(!mapDiv.classList.contains('map-ui-hidden'));
     });
 
-    // Reset map view button logic
     document.getElementById('resetViewBtn').onclick = function() {
       map.setView(initialView.center, initialView.zoom);
-      localStorage.removeItem('nbMapView');
+      localStorage.removeItem(LS_KEY);
     };
-
-    // Create the custom pane BEFORE adding any boundary layers
-    map.createPane('nbBoundaryPane');
-    map.getPane('nbBoundaryPane').style.zIndex = 405;
-
-    // Add thick black NB boundary from NRCan service, no fill, only for New Brunswick
-    L.esri.featureLayer({
-      url: 'https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Provinces/MapServer/0',
-      where: "POLITICALDIV = 4",
-      pane: 'nbBoundaryPane',
-      style: function() {
-        return {
-          color: 'black',
-          weight: 5,
-          fill: false
-        };
-      },
-      interactive: false
-    }).addTo(map);
-
-    
   </script>
+
   <div style="position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000;">
     <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html"
        target="_blank"
@@ -476,10 +419,3 @@
   </div>
 </body>
 </html>
-
-
-
-
-
-
-
