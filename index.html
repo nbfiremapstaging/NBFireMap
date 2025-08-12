@@ -16,7 +16,7 @@
   <!-- ============================ CSS ============================ -->
   <style>
     :root {
-      /* Unified design tokens */
+      /* ✨ CHANGES: tighter, shared design tokens */
       --bg: #f7f8fc;
       --text: #0f172a;
       --muted: #5b6474;
@@ -74,17 +74,17 @@
       font-size: var(--fs-14);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      letter-spacing: 0.1px;
+      letter-spacing: 0.1px; /* ✨ CHANGES: subtle tracking for UI */
     }
 
     /* Leaflet containers (matchy controls) */
     .leaflet-control-layers-expanded { max-height: 320px; overflow-y: auto; }
     .leaflet-control-layers, .info.legend { transition: opacity 0.2s; backdrop-filter: blur(6px); }
-    .info.legend { bottom: 86px !important; } /* room for footer & summary btn */
-    .leaflet-top.leaflet-left { top: 52px !important; }   /* below reset */
-    .leaflet-top.leaflet-right { top: 72px !important; }  /* below toggle */
+    .info.legend { bottom: 86px !important; } /* make room for footer & summary btn */
+    .leaflet-top.leaflet-left { top: 52px !important; }   /* below reset button */
+    .leaflet-top.leaflet-right { top: 72px !important; }  /* below toggle button */
 
-    /* Unify Leaflet bars */
+    /* ✨ CHANGES: unify Leaflet bar look */
     .leaflet-bar a, .leaflet-bar a:hover {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -120,13 +120,13 @@
     .legend-box { padding: 12px 14px; }
     .legend-title { font-weight: 800; margin-bottom: 8px; font-size: var(--fs-14); letter-spacing: 0.2px; }
 
-    /* Map buttons */
+    /* Generic map buttons (unified) */
     .map-btn {
       position: absolute;
       z-index: 1001;
       background: var(--btn-bg);
       border: 1px solid var(--btn-border);
-      border-radius: 999px; /* pill */
+      border-radius: 999px; /* ✨ CHANGES: pill buttons */
       padding: 10px 14px;
       font-size: var(--fs-14);
       font-weight: 700;
@@ -143,19 +143,27 @@
     .reset-view-btn { top: 12px; left: 12px; z-index: 1002; }
     .map-btn .icon { width: 18px; height: 18px; display: inline-grid; place-items: center; }
 
-    /* Hide UI helper */
+    /* Hide UI helper class */
     .map-ui-hidden .leaflet-control-layers,
     .map-ui-hidden .info.legend { opacity: 0; pointer-events: none; }
 
     /* Tooltips (no bubble chrome) */
     .city-label-tooltip,
-    .perimeter-label-tooltip { background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    .perimeter-label-tooltip {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
     .city-label-tooltip::before,
     .perimeter-label-tooltip::before { display: none !important; }
 
     .city-label {
       font-size: 15px; font-weight: 800; color: #fff;
-      text-shadow: 0 0 2px rgba(0,0,0,0.7), 0 0 8px rgba(0,0,0,0.6), 1px 1px 0 rgba(0,0,0,0.9);
+      text-shadow:
+        0 0 2px rgba(0,0,0,0.7),
+        0 0 8px rgba(0,0,0,0.6),
+        1px 1px 0 rgba(0,0,0,0.9);
       letter-spacing: 0.2px;
     }
     .perimeter-label {
@@ -165,8 +173,10 @@
       backdrop-filter: blur(2px);
     }
 
-    /* Fire Summary */
-    .fire-summary-btn { position: fixed; left: 12px; bottom: 86px; z-index: 2001; }
+    /* Fire Summary panel */
+    .fire-summary-btn {
+      position: fixed; left: 12px; bottom: 86px; z-index: 2001;
+    }
     .fire-summary-overlay {
       position: fixed; inset: 0; display: none;
       align-items: start; justify-content: center; z-index: 3000;
@@ -181,8 +191,14 @@
       width: min(560px, calc(100% - 24px));
       color: var(--text);
     }
-    .fire-summary header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; gap: 8px; }
-    .fire-summary h2 { font-size: var(--fs-18); font-weight: 800; margin: 0; letter-spacing: 0.2px; }
+    .fire-summary header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 8px; gap: 8px;
+    }
+    .fire-summary h2 {
+      font-size: var(--fs-18); font-weight: 800; margin: 0;
+      letter-spacing: 0.2px;
+    }
     .fire-summary .body { padding: 0 16px 16px; line-height: 1.5; }
     .close-summary {
       background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
@@ -223,9 +239,11 @@
     .legend-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
     .legend-link { color: var(--link); text-decoration: none; font-weight: 700; }
     .legend-link:hover { text-decoration: underline; }
-    .legend-icon { width: 22px; height: 22px; display: inline-grid; place-items: center; }
+    .legend-icon {
+      width: 22px; height: 22px; display: inline-grid; place-items: center;
+    }
 
-    /* Unified map markers */
+    /* ✨ CHANGES: unified map markers */
     .marker-badge {
       width: 38px; height: 38px;
       border-radius: 999px;
@@ -236,46 +254,8 @@
     }
     .marker-badge i { font-size: 18px; color: var(--ring, #9aa0a6); }
 
-    /* ---------- Mobile layout fixes ---------- */
-    @media (max-width: 767px) {
-      /* Make the toggle a FAB in the bottom-right */
-      .map-toggle-btn {
-        top: auto !important;
-        right: 12px !important;
-        bottom: 12px !important;
-        left: auto !important;
-        z-index: 2002; /* above Leaflet controls */
-      }
-      /* Keep Reset at top-left, give it a touch more spacing */
-      .reset-view-btn {
-        top: 10px !important;
-        left: 10px !important;
-      }
-      /* Let Leaflet controls sit below the reset button */
-      .leaflet-top.leaflet-right {
-        top: 56px !important;
-        right: 8px !important;
-      }
-      .leaflet-top.leaflet-left {
-        top: 56px !important;
-        left: 8px !important;
-      }
-      /* Legend to bottom-left so it doesn't fight the FAB or footer */
-      .info.legend {
-        left: 12px !important;
-        right: auto !important;
-        bottom: 86px !important; /* clears footer + summary button */
-        max-width: min(88vw, 360px);
-      }
-      /* Layer panel: slightly narrower + taller, to avoid overflow */
-      .leaflet-control-layers-expanded { max-height: 55vh; }
-      .leaflet-control-layers {
-        margin-right: 4px;
-        margin-top: 6px;
-      }
-      /* Footer spacing stays, no overlap with FAB/legend */
-      .nb-footer { padding: 0 56px; }
-    }
+    /* VIIRS circle override (Leaflet circleMarkers read CSS vars fine) */
+    .viirs-dot { stroke: var(--viirs); fill: var(--viirs); }
   </style>
 </head>
 
@@ -381,7 +361,7 @@
     });
     map.on('moveend', () => saveView(map));
 
-    // Dedicated popup pane above EVERYTHING
+    // Create a dedicated popup pane that sits above EVERYTHING on the map
     map.createPane('alwaysOnTopPopup');
     map.getPane('alwaysOnTopPopup').style.zIndex = 9999;
 
@@ -417,7 +397,7 @@
     const nbActiveWildFires = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
       pointToLayer: (feature, latlng) => {
-        // Circular badge marker w/ status ring + flame icon
+        // ✨ CHANGES: new circular badge marker w/ status ring + flame icon
         const ring = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
         const icon = L.divIcon({
           className: 'fire-badge-icon',
@@ -547,7 +527,7 @@
       opacity: 0.7
     });
 
-    // Weather stations
+    // Weather stations (keep your arrow; unify readout chip)
     const weatherStations = L.esri.featureLayer({
       url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
       pointToLayer: (feature, latlng) => {
@@ -726,6 +706,7 @@
       div.innerHTML = `
         <div class="legend-title"><i class="fa-solid fa-map"></i> Legend</div>
 
+        <!-- ✨ CHANGES: icons match new marker badges -->
         <div class="legend-row">
           <span class="legend-icon">
             <span class="marker-badge" style="--ring:var(--oc); width:18px; height:18px; border-width:2px;">
