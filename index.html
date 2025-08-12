@@ -5,48 +5,149 @@
   <title>New Brunswick Wildfire Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet / Plugins -->
+  <!-- Fonts / Leaflet / Plugins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <!-- ============================ CSS ============================ -->
   <style>
+    :root {
+      /* ✨ CHANGES: tighter, shared design tokens */
+      --bg: #f7f8fc;
+      --text: #0f172a;
+      --muted: #5b6474;
+      --panel: rgba(255,255,255,0.85);
+      --panel-strong: #ffffff;
+      --border: #e6eaf1;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 10px 30px rgba(2, 8, 20, 0.08);
+      --shadow-soft: 0 6px 16px rgba(2, 8, 20, 0.06);
+      --btn-bg: #ffffff;
+      --btn-border: #d9dee6;
+      --btn-hover: #f2f4f7;
+      --link: #2563eb;
+      --focus: 0 0 0 3px rgba(37, 99, 235, 0.28);
+
+      /* Status colors */
+      --oc: #ef4444;   /* Out of Control */
+      --cont: #fb923c; /* Contained */
+      --uc: #facc15;   /* Under Control */
+      --pat: #22c55e;  /* Being Patrolled */
+
+      --viirs: #ffd666;
+      --perimeter: #ef4444;
+      --boundary: #0b0f19;
+
+      /* Type scale */
+      --fs-12: 12px;
+      --fs-14: 14px;
+      --fs-16: 16px;
+      --fs-18: 18px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0f19;
+        --text: #e5e7eb;
+        --muted: #98a2b3;
+        --panel: rgba(17, 24, 39, 0.8);
+        --panel-strong: #111827;
+        --border: #1f2937;
+        --btn-bg: #111827;
+        --btn-border: #374151;
+        --btn-hover: #1f2937;
+        --link: #60a5fa;
+        --boundary: #ffffff;
+      }
+    }
+
     /* Base layout */
     html, body, #map { height: 100%; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-size: var(--fs-14);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: 0.1px; /* ✨ CHANGES: subtle tracking for UI */
+    }
 
-    /* Layer control / legend */
-    .leaflet-control-layers-expanded { max-height: 300px; overflow-y: auto; }
-    .leaflet-control-layers, .info.legend { transition: opacity 0.2s; }
-    .info.legend { bottom: 70px !important; }
+    /* Leaflet containers (matchy controls) */
+    .leaflet-control-layers-expanded { max-height: 320px; overflow-y: auto; }
+    .leaflet-control-layers, .info.legend { transition: opacity 0.2s; backdrop-filter: blur(6px); }
+    .info.legend { bottom: 86px !important; } /* make room for footer & summary btn */
+    .leaflet-top.leaflet-left { top: 52px !important; }   /* below reset button */
+    .leaflet-top.leaflet-right { top: 72px !important; }  /* below toggle button */
 
-    /* Position tweaks so custom buttons don’t overlap native controls */
-    .leaflet-top.leaflet-left { top: 40px !important; }
-    .leaflet-top.leaflet-right { top: 60px !important; }
+    /* ✨ CHANGES: unify Leaflet bar look */
+    .leaflet-bar a, .leaflet-bar a:hover {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: var(--shadow-soft);
+    }
+    .leaflet-bar a {
+      width: 34px; height: 34px; line-height: 34px; font-size: 16px;
+    }
+    .leaflet-control-layers {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: var(--fs-14);
+      padding: 8px 10px;
+    }
+    .leaflet-control-attribution {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-soft);
+      padding: 4px 8px;
+    }
 
-    /* Generic map buttons */
+    /* Panels & legend */
+    .panel-box, .legend-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .legend-box { padding: 12px 14px; }
+    .legend-title { font-weight: 800; margin-bottom: 8px; font-size: var(--fs-14); letter-spacing: 0.2px; }
+
+    /* Generic map buttons (unified) */
     .map-btn {
       position: absolute;
       z-index: 1001;
-      background: #fff;
-      border: 1px solid #bbb;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-size: 15px;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 999px; /* ✨ CHANGES: pill buttons */
+      padding: 10px 14px;
+      font-size: var(--fs-14);
+      font-weight: 700;
+      color: var(--text);
       cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.13);
-      transition: background 0.2s;
+      box-shadow: var(--shadow);
+      transition: background 0.2s, transform 0.06s ease, box-shadow 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
     }
-    .map-btn:hover { background: #f0f0f0; }
+    .map-btn:hover { background: var(--btn-hover); box-shadow: 0 8px 22px rgba(2,8,20,0.08); }
+    .map-btn:active { transform: translateY(1px); }
+    .map-btn:focus-visible { outline: none; box-shadow: var(--focus); }
     .map-toggle-btn { top: 12px; right: 12px; }
     .reset-view-btn { top: 12px; left: 12px; z-index: 1002; }
+    .map-btn .icon { width: 18px; height: 18px; display: inline-grid; place-items: center; }
 
     /* Hide UI helper class */
     .map-ui-hidden .leaflet-control-layers,
     .map-ui-hidden .info.legend { opacity: 0; pointer-events: none; }
 
-    /* City/perimeter tooltips (no bubble chrome) */
+    /* Tooltips (no bubble chrome) */
     .city-label-tooltip,
     .perimeter-label-tooltip {
       background: none !important;
@@ -58,54 +159,67 @@
     .perimeter-label-tooltip::before { display: none !important; }
 
     .city-label {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 15px; font-weight: 700; color: #fff;
+      font-size: 15px; font-weight: 800; color: #fff;
       text-shadow:
-        -1px -1px 0 #000, 1px -1px 0 #000,
-        -1px  1px 0 #000, 1px  1px 0 #000;
+        0 0 2px rgba(0,0,0,0.7),
+        0 0 8px rgba(0,0,0,0.6),
+        1px 1px 0 rgba(0,0,0,0.9);
+      letter-spacing: 0.2px;
     }
     .perimeter-label {
-      font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 12px; font-weight: 800; pointer-events: none;
+      padding: 2px 6px; border-radius: 6px;
+      background: color-mix(in oklab, var(--perimeter) 12%, transparent);
+      backdrop-filter: blur(2px);
     }
 
     /* Fire Summary panel */
     .fire-summary-btn {
-      position: fixed;
-      left: 12px; bottom: 64px; z-index: 2001;
-      background: #fff; border: 1px solid #bbb; border-radius: 6px;
-      padding: 6px 12px; font: 15px 'Segoe UI', Arial, sans-serif;
-      cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      position: fixed; left: 12px; bottom: 86px; z-index: 2001;
     }
     .fire-summary-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.25);
-      display: none; align-items: start; justify-content: center;
-      z-index: 3000;
+      position: fixed; inset: 0; display: none;
+      align-items: start; justify-content: center; z-index: 3000;
+      background: rgba(0,0,0,0.25); backdrop-filter: blur(2px);
     }
     .fire-summary {
-      margin-top: 14px; background: #fff; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-      width: min(520px, calc(100% - 24px));
-      font: 14px 'Segoe UI', Arial, sans-serif; color: #111;
+      margin-top: 16px;
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: min(560px, calc(100% - 24px));
+      color: var(--text);
     }
     .fire-summary header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px 6px; font-weight: 800; font-size: 18px;
+      padding: 14px 16px 8px; gap: 8px;
     }
-    .fire-summary .body { padding: 0 14px 12px; }
+    .fire-summary h2 {
+      font-size: var(--fs-18); font-weight: 800; margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .fire-summary .body { padding: 0 16px 16px; line-height: 1.5; }
+    .close-summary {
+      background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+      border-radius: var(--radius-sm); padding: 8px 12px; cursor: pointer; font-weight: 700;
+      box-shadow: var(--shadow-soft);
+    }
+    .close-summary:hover { background: var(--btn-hover); }
+    .close-summary:focus-visible { outline: none; box-shadow: var(--focus); }
+
     .chip {
       display: inline-flex; align-items: center; gap: 8px;
-      background: #f6f6f6; border-radius: 999px; padding: 6px 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 10px;
       margin-right: 8px; margin-bottom: 8px; font-weight: 700;
+      box-shadow: var(--shadow-soft);
     }
     .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
     .summary-list { margin: 8px 0 0; padding-left: 20px; }
-    .summary-list a { color: #0066cc; text-decoration: underline; }
-    .close-summary {
-      background:#eee; border:1px solid #bbb; border-radius:6px;
-      padding:6px 10px; cursor:pointer; font: 14px 'Segoe UI', Arial, sans-serif;
-    }
+    .summary-list a { color: var(--link); text-decoration: none; font-weight: 700; }
+    .summary-list a:hover { text-decoration: underline; }
 
     /* Footer link */
     .nb-footer {
@@ -113,11 +227,35 @@
       text-align: center; z-index: 2000;
     }
     .nb-footer a {
-      background:#fff; border-radius:6px; padding:8px 18px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.13);
-      color:#0074d9; font-weight:bold; text-decoration:underline;
-      font-family:'Segoe UI',Arial,sans-serif;
+      background: var(--btn-bg); border: 1px solid var(--btn-border);
+      border-radius: 12px; padding: 10px 18px;
+      box-shadow: var(--shadow);
+      color: var(--link); font-weight: 800; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 10px;
     }
+    .nb-footer a:hover { background: var(--btn-hover); }
+
+    /* Legend rows */
+    .legend-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+    .legend-link { color: var(--link); text-decoration: none; font-weight: 700; }
+    .legend-link:hover { text-decoration: underline; }
+    .legend-icon {
+      width: 22px; height: 22px; display: inline-grid; place-items: center;
+    }
+
+    /* ✨ CHANGES: unified map markers */
+    .marker-badge {
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      display: grid; place-items: center;
+      background: var(--panel-strong);
+      border: 2.5px solid var(--ring, #9aa0a6);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    }
+    .marker-badge i { font-size: 18px; color: var(--ring, #9aa0a6); }
+
+    /* VIIRS circle override (Leaflet circleMarkers read CSS vars fine) */
+    .viirs-dot { stroke: var(--viirs); fill: var(--viirs); }
   </style>
 </head>
 
@@ -125,21 +263,29 @@
   <!-- ============================ HTML ============================ -->
   <div id="map" aria-label="Interactive wildfire map"></div>
 
-  <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false">
-    Show Legend &amp; Layers
+  <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show/Hide legend and layer list">
+    <span class="icon"><i class="fa-solid fa-layer-group"></i></span>
+    <span>Show Legend &amp; Layers</span>
   </button>
 
   <button id="resetViewBtn" class="map-btn reset-view-btn" type="button" title="Reset map view">
-    Reset Map View
+    <span class="icon"><i class="fa-solid fa-compass"></i></span>
+    <span>Reset Map View</span>
   </button>
 
   <!-- Fire summary trigger and overlay -->
-  <button id="fireSummaryBtn" class="fire-summary-btn" type="button">Fire Summary</button>
+  <button id="fireSummaryBtn" class="map-btn fire-summary-btn" type="button" title="Open summary">
+    <span class="icon"><i class="fa-solid fa-fire"></i></span>
+    <span>Fire Summary</span>
+  </button>
+
   <div id="fireSummaryOverlay" class="fire-summary-overlay" role="presentation">
-    <div class="fire-summary" role="dialog" aria-modal="true" aria-labelledby="fs-title">
+    <div class="fire-summary panel-box" role="dialog" aria-modal="true" aria-labelledby="fs-title">
       <header>
-        <div id="fs-title">New Brunswick Fire Summary</div>
-        <button id="fs-close" class="close-summary" type="button">Close</button>
+        <h2 id="fs-title">New Brunswick Fire Summary</h2>
+        <button id="fs-close" class="close-summary" type="button">
+          <span class="icon"><i class="fa-solid fa-xmark"></i></span> Close
+        </button>
       </header>
       <div id="fs-body" class="body"></div>
     </div>
@@ -147,6 +293,7 @@
 
   <div class="nb-footer">
     <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html" target="_blank" rel="noopener">
+      <i class="fa-solid fa-up-right-from-square"></i>
       NB Fire Watch &amp; Burn Restrictions
     </a>
   </div>
@@ -182,11 +329,11 @@
 
     const fireStatusColor = (label) => {
       switch (normalizeFireStatus(label)) {
-        case 'out of control': return 'red';
-        case 'contained':     return 'orange';
-        case 'under control': return 'yellow';
-        case 'being patrolled': return 'green';
-        default: return 'gray';
+        case 'out of control':  return getComputedStyle(document.documentElement).getPropertyValue('--oc').trim();
+        case 'contained':       return getComputedStyle(document.documentElement).getPropertyValue('--cont').trim();
+        case 'under control':   return getComputedStyle(document.documentElement).getPropertyValue('--uc').trim();
+        case 'being patrolled': return getComputedStyle(document.documentElement).getPropertyValue('--pat').trim();
+        default: return '#9aa0a6';
       }
     };
 
@@ -213,6 +360,10 @@
       maxBoundsViscosity: 0.5
     });
     map.on('moveend', () => saveView(map));
+
+    // Create a dedicated popup pane that sits above EVERYTHING on the map
+    map.createPane('alwaysOnTopPopup');
+    map.getPane('alwaysOnTopPopup').style.zIndex = 9999;
 
     // Panes
     map.createPane('viirsPane');       map.getPane('viirsPane').style.zIndex = 410;
@@ -246,18 +397,18 @@
     const nbActiveWildFires = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
       pointToLayer: (feature, latlng) => {
-        const color = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
+        // ✨ CHANGES: new circular badge marker w/ status ring + flame icon
+        const ring = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
         const icon = L.divIcon({
-          className: 'fire-triangle-icon',
+          className: 'fire-badge-icon',
           html: `
-            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
-              <svg width="32" height="32" viewBox="0 0 32 32" style="display:block;margin-top:4px;">
-                <polygon points="16,4 28,28 4,28" style="fill:${color};stroke:#222;stroke-width:2" />
-              </svg>
+            <div class="marker-badge" style="--ring:${ring}">
+              <i class="fa-solid fa-fire" aria-hidden="true"></i>
             </div>
           `,
-          iconSize: [44, 44],
-          iconAnchor: [22, 30]
+          iconSize: [38, 38],
+          iconAnchor: [19, 26],
+          popupAnchor: [0, -22]
         });
         return L.marker(latlng, { icon });
       },
@@ -270,23 +421,22 @@
         const statusColor = fireStatusColor(status);
 
         const popupHTML = `
-          <div style="font:14px 'Segoe UI',Arial,sans-serif;min-width:220px">
-            <div style="font-weight:800;font-size:16px;margin-bottom:6px">
-              ${p.FIRE_NAME || 'Unnamed Fire'}
-            </div>
+          <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
+            <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">${p.FIRE_NAME || 'Unnamed Fire'}</div>
             <div style="margin:6px 0 10px">
-              <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${statusColor};color:#111;font-weight:700">
+              <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);color:#111;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.12)">
+                <span class="dot" style="background:${statusColor}"></span>
                 ${status}
               </span>
             </div>
-            <div style="line-height:1.35">
+            <div>
               <div><b>Area:</b> ${numberFmt(sizeHa, 1)} ha</div>
               <div><b>Detected:</b> ${detected}</div>
               <div><b>Status updated:</b> ${statusDate}</div>
             </div>
           </div>
         `;
-        layer.bindPopup(popupHTML, { maxWidth: 320 });
+        layer.bindPopup(popupHTML, { maxWidth: 340, pane: 'alwaysOnTopPopup' });
 
         // Store by stable key
         const rawId = feature.id ?? p.OBJECTID ?? p.GlobalID ?? p.FIRE_ID ?? Math.random();
@@ -298,29 +448,23 @@
         let openT = null, closeT = null;
         const OPEN_DELAY = 150, CLOSE_DELAY = 60;
 
-        const clearTimers = () => {
-          if (openT) { clearTimeout(openT); openT = null; }
-          if (closeT) { clearTimeout(closeT); closeT = null; }
-        };
+        const clearTimers = () => { if (openT) { clearTimeout(openT); openT = null; } if (closeT) { clearTimeout(closeT); closeT = null; } };
 
         layer.on('mouseover', function () {
           if (clickedOpen) return;
           if (closeT) { clearTimeout(closeT); closeT = null; }
           if (!openT) openT = setTimeout(() => { openT = null; this.openPopup(); }, OPEN_DELAY);
         });
-
         layer.on('mouseout', function () {
           if (clickedOpen) return;
           if (openT) { clearTimeout(openT); openT = null; }
           if (!closeT) closeT = setTimeout(() => { closeT = null; this.closePopup(); }, CLOSE_DELAY);
         });
-
         layer.on('click', function () {
           clickedOpen = !clickedOpen;
           clearTimers();
           if (clickedOpen) this.openPopup(); else this.closePopup();
         });
-
         layer.on('remove', clearTimers);
       }
     }).addTo(map);
@@ -338,16 +482,16 @@
       url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/ArcGIS/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0',
       pane: 'viirsPane',
       pointToLayer: (_feature, latlng) =>
-        L.circleMarker(latlng, { radius: 5, color: '#ffe066', fillColor: '#ffe066', fillOpacity: 0.7 })
+        L.circleMarker(latlng, { radius: 5, color: 'var(--viirs)', fillColor: 'var(--viirs)', fillOpacity: 0.8 })
     }).addTo(map);
 
     // Fire perimeters + labels
-    const PERIMETER_COLOR = 'red';
+    const PERIMETER_COLOR = getComputedStyle(document.documentElement).getPropertyValue('--perimeter').trim();
     const perimeterLabelLayers = new Set();
 
     const activefires = L.esri.featureLayer({
       url: 'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
-      style: () => ({ color: PERIMETER_COLOR, weight: 1, fillOpacity: 0.20 }),
+      style: () => ({ color: PERIMETER_COLOR, weight: 1.2, fillOpacity: 0.18 }),
       onEachFeature: (feature, layer) => {
         const ha = feature?.properties?.AREA;
         const html = `<span class="perimeter-label" style="color:${PERIMETER_COLOR}">${numberFmt(ha, 1)} ha</span>`;
@@ -369,7 +513,7 @@
     // Crown lands (toggle visibility at low zoom)
     const nbCrownLands = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Crown_Lands/FeatureServer/0',
-      style: () => ({ color: 'purple', weight: 1, fillOpacity: 0.2 })
+      style: () => ({ color: '#a855f7', weight: 1, fillOpacity: 0.18 })
     });
 
     const updateCrownLandsVisibility = () => {
@@ -383,7 +527,7 @@
       opacity: 0.7
     });
 
-    // Weather stations
+    // Weather stations (keep your arrow; unify readout chip)
     const weatherStations = L.esri.featureLayer({
       url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
       pointToLayer: (feature, latlng) => {
@@ -397,18 +541,18 @@
           className: 'weather-arrow-icon',
           html: `
             <div style="display:flex;flex-direction:column;align-items:center;">
-              <svg width="38" height="38" style="transform:rotate(${windDir}deg);display:block;">
-                <polygon points="19,4 30,30 19,24 8,30" style="fill:#bbb;stroke:#111;stroke-width:2" />
+              <svg width="38" height="38" style="transform:rotate(${windDir}deg);display:block;filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));">
+                <polygon points="19,4 30,30 19,24 8,30" style="fill:#cbd5e1;stroke:#111827;stroke-width:2" />
               </svg>
-              <div style="font-size:13px;font-weight:bold;color:#222;background:rgba(255,255,255,0.85);border-radius:4px;padding:2px 6px;line-height:1.1;text-align:center;">
+              <div style="font-size:12px;font-weight:800;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:4px 8px;line-height:1.15;text-align:center;box-shadow:var(--shadow-soft)">
                 ${windSpeed !== undefined ? `${windSpeed}<span style="font-size:10px;"> km/h</span>` : ''}<br>
                 ${temp !== undefined ? `${temp}<span style="font-size:10px;">°C</span>` : ''}<br>
                 ${humidity !== undefined ? `${humidity}<span style="font-size:10px;">%</span>` : ''}
               </div>
             </div>
           `,
-          iconSize: [38, 54],
-          iconAnchor: [19, 32]
+          iconSize: [38, 58],
+          iconAnchor: [19, 34]
         });
         return L.marker(latlng, { icon });
       }
@@ -439,7 +583,7 @@
       url: 'https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Provinces/MapServer/0',
       where: "POLITICALDIV = 4",
       pane: 'nbBoundaryPane',
-      style: () => ({ color: 'black', weight: 5, fill: false }),
+      style: () => ({ color: getComputedStyle(document.documentElement).getPropertyValue('--boundary').trim(), weight: 5, fill: false }),
       interactive: false
     }).addTo(map);
 
@@ -452,14 +596,16 @@
     const planeMarkers = new Map();
 
     const makePlaneIcon = (headingDeg, callsign) => {
-      const ICON_OFFSET = -45; // tweak if emoji direction is off
+      const ICON_OFFSET = -45;
       const isWhitelisted = WHITELIST_CALLSIGNS.has(callsign);
       const extraStyle = isWhitelisted ? 'filter:hue-rotate(-90deg) saturate(5);' : '';
       return L.divIcon({
         className: 'plane-div-icon',
         html: `
           <div style="transform: rotate(${ICON_OFFSET}deg); transform-origin:center; display:inline-block;">
-            <div style="${extraStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block; font-size:26px;">✈️</div>
+            <div style="${extraStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block; font-size:26px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));">
+              ✈️
+            </div>
           </div>
         `,
         iconSize: [30, 46],
@@ -481,9 +627,9 @@
           pane: 'planesPane',
           keyboard: false,
           zIndexOffset: 10000
-        }).bindPopup(popupContent);
+        })
+        .bindPopup(popupContent, { pane: 'alwaysOnTopPopup' });
 
-        // hover-to-open, click-to-lock
         let clicked = false;
         m.on('mouseover', function () { if (!clicked) this.openPopup(); });
         m.on('mouseout',  function () { if (!clicked) this.closePopup(); });
@@ -536,7 +682,6 @@
     fetchOpenSkyStates();
     const OPEN_SKY_INTERVAL_MS = 250000;
     let planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS);
-
     planesLayer.on('add', () => { if (!planesTimer) planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS); });
     planesLayer.on('remove', () => { if (planesTimer) { clearInterval(planesTimer); planesTimer = null; } });
 
@@ -557,36 +702,64 @@
 
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = () => {
-      const div = L.DomUtil.create('div', 'info legend');
-      div.style.background = 'rgba(255,255,255,0.95)';
-      div.style.padding = '10px 14px';
-      div.style.borderRadius = '8px';
-      div.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+      const div = L.DomUtil.create('div', 'info legend legend-box');
       div.innerHTML = `
-        <b>Legend</b><br>
-        <div style="margin-bottom:8px;">
-          <svg width="24" height="24" style="vertical-align:middle;"><polygon points="12,3 22,21 2,21" style="fill:red;stroke:#222;stroke-width:2" /></svg><span style="margin-left:6px;">Out of Control Fire</span><br>
-          <svg width="24" height="24" style="vertical-align:middle;"><polygon points="12,3 22,21 2,21" style="fill:orange;stroke:#222;stroke-width:2" /></svg><span style="margin-left:6px;">Contained Fire</span><br>
-          <svg width="24" height="24" style="vertical-align:middle;"><polygon points="12,3 22,21 2,21" style="fill:yellow;stroke:#222;stroke-width:2" /></svg><span style="margin-left:6px;">Under Control Fire</span><br>
-          <svg width="24" height="24" style="vertical-align:middle;"><polygon points="12,3 22,21 2,21" style="fill:green;stroke:#222;stroke-width:2" /></svg><span style="margin-left:6px;">Being Patrolled Fire</span>
+        <div class="legend-title"><i class="fa-solid fa-map"></i> Legend</div>
+
+        <!-- ✨ CHANGES: icons match new marker badges -->
+        <div class="legend-row">
+          <span class="legend-icon">
+            <span class="marker-badge" style="--ring:var(--oc); width:18px; height:18px; border-width:2px;">
+              <i class="fa-solid fa-fire" style="font-size:12px;"></i>
+            </span>
+          </span>
+          <span>Out of Control Fire</span>
         </div>
-        <div style="margin-bottom:8px;">
-          <svg width="24" height="24" style="vertical-align:middle;"><polygon points="12,4 20,20 12,16 4,20" style="fill:#bbb;stroke:#111;stroke-width:2" /></svg>
-          <a href="https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a" target="_blank" rel="noopener" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">Weather Station Wind Direction</a><br>
-          <span style="display:inline-block;width:24px;"></span>
-          <span style="font-size:12px; font-weight:bold; white-space:nowrap;">12 <span style="font-size:10px;"> km/h</span>, 20<span style="font-size:10px;">°C</span>, 60<span style="font-size:10px;">%</span></span>
-          <span style="margin-left:6px;">Wind Speed, Temp, Humidity</span>
+        <div class="legend-row">
+          <span class="legend-icon">
+            <span class="marker-badge" style="--ring:var(--cont); width:18px; height:18px; border-width:2px;">
+              <i class="fa-solid fa-fire" style="font-size:12px;"></i>
+            </span>
+          </span>
+          <span>Contained Fire</span>
         </div>
-        <div>
-          <svg width="18" height="18" style="vertical-align:middle;"><circle cx="9" cy="9" r="6" fill="#ffe066" stroke="#ffe066" stroke-width="2"/></svg>
-          <a href="https://www.arcgis.com/home/item.html?id=dece90af1a0242dcbf0ca36d30276aa3" target="_blank" rel="noopener" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">VIIRS Hotspot</a>
+        <div class="legend-row">
+          <span class="legend-icon">
+            <span class="marker-badge" style="--ring:var(--uc); width:18px; height:18px; border-width:2px;">
+              <i class="fa-solid fa-fire" style="font-size:12px;"></i>
+            </span>
+          </span>
+          <span>Under Control Fire</span>
         </div>
-        <div>
-          <a href="https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer" target="_blank" rel="noopener" style="margin-left:6px; color:#0074d9; text-decoration:underline; font-weight:bold;">Sentinel-2C Imagery</a>
+        <div class="legend-row" style="margin-bottom:8px;">
+          <span class="legend-icon">
+            <span class="marker-badge" style="--ring:var(--pat); width:18px; height:18px; border-width:2px;">
+              <i class="fa-solid fa-fire" style="font-size:12px;"></i>
+            </span>
+          </span>
+          <span>Being Patrolled Fire</span>
         </div>
-        <div style="margin-top:12px; font-size:12px;">
-          Fires and Crown Land info are from
-          <a href="https://www.snb.ca/geonb1/e/dc/catalogue-E.asp" target="_blank" rel="noopener" style="color:#0074d9; text-decoration:underline; font-weight:bold;">GeoNB</a>
+
+        <div class="legend-row">
+          <i class="fa-solid fa-location-arrow legend-icon" style="transform:rotate(45deg);"></i>
+          <a class="legend-link" href="https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a" target="_blank" rel="noopener">Weather Station Wind</a>
+        </div>
+        <div class="legend-row" style="margin-left:32px;font-size:12px;">
+          <strong>12</strong> km/h,&nbsp;<strong>20</strong>°C,&nbsp;<strong>60</strong>%
+        </div>
+
+        <div class="legend-row" style="margin-top:6px;">
+          <i class="fa-solid fa-satellite legend-icon"></i>
+          <a class="legend-link" href="https://www.arcgis.com/home/item.html?id=dece90af1a0242dcbf0ca36d30276aa3" target="_blank" rel="noopener">VIIRS Hotspot</a>
+        </div>
+
+        <div class="legend-row" style="margin-top:8px;">
+          <i class="fa-solid fa-image legend-icon"></i>
+          <a class="legend-link" href="https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer" target="_blank" rel="noopener">Sentinel-2C Imagery</a>
+        </div>
+
+        <div style="margin-top:10px; font-size:12px; color: var(--muted);">
+          Fires &amp; Crown Land data: <a class="legend-link" href="https://www.snb.ca/geonb1/e/dc/catalogue-E.asp" target="_blank" rel="noopener">GeoNB</a>
         </div>
       `;
       return div;
@@ -599,11 +772,11 @@
       const btn = document.getElementById('mapToggleBtn');
       if (hidden) {
         mapDiv.classList.add('map-ui-hidden');
-        btn.innerText = 'Show Legend & Layers';
+        btn.querySelector('span:last-child').textContent = 'Show Legend & Layers';
         btn.setAttribute('aria-pressed', 'false');
       } else {
         mapDiv.classList.remove('map-ui-hidden');
-        btn.innerText = 'Hide Legend & Layers';
+        btn.querySelector('span:last-child').textContent = 'Hide Legend & Layers';
         btn.setAttribute('aria-pressed', 'true');
       }
     };
@@ -612,7 +785,7 @@
     // Button events
     document.getElementById('mapToggleBtn').addEventListener('click', () => {
       const hidden = document.getElementById('map').classList.contains('map-ui-hidden');
-      setMapUIHidden(hidden); // toggles text & state
+      setMapUIHidden(!hidden);
     });
     document.getElementById('resetViewBtn').addEventListener('click', () => {
       map.setView(INITIAL_VIEW.center, INITIAL_VIEW.zoom);
@@ -622,6 +795,11 @@
     // ---------- Fire Summary ----------
     const summaryOverlay = document.getElementById('fireSummaryOverlay');
     const summaryBody = document.getElementById('fs-body');
+
+    const chipHTML = (label, n) => {
+      const color = fireStatusColor(label);
+      return `<span class="chip"><span class="dot" style="background:${color}"></span>${label} <span style="font-weight:800;margin-left:6px;">${n}</span></span>`;
+    };
 
     const buildSummaryHTML = () => {
       const items = Array.from(fireStore.values());
@@ -644,17 +822,12 @@
         .sort((a, b) => (Number(b.props.FIRE_SIZE) || 0) - (Number(a.props.FIRE_SIZE) || 0))
         .slice(0, 5);
 
-      const chip = (label) => {
-        const color = fireStatusColor(label);
-        const key = normalizeFireStatus(label);
-        const n =
-          key === 'out of control' ? counts['out of control'] :
-          key === 'contained' ? counts['contained'] :
-          key === 'under control' ? counts['under control'] :
-          key === 'being patrolled' ? counts['being patrolled'] :
-          counts.other;
-        return `<span class="chip"><span class="dot" style="background:${color}"></span>${label} <span style="font-weight:700;margin-left:6px;">${n}</span></span>`;
-      };
+      const chips = [
+        ['Out of Control', counts['out of control']],
+        ['Contained', counts['contained']],
+        ['Under Control', counts['under control']],
+        ['Being Patrolled', counts['being patrolled']]
+      ].map(([label, n]) => chipHTML(label, n)).join('');
 
       const list = top5.map((it) => {
         const p = it.props || {};
@@ -664,17 +837,15 @@
       }).join('');
 
       return `
-        <div><b>Total area burned:</b> ${numberFmt(totalArea, 0)} ha</div>
-        <div style="margin-top:10px;"><b>Fires by status:</b></div>
-        <div style="margin-top:6px;">
-          ${chip('Out of Control')}
-          ${chip('Contained')}
-          ${chip('Being Patrolled')}
-          ${chip('Under Control')}
-        </div>
-        <div><b>Top 5 largest fires <span style="font-weight:400">(largest → smallest)</span></b></div>
+        <div style="font-weight:800;margin-bottom:6px">Total area burned: ${numberFmt(totalArea, 0)} ha</div>
+
+        <div style="margin:10px 0 6px;"><b>Fires by status</b></div>
+        <div>${chips}</div>
+
+        <div style="margin-top:8px;"><b>Top 5 largest fires <span style="font-weight:600;color:var(--muted)">(largest → smallest)</span></b></div>
         <ol class="summary-list" id="fs-top5">${list || '<li>No active fires</li>'}</ol>
-        <div style="margin-top:10px;font-size:12px;color:#666;">Source: NB Active Fires (Public_Fires/MapServer/0).</div>
+
+        <div style="margin-top:12px;font-size:12px;color:var(--muted);">Source: NB Active Fires (Public_Fires/MapServer/0).</div>
       `;
     };
 
