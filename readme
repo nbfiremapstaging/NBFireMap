@@ -1,6 +1,6 @@
 https://nbfiremap.github.io/NBFireMap/
 
-<picture>https://raw.githubusercontent.com/nbfiremap/NBFireMap/refs/heads/main/image.png</picture>
+<picture src='https://raw.githubusercontent.com/nbfiremap/NBFireMap/refs/heads/main/image.png'></picture>
 
 This map is provided for informational purposes only. While every effort has been made to ensure the accuracy of the information presented, errors or omissions may occur. The data displayed has not been created or verified by me and is sourced directly from the following external providers and updated on their scheduled:
 
