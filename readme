@@ -1,8 +1,6 @@
 https://nbfiremap.github.io/NBFireMap/
 
-<picture>
-<img src="https://raw.githubusercontent.com/nbfiremap/NBFireMap/refs/heads/main/image.png" alt="pic" />
-</picture>
+![alt text](https://raw.githubusercontent.com/nbfiremap/NBFireMap/refs/heads/main/image.png)
 
 <picture src='https://raw.githubusercontent.com/nbfiremap/NBFireMap/refs/heads/main/image.png'></picture>
 
