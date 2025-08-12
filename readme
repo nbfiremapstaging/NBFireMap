@@ -1,0 +1,17 @@
+This map is provided for informational purposes only. While every effort has been made to ensure the accuracy of the information presented, errors or omissions may occur. The data displayed has not been created or verified by me and is sourced directly from the following external providers:
+
+  NB Active Wildfires layer and Burn Ban layer sourced from https://nbdnr.maps.arcgis.com/
+
+  Weather Stations from https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a
+
+  VIIRS Hot Spots from https://www.arcgis.com/home/item.html?id=dece90af1a0242dcbf0ca36d30276aa3
+
+  Fire Perimeters from https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0
+
+  Aircraft locations from OpenSky API
+
+  NB Crown Lands from https://geonb.snb.ca/
+
+  Sentinel2C Imagery from https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer
+
+No guarantee is made as to the completeness, currency, or accuracy of this information. Users should verify all information independently before making decisions based on it. Use of this map constitutes acceptance of these terms.
