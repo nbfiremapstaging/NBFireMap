@@ -16,7 +16,6 @@
   <!-- ============================ CSS ============================ -->
   <style>
     :root {
-      /* ✨ CHANGES: tighter, shared design tokens */
       --bg: #f7f8fc;
       --text: #0f172a;
       --muted: #5b6474;
@@ -74,17 +73,17 @@
       font-size: var(--fs-14);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      letter-spacing: 0.1px; /* ✨ CHANGES: subtle tracking for UI */
+      letter-spacing: 0.1px;
     }
 
     /* Leaflet containers (matchy controls) */
     .leaflet-control-layers-expanded { max-height: 320px; overflow-y: auto; }
     .leaflet-control-layers, .info.legend { transition: opacity 0.2s; backdrop-filter: blur(6px); }
-    .info.legend { bottom: 86px !important; } /* make room for footer & summary btn */
-    .leaflet-top.leaflet-left { top: 52px !important; }   /* below reset button */
-    .leaflet-top.leaflet-right { top: 72px !important; }  /* below toggle button */
+    .info.legend { bottom: 86px !important; }
+    .leaflet-top.leaflet-left { top: 52px !important; }
+    .leaflet-top.leaflet-right { top: 72px !important; }
 
-    /* ✨ CHANGES: unify Leaflet bar look */
+    /* Unified Leaflet bar look */
     .leaflet-bar a, .leaflet-bar a:hover {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -101,6 +100,7 @@
       box-shadow: var(--shadow);
       font-size: var(--fs-14);
       padding: 8px 10px;
+      max-width: 280px;
     }
     .leaflet-control-attribution {
       background: var(--panel);
@@ -120,13 +120,13 @@
     .legend-box { padding: 12px 14px; }
     .legend-title { font-weight: 800; margin-bottom: 8px; font-size: var(--fs-14); letter-spacing: 0.2px; }
 
-    /* Generic map buttons (unified) */
+    /* Generic map buttons */
     .map-btn {
       position: absolute;
       z-index: 1001;
       background: var(--btn-bg);
       border: 1px solid var(--btn-border);
-      border-radius: 999px; /* ✨ CHANGES: pill buttons */
+      border-radius: 999px;
       padding: 10px 14px;
       font-size: var(--fs-14);
       font-weight: 700;
@@ -243,7 +243,7 @@
       width: 22px; height: 22px; display: inline-grid; place-items: center;
     }
 
-    /* ✨ CHANGES: unified map markers */
+    /* Unified map markers */
     .marker-badge {
       width: 38px; height: 38px;
       border-radius: 999px;
@@ -254,8 +254,29 @@
     }
     .marker-badge i { font-size: 18px; color: var(--ring, #9aa0a6); }
 
-    /* VIIRS circle override (Leaflet circleMarkers read CSS vars fine) */
+    /* VIIRS circle override */
     .viirs-dot { stroke: var(--viirs); fill: var(--viirs); }
+
+    /* ---------------- Mobile-only sizing for layers control + legend ---------------- */
+    @media (max-width: 767.98px) {
+      .leaflet-control-layers {
+        font-size: var(--fs-12);
+        padding: 6px 8px;
+        max-width: 220px;
+      }
+      .leaflet-control-layers-expanded {
+        max-height: 220px;
+      }
+      .info.legend.legend-box {
+        padding: 8px 10px;
+        font-size: var(--fs-12);
+        max-width: 220px;
+      }
+      .legend-title { font-size: var(--fs-12); margin-bottom: 6px; }
+      .legend-row { gap: 6px; margin: 4px 0; }
+      .legend-icon { width: 18px; height: 18px; }
+      .info.legend { bottom: 78px !important; } /* a tad tighter on mobile */
+    }
   </style>
 </head>
 
@@ -397,7 +418,6 @@
     const nbActiveWildFires = L.esri.featureLayer({
       url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
       pointToLayer: (feature, latlng) => {
-        // ✨ CHANGES: new circular badge marker w/ status ring + flame icon
         const ring = fireStatusColor(feature.properties.FIRE_STAT_DESC_E);
         const icon = L.divIcon({
           className: 'fire-badge-icon',
@@ -418,14 +438,14 @@
         const sizeHa = p.FIRE_SIZE;
         const detected = formatEsriDate(p.TIME_DETECTED);
         const statusDate = formatEsriDate(p.FIRE_STAT_DATE);
-        const statusColor = fireStatusColor(status);
+        const statusColorVal = fireStatusColor(status);
 
         const popupHTML = `
           <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
             <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">${p.FIRE_NAME || 'Unnamed Fire'}</div>
             <div style="margin:6px 0 10px">
               <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);color:#111;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.12)">
-                <span class="dot" style="background:${statusColor}"></span>
+                <span class="dot" style="background:${statusColorVal}"></span>
                 ${status}
               </span>
             </div>
@@ -438,7 +458,6 @@
         `;
         layer.bindPopup(popupHTML, { maxWidth: 340, pane: 'alwaysOnTopPopup' });
 
-        // Store by stable key
         const rawId = feature.id ?? p.OBJECTID ?? p.GlobalID ?? p.FIRE_ID ?? Math.random();
         const id = String(rawId);
         fireStore.set(id, { id, props: p, latlng: layer.getLatLng(), layer });
@@ -469,7 +488,6 @@
       }
     }).addTo(map);
 
-    // Keep store in sync as features are removed
     nbActiveWildFires.on('removefeature', (e) => {
       const p = (e.feature && e.feature.properties) || {};
       const id = String(e.feature && (e.feature.id ?? p.OBJECTID ?? p.GlobalID ?? p.FIRE_ID));
@@ -527,7 +545,7 @@
       opacity: 0.7
     });
 
-    // Weather stations (keep your arrow; unify readout chip)
+    // Weather stations
     const weatherStations = L.esri.featureLayer({
       url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
       pointToLayer: (feature, latlng) => {
@@ -587,12 +605,13 @@
       interactive: false
     }).addTo(map);
 
-    // ---------- OpenSky planes ----------
+    // ---------- OpenSky planes (OFF by default) ----------
     const OPEN_SKY_URL = "https://opensky-network.org/api/states/all";
     const PROXY_URL = ""; // if you need one, set it here
     const WHITELIST_CALLSIGNS = window.WHITELIST_CALLSIGNS || new Set();
 
-    const planesLayer = L.layerGroup().addTo(map);
+    // Not added to map initially -> checkbox is unchecked by default
+    const planesLayer = L.layerGroup();
     const planeMarkers = new Map();
 
     const makePlaneIcon = (headingDeg, callsign) => {
@@ -679,11 +698,16 @@
       }
     }
 
-    fetchOpenSkyStates();
+    // Only poll when the layer is visible
     const OPEN_SKY_INTERVAL_MS = 250000;
-    let planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS);
-    planesLayer.on('add', () => { if (!planesTimer) planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS); });
-    planesLayer.on('remove', () => { if (planesTimer) { clearInterval(planesTimer); planesTimer = null; } });
+    let planesTimer = null;
+    planesLayer.on('add', () => {
+      fetchOpenSkyStates();
+      if (!planesTimer) planesTimer = setInterval(fetchOpenSkyStates, OPEN_SKY_INTERVAL_MS);
+    });
+    planesLayer.on('remove', () => {
+      if (planesTimer) { clearInterval(planesTimer); planesTimer = null; }
+    });
 
     // ---------- Controls & Legend ----------
     const overlays = {
@@ -691,7 +715,7 @@
       "Weather Stations": weatherStations,
       "VIIRS Hotspots": viirsHotspots,
       "Fire Perimeters": activefires,
-      "Aircraft": planesLayer,
+      "Aircraft": planesLayer,                 // OFF by default (not added to map)
       "Major Cities & Towns": cityMarkers,
       "NB Crown Lands (zoom in to view)": nbCrownLands,
       "NB Burn Bans": nbBurnBans,
@@ -706,7 +730,6 @@
       div.innerHTML = `
         <div class="legend-title"><i class="fa-solid fa-map"></i> Legend</div>
 
-        <!-- ✨ CHANGES: icons match new marker badges -->
         <div class="legend-row">
           <span class="legend-icon">
             <span class="marker-badge" style="--ring:var(--oc); width:18px; height:18px; border-width:2px;">
@@ -813,7 +836,7 @@
         const sz = Number(p.FIRE_SIZE);
         if (isFinite(sz)) totalArea += sz;
 
-        const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
+      const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
         if (counts.hasOwnProperty(key)) counts[key]++; else counts.other++;
       });
 
