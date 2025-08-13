@@ -837,6 +837,7 @@
           .featureLayer({
             url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/ArcGIS/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0',
             pane: 'viirsPane',
+            refreshInterval: 1,
             pointToLayer: (_f, latlng) =>
               L.circleMarker(latlng, {
                 radius: 5,
@@ -853,6 +854,7 @@
           .featureLayer({
             url: 'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
             pane: 'perimetersPane',
+            refreshInterval: 1,
             style: () => ({ color: PERIMETER_COLOR, weight: 1.2, fillOpacity: 0.18 }),
             onEachFeature: (feature, layer) => {
               const ha = feature?.properties?.AREA;
@@ -897,6 +899,7 @@
         const nbBurnBans = L.esri.dynamicMapLayer({
           url: 'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
           opacity: 0.7,
+          refreshInterval: 1,
           pane: 'perimetersPane'
         });
 
@@ -904,6 +907,7 @@
           .featureLayer({
             url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
             pane: 'weatherPane',
+            refreshInterval: 1,
             pointToLayer: (feature, latlng) => {
               const p = feature.properties || {};
               const windDir = p.WindDirection || 0;
@@ -962,13 +966,21 @@
             ['Moncton', 46.0878, -64.7782],
             ['Bathurst', 47.6186, -65.6517],
             ['Miramichi', 47.0281, -65.5019],
-            ['Edmundston', 47.373, -68.3251],
+            ['Edmundston', 47.3730, -68.3251],
             ['Campbellton', 48.0075, -66.6731],
             ['Dieppe', 46.0842, -64.6877],
             ['Riverview', 46.0617, -64.8052],
             ['Quispamsis', 45.4319, -65.9469],
             ['Oromocto', 45.8491, -66.4828],
-            ['Woodstock', 46.1527, -67.6016]
+            ['Woodstock', 46.1527, -67.6016],
+            ['Grand Falls', 47.0469, -67.7394],
+            ['Shediac', 46.2197, -64.5403],
+            ['Tracadie', 47.5081, -64.9117],
+            ['St. Stephen', 45.1942, -67.2756],
+            ['Shippagan', 47.7400, -64.7078],
+            ['Caraquet', 47.7943, -64.9386],
+            ['Bouctouche', 46.4711, -64.7400],
+            ['Sussex', 45.7221, -65.5060]
           ].map(([name, lat, lng]) =>
             L.marker([lat, lng], {
               icon: L.divIcon({ html: '', iconSize: [0, 0] }),
@@ -1117,6 +1129,7 @@
               transparent: true,
               version: '1.1.1',
               opacity: 0.4,
+              refreshInterval: 1,
               pane: 'perimetersPane',
               attribution: 'CWFIS © Natural Resources Canada'
             }
@@ -1126,13 +1139,14 @@
         const smokeLayer = L.esri.imageMapLayer({
           url: 'https://enterpriseim.esriservices.ca/server/rest/services/Hosted/Aug12/ImageServer',
           opacity: 0.5,
+          refreshInterval: 1,
           pane: 'sentinelPane'
         });
 
         const aqiLayer = L.esri.featureLayer({
           url: 'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1',
           pane: 'aqiPane',
-          refreshInterval: 2, // minutes
+          refreshInterval: 1, // minutes
           pointToLayer: (feature, latlng) => {
             const p = feature.properties || {};
             const raw = p.aqhi ?? p.aqhi_round;
@@ -1173,7 +1187,7 @@
         // NOAA base reflectivity ImageServer (auto-refresh every 2 minutes)
         const noaaRadar = L.esri.imageMapLayer({
           url: 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
-          opacity: 0.3, // 30%
+          opacity: 0.8, // 30%
           pane: 'radarPane',
           refreshInterval: 2 // minutes
         });
@@ -1184,7 +1198,7 @@
           version: '1.3.0',
           format: 'image/png',
           transparent: true,
-          opacity: 0.4,
+          opacity: 1,
           pane: 'lightningPane'
         });
 
@@ -1218,7 +1232,7 @@
           'Fire Perimeters': activefires,
           Aircraft: planesLayer,
           'Major Cities & Towns': cityMarkers,
-          'NB Crown Lands': nbCrownLands,
+          //'NB Crown Lands': nbCrownLands,
           'NB Burn Bans': nbBurnBans,
           'AQHI Risk': aqiLayer,
           'Weather Radar': noaaRadar,
@@ -1259,9 +1273,9 @@
               '<span class="icons-pack"><i class="fa-solid fa-ban legend-icon"></i></span>',
             'AQHI Risk':
               '<span class="icons-pack"><i class="fa-solid fa-wind legend-icon"></i></span>',
-            'Weather Radar (NOAA)':
-              '<span class="icons-pack"><i class="fa-solid fa-radar legend-icon"></i></span>',
-            'Lightning Density (GeoMet)':
+            'Weather Radar':
+              '<span class="icons-pack"><i class="fa-solid fa-broadcast-tower legend-icon"></i></span>',
+            'Lightning Density':
               '<span class="icons-pack"><i class="fa-solid fa-bolt legend-icon"></i></span>',
             Smoke:
               '<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>',
