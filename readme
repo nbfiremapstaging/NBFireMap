@@ -1,19 +1,71 @@
-https://nbfiremap.github.io/NBFireMap/
+# 🗺️ New Brunswick Wildfire Map
 
-This map is provided for informational purposes only. While every effort has been made to ensure the accuracy of the information presented, errors or omissions may occur. The data displayed has not been created or verified by me and is sourced directly from the following external providers and updated on their scheduled:
+An interactive Leaflet + Esri web map that displays live wildfire status, perimeters, weather stations, air quality (AQHI), burn bans, smoke plumes, and more — all focused on the province of New Brunswick, Canada.
 
-  NB Active Wildfires layer and Burn Ban layer sourced from https://nbdnr.maps.arcgis.com/
+---
 
-  Weather Stations from https://esricanada.maps.arcgis.com/home/item.html?id=38406bada3104e258fc8b42a2a96581a
+## 📸 Screenshots
 
-  VIIRS Hot Spots from https://www.arcgis.com/home/item.html?id=dece90af1a0242dcbf0ca36d30276aa3
+> _Replace the placeholder image URLs below with your own._
 
-  Fire Perimeters from https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0
+| Desktop View | Mobile View |
+|--------------|-------------|
+| ![Desktop Screenshot](INSERT-DESKTOP-SCREENSHOT-URL) | ![Mobile Screenshot](INSERT-MOBILE-SCREENSHOT-URL) |
 
-  Aircraft locations from OpenSky API
+---
 
-  NB Crown Lands from https://geonb.snb.ca/
+## ✨ Features
 
-  Sentinel2C Imagery from https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer
+- **Live wildfire locations** from NB ERD Public Fires layer.
+- **Status-based fire icons** (Out of Control, Contained, Under Control, Being Patrolled).
+- **Active wildfire perimeters** with area labels (zoom-dependent visibility).
+- **Weather station markers** with wind direction, speed, temperature, and humidity.
+- **AQHI (Air Quality Health Index)** stations with color-coded risk categories.
+- **VIIRS satellite hotspots** from NASA FIRMS.
+- **Smoke plume imagery**.
+- **Crown lands boundaries** (visible only when zoomed in).
+- **Burn ban status** from NB burn categories service.
+- **Aircraft tracking** via OpenSky Network (with whitelist highlighting).
+- **Fire risk map** from CWFIS (Canadian Wildland Fire Information System).
+- **Sentinel-2C imagery** overlay.
+- **City labels** for major NB communities.
+- **Responsive design** with simplified mobile UI.
 
-No guarantee is made as to the completeness, currency, or accuracy of this information. Users should verify all information independently before making decisions based on it. Use of this map constitutes acceptance of these terms.
+---
+
+## 🔧 Technology Stack
+
+- [Leaflet](https://leafletjs.com/) — base mapping library
+- [Esri Leaflet](https://esri.github.io/esri-leaflet/) & [Esri Leaflet Image](https://esri.github.io/esri-leaflet/api-reference/esri-leaflet-image.html) — ArcGIS service integration
+- [Font Awesome](https://fontawesome.com/) — icons
+- [OpenSky Network API](https://opensky-network.org/) — aircraft positions
+- CSS custom properties for theme colors & layout
+
+---
+
+## 📡 Data Sources
+
+| Layer / Feature                | Source & Link |
+|--------------------------------|---------------|
+| **NB Active Wild Fires**       | [GNB ArcGIS Public Fires](https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0) |
+| **Weather Stations**           | [Environment Canada NB Stations](https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0) |
+| **AQHI**                       | [AQHI Stations Observations Realtime](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1) |
+| **Fire Perimeters**            | [Active Wildfire Perimeters in Canada (View)](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0) |
+| **Crown Lands**                 | [GNB Open Data Crown Lands](https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Crown_Lands/FeatureServer/0) |
+| **Burn Bans**                   | [GNB Burn Categories](https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer) |
+| **VIIRS Hotspots**              | [NASA FIRMS VIIRS Fire Activity](https://firms.modaps.eosdis.nasa.gov/) via ArcGIS |
+| **Smoke Imagery**               | [ESRI Hosted ImageServer](https://enterpriseim.esriservices.ca/server/rest/services/Hosted/Aug12/ImageServer) |
+| **Fire Risk Map**               | [CWFIS Geoserver WMS](https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms) |
+| **Sentinel-2C Imagery**         | [Sentinel-2 ArcGIS ImageServer](https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer) |
+| **Aircraft**                    | [OpenSky Network API](https://opensky-network.org/api/states/all) |
+| **NB Boundary**                 | [Provinces and Territories of Canada Layer](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0) |
+| **City Locations**              | Static in-code coordinates |
+
+---
+
+## 🚀 Getting Started
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/nb-wildfire-map.git
+   cd nb-wildfire-map
