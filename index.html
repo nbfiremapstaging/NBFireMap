@@ -466,6 +466,39 @@
         align-items: center;
         gap: 10px;
       }
+
+      /* --- Wind arrow bead animation --- */
+@keyframes windDots {
+  0%   { transform: translateY(18px); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(-18px); opacity: 0; }
+}
+.wind-dots {
+  position: absolute;
+  top: 6px;           /* aligns with the arrow shaft area */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;         /* shaft width for dots to “ride” on */
+  height: 28px;       /* travel distance */
+  pointer-events: none;
+}
+.wind-dots .dot {
+  position: absolute;
+  left: 1px;          /* center within the 8px lane */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;   /* white dots */
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.45));
+  animation: windDots var(--spd, 1.6s) linear infinite;
+}
+.wind-dots .dot:nth-child(2) { animation-delay: calc(var(--spd, 1.6s) * .20); }
+.wind-dots .dot:nth-child(3) { animation-delay: calc(var(--spd, 1.6s) * .40); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wind-dots .dot { animation: none; }
+}
+
     </style>
   </head>
   <body>
@@ -904,59 +937,60 @@
         });
 
         const weatherStations = L.esri
-          .featureLayer({
-            url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
-            pane: 'weatherPane',
-            refreshInterval: 1,
-            pointToLayer: (feature, latlng) => {
-              const p = feature.properties || {};
-              const windDir = p.WindDirection || 0;
-              const windSpeed = p.WindSpeed_kmh;
-              const temp = p.Temperature_C;
-              const humidity = p.Humidity_Percent;
+  .featureLayer({
+    url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
+    pane: 'weatherPane',
+    refreshInterval: 1,
+    pointToLayer: (feature, latlng) => {
+      const p = feature.properties || {};
+      const windDir = Number(p.WindDirection) || 0;      // degrees (arrow is rotated to match)
+      const windSpeed = Number(p.WindSpeed_kmh);         // km/h
+      const temp = p.Temperature_C;
+      const humidity = p.Humidity_Percent;
 
-              const icon = L.divIcon({
-                className: 'weather-arrow-icon',
-                html: `
-                  <div style="display:flex;flex-direction:column;align-items:center;">
-                    <svg
-                      width="38"
-                      height="38"
-                      style="transform:rotate(${windDir}deg);display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));"
-                    >
-                      <polygon
-                        points="19,4 30,30 19,24 8,30"
-                        style="fill:#cbd5e1;stroke:#111827;stroke-width:2"
-                      />
-                    </svg>
-                    <div
-                      style="font-size:12px;font-weight:800;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:4px 8px;line-height:1.15;text-align:center;box-shadow:var(--shadow-soft)"
-                    >
-                      ${
-                        windSpeed != null
-                          ? `${windSpeed}<span style="font-size:10px;"> km/h</span>`
-                          : ''
-                      }<br />
-                      ${
-                        temp != null
-                          ? `${temp}<span style="font-size:10px;">°C</span>`
-                          : ''
-                      }<br />
-                      ${
-                        humidity != null
-                          ? `${humidity}<span style="font-size:10px;">%</span>`
-                          : ''
-                      }
-                    </div>
-                  </div>`,
-                iconSize: [38, 58],
-                iconAnchor: [19, 34]
-              });
+      // Map speed -> animation duration (seconds). Faster wind = shorter duration.
+      // 0 km/h ≈ 3.5s, 80+ km/h ≈ 0.6s (clamped).
+      const clamped = Math.max(0, Math.min(80, isFinite(windSpeed) ? windSpeed : 0));
+      const duration = Math.max(0.6, 3.5 - clamped * 0.035).toFixed(2);
 
-              return L.marker(latlng, { icon });
-            }
-          })
-          .addTo(map);
+      const icon = L.divIcon({
+        className: 'weather-arrow-icon',
+        html: `
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="position:relative; display:block; transform:rotate(${windDir}deg); filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));">
+              <!-- Arrow -->
+              <svg width="38" height="38" aria-hidden="true">
+                <polygon
+                  points="19,4 30,30 19,24 8,30"
+                  style="fill:#cbd5e1;stroke:#111827;stroke-width:2"
+                />
+              </svg>
+
+              <!-- Moving beads (follow arrow direction due to container rotation) -->
+              <div class="wind-dots" style="--spd:${duration}s">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+
+            <div
+              style="font-size:12px;font-weight:800;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:4px 8px;line-height:1.15;text-align:center;box-shadow:var(--shadow-soft)"
+            >
+              ${isFinite(windSpeed) ? `${windSpeed}<span style="font-size:10px;"> km/h</span>` : ''}<br />
+              ${temp != null ? `${temp}<span style="font-size:10px;">°C</span>` : ''}<br />
+              ${humidity != null ? `${humidity}<span style="font-size:10px;">%</span>` : ''}
+            </div>
+          </div>`,
+        iconSize: [38, 58],
+        iconAnchor: [19, 34]
+      });
+
+      return L.marker(latlng, { icon });
+    }
+  })
+  .addTo(map);
+
 
         // Cities (labels only)
         const cityMarkers = L.layerGroup(
