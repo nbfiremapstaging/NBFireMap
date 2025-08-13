@@ -688,6 +688,7 @@
           ['sentinelPane', 400],
           ['nbBoundaryPane', 405],
           ['perimetersPane', 412],
+          ['radarPane', 413], 
           ['viirsPane', 414],
           ['weatherPane', 415],
           ['aqiPane', 416],
@@ -857,6 +858,13 @@
           .addTo(map);
 
         const perimeterLabelLayers = new Set();
+
+        const noaaRadar = L.esri.imageMapLayer({
+          url: 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
+          opacity: 0.7,
+          pane: 'radarPane'
+          });
+
 
         const activefires = L.esri
           .featureLayer({
@@ -1211,6 +1219,7 @@
           'NB Crown Lands': nbCrownLands,
           'NB Burn Bans': nbBurnBans,
           'AQHI Risk': aqiLayer,
+          'Weather Radar': noaaRadar,
           Smoke: smokeLayer,
           'Fire Risk': fireRiskGroup,
           'Sentinel-2C Imagery': sentinel2c
@@ -1247,6 +1256,8 @@
               '<span class="icons-pack"><i class="fa-solid fa-ban legend-icon"></i></span>',
             'AQHI Risk':
               '<span class="icons-pack"><i class="fa-solid fa-wind legend-icon"></i></span>',
+            'Weather Radar (NOAA)':
+              '<span class="icons-pack"><i class="fa-solid fa-radar legend-icon"></i></span>',
             Smoke:
               '<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>',
             'Fire Risk':
