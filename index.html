@@ -303,7 +303,24 @@
     const OPEN_SKY_URL="https://opensky-network.org/api/states/all";
     const WHITELIST_CALLSIGNS=window.WHITELIST_CALLSIGNS||new Set();
     const planesLayer=L.layerGroup(); const planeMarkers=new Map();
-    const makePlaneIcon=(heading,callsign)=>{const ICON_OFFSET=-45;const wl=WHITELIST_CALLSIGNS.has(callsign);const extra=wl?'filter:hue-rotate(-90deg) saturate(5);':'';return L.divIcon({className:'plane-div-icon',html:`<div style="transform:rotate(${ICON_OFFSET}deg)"><div style="${extra} transform:rotate(${Number.isFinite(heading)?heading:0}deg);font-size:26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));">✈️</div></div>`,iconSize:[30,46],iconAnchor:[15,23]})};
+    const makePlaneIcon = (heading, callsign) => {
+  const ICON_OFFSET = -45;
+  const wl = (window.WHITELIST_CALLSIGNS || new Set()).has(callsign);
+  // build a single filter chain so it doesn't get overwritten
+  const baseShadow = 'drop-shadow(0 2px 2px rgba(0,0,0,.25))';
+  const filterChain = wl ? `hue-rotate(-90deg) saturate(5) ${baseShadow}` : baseShadow;
+
+  const rotate = Number.isFinite(heading) ? heading : 0;
+  return L.divIcon({
+    className: 'plane-div-icon',
+    html: `
+      <div style="transform:rotate(${ICON_OFFSET}deg);transform-origin:center;display:inline-block;">
+        <div style="transform:rotate(${rotate}deg);font-size:26px;filter:${filterChain}">✈️</div>
+      </div>`,
+    iconSize: [30, 46],
+    iconAnchor: [15, 23]
+  });
+};
     const upsertPlane=(id,lat,lon,hdg,callsign,vel)=>{let m=planeMarkers.get(id);const html=`<b>${callsign||'Unknown'}</b><br>Heading: ${Number.isFinite(hdg)?Math.round(hdg):'—'}°<br>Speed: ${vel!=null?Math.round(vel*1.94384):'—'} kt`; if(!m){m=L.marker([lat,lon],{icon:makePlaneIcon(hdg,callsign),pane:'planesPane',keyboard:false,zIndexOffset:10000}).bindPopup(html,{pane:'alwaysOnTopPopup'});let clicked=false;m.on('mouseover',function(){if(!clicked)this.openPopup()});m.on('mouseout',function(){if(!clicked)this.closePopup()});m.on('click',function(){clicked=!clicked;clicked?this.openPopup():this.closePopup()});m.addTo(planesLayer);planeMarkers.set(id,m)}else{m.setLatLng([lat,lon]);m.setIcon(makePlaneIcon(hdg,callsign));m.setPopupContent(html)}};
     const pruneMissing=(seen)=>{for(const[k,m]of planeMarkers.entries()){if(!seen.has(k)){planesLayer.removeLayer(m);planeMarkers.delete(k)}}};
     async function fetchOpenSky(){ try{ const [lamin,lomin]=NB_BOUNDS[0], [lamax,lomax]=NB_BOUNDS[1]; const r=await fetch(`${OPEN_SKY_URL}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`); if(!r.ok) throw new Error(r.statusText); const data=await r.json(); const states=Array.isArray(data.states)?data.states:[]; const seen=new Set(); for(const s of states){const icao24=s[0]; const callsign=(s[1]||'').trim().toUpperCase(); const lon=s[5],lat=s[6],vel=s[9],hdg=s[10]; if(!icao24||lat==null||lon==null) continue; seen.add(icao24); upsertPlane(icao24,lat,lon,hdg,callsign,vel)} pruneMissing(seen); }catch(e){ console.warn('OpenSky fetch failed:',e); } }
