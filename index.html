@@ -53,9 +53,6 @@
       --fs-18: 18px;
     }
 
-    /* NOTE: dark-mode override removed to keep light theme everywhere
-    @media (prefers-color-scheme: dark) { ... } */
-
     /* Base layout */
     html, body, #map { height: 100%; margin: 0; padding: 0; }
     body {
@@ -240,6 +237,18 @@
     /* VIIRS circle override */
     .viirs-dot { stroke: var(--viirs); fill: var(--viirs); }
 
+    /* Scrollable list inside summary without changing the popup size */
+    .fs-scroll {
+      max-height: 260px;
+      overflow-y: auto;
+      margin-top: 6px;
+    }
+    .fs-meta {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
     /* ---------------- Mobile-only sizing for layers control + legend ---------------- */
     @media (max-width: 767.98px) {
       .leaflet-control-layers { font-size: var(--fs-12); padding: 6px 8px; max-width: 220px; }
@@ -344,6 +353,23 @@
     const numberFmt = (n, d = 1) =>
       (n == null || isNaN(n)) ? '—' : Number(n).toLocaleString(undefined, { maximumFractionDigits: d });
 
+    // ---- Atlantic Time helpers (for "new today") ----
+    const ATLANTIC_TZ = 'America/Moncton';
+    const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
+      if (ms == null) return null;
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit'
+      });
+      const parts = fmt.formatToParts(new Date(ms));
+      const get = k => Number(parts.find(p => p.type === k)?.value);
+      return { y: get('year'), m: get('month'), d: get('day') };
+    };
+    const isSameYMDInTz = (aMs, bMs, tz = ATLANTIC_TZ) => {
+      if (aMs == null || bMs == null) return false;
+      const a = ymdInTz(aMs, tz), b = ymdInTz(bMs, tz);
+      return a && b && a.y === b.y && a.m === b.m && a.d === b.d;
+    };
+
     // ---------- Map init ----------
     const restored = getSavedView();
     const map = L.map('map', {
@@ -395,9 +421,7 @@
         const icon = L.divIcon({
           className: 'fire-badge-icon',
           html: `
-            <div class="marker-badge" style="--ring:${ring}">
-              <i class="fa-solid fa-fire" aria-hidden="true"></i>
-            </div>
+            <div class="marker-badge" style="--ring:${ring}"><i class="fa-solid fa-fire" aria-hidden="true"></i></div>
           `,
           iconSize: [38, 38],
           iconAnchor: [19, 26],
@@ -583,7 +607,6 @@
     const PROXY_URL = ""; // if you need one, set it here
     const WHITELIST_CALLSIGNS = window.WHITELIST_CALLSIGNS || new Set();
 
-    // Not added to map initially -> checkbox is unchecked by default
     const planesLayer = L.layerGroup();
     const planeMarkers = new Map();
 
@@ -595,9 +618,7 @@
         className: 'plane-div-icon',
         html: `
           <div style="transform: rotate(${ICON_OFFSET}deg); transform-origin:center; display:inline-block;">
-            <div style="${extraStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block; font-size:26px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));">
-              ✈️
-            </div>
+            <div style="${extraStyle} transform: rotate(${Number.isFinite(headingDeg) ? headingDeg : 0}deg); display:block; font-size:26px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));">✈️</div>
           </div>
         `,
         iconSize: [30, 46],
@@ -671,7 +692,6 @@
       }
     }
 
-    // Only poll when the layer is visible
     const OPEN_SKY_INTERVAL_MS = 250000;
     let planesTimer = null;
     planesLayer.on('add', () => {
@@ -688,7 +708,7 @@
       "Weather Stations": weatherStations,
       "VIIRS Hotspots": viirsHotspots,
       "Fire Perimeters": activefires,
-      "Aircraft": planesLayer,                 // OFF by default (not added to map)
+      "Aircraft": planesLayer,
       "Major Cities & Towns": cityMarkers,
       "NB Crown Lands (zoom in to view)": nbCrownLands,
       "NB Burn Bans": nbBurnBans,
@@ -799,10 +819,16 @@
 
     const buildSummaryHTML = () => {
       const items = Array.from(fireStore.values());
+      const nowMs = Date.now();
+
+      // Totals by status + total area
       let totalArea = 0;
       const counts = {
         'out of control': 0, 'contained': 0, 'under control': 0, 'being patrolled': 0, 'other': 0
       };
+
+      // “New today” (Atlantic time) based on TIME_DETECTED
+      let newToday = 0;
 
       items.forEach((it) => {
         const p = it.props || {};
@@ -811,12 +837,10 @@
 
         const key = normalizeFireStatus(p.FIRE_STAT_DESC_E);
         if (counts.hasOwnProperty(key)) counts[key]++; else counts.other++;
-      });
 
-      const top5 = items
-        .slice()
-        .sort((a, b) => (Number(b.props.FIRE_SIZE) || 0) - (Number(a.props.FIRE_SIZE) || 0))
-        .slice(0, 5);
+        const detectedMs = p.TIME_DETECTED != null ? Number(p.TIME_DETECTED) : null;
+        if (detectedMs != null && isSameYMDInTz(detectedMs, nowMs, ATLANTIC_TZ)) newToday++;
+      });
 
       const chips = [
         ['Out of Control', counts['out of control']],
@@ -825,23 +849,43 @@
         ['Being Patrolled', counts['being patrolled']]
       ].map(([label, n]) => chipHTML(label, n)).join('');
 
-      const list = top5.map((it) => {
+      // Build ALL fires list, sorted by size (desc)
+      const sorted = items
+        .slice()
+        .sort((a, b) => (Number(b.props.FIRE_SIZE) || 0) - (Number(a.props.FIRE_SIZE) || 0));
+
+      const list = sorted.map((it) => {
         const p = it.props || {};
         const name = p.FIRE_NAME || 'Unnamed Fire';
         const area = numberFmt(p.FIRE_SIZE, 0);
-        return `<li><a href="#" data-fireid="${String(it.id)}">${name} — ${area} ha</a></li>`;
-      }).join('');
+        const status = p.FIRE_STAT_DESC_E || '—';
+        return `
+          <li style="margin: 4px 0;">
+            <a href="#" data-fireid="${String(it.id)}">
+              <span style="font-weight:700">${name}</span>
+              &nbsp;—&nbsp;${area} ha
+              <span style="opacity:.8">• ${status}</span>
+            </a>
+          </li>`;
+      }).join('') || '<li>No active fires</li>';
 
       return `
-        <div style="font-weight:800;margin-bottom:6px">Total area burned: ${numberFmt(totalArea, 0)} ha</div>
+        <div class="fs-meta">
+          <div style="font-weight:800">New fires today (Atlantic): ${numberFmt(newToday, 0)}</div>
+          <div style="font-weight:800">Total area burned: ${numberFmt(totalArea, 0)} ha</div>
+        </div>
 
-        <div style="margin:10px 0 6px;"><b>Fires by status</b></div>
+        <div style="margin:8px 0 6px;"><b>Fires by status</b></div>
         <div>${chips}</div>
 
-        <div style="margin-top:8px;"><b>Top 5 largest fires <span style="font-weight:600;color:var(--muted)">(largest → smallest)</span></b></div>
-        <ol class="summary-list" id="fs-top5">${list || '<li>No active fires</li>'}</ol>
+        <div style="margin-top:10px;">
+          <b>All active fires <span style="font-weight:600;color:var(--muted)">(largest → smallest)</span></b>
+          <ol class="summary-list fs-scroll" id="fs-all">${list}</ol>
+        </div>
 
-        <div style="margin-top:12px;font-size:12px;color:var(--muted);">Source: NB Active Fires (Public_Fires/MapServer/0).</div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted);">
+          “New today” uses TIME_DETECTED evaluated in Atlantic Time. Source: NB Active Fires (Public_Fires/MapServer/0).
+        </div>
       `;
     };
 
@@ -849,7 +893,7 @@
       summaryBody.innerHTML = buildSummaryHTML();
       summaryOverlay.style.display = 'flex';
 
-      const listEl = document.getElementById('fs-top5');
+      const listEl = document.getElementById('fs-all');
       if (!listEl) return;
 
       listEl.querySelectorAll('a[data-fireid]').forEach((a) => {
