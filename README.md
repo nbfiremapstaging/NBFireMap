@@ -2,6 +2,8 @@
 
 An interactive Leaflet + Esri web map that displays **live wildfire status, perimeters, weather stations, air quality (AQHI), burn bans, smoke plumes**, and more — all focused on the province of **New Brunswick, Canada**.
 
+The Map: https://nbfiremap.github.io/NBFireMap/
+
 ---
 
 ## ✨ Features
