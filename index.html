@@ -103,7 +103,7 @@
         top: 72px !important;
       }
 
-      /* Layers/legend panel (single, de-duped block) */
+      /* Layers/legend panel */
       .leaflet-control-layers {
         background: var(--panel);
         border: 1px solid var(--border);
@@ -244,11 +244,7 @@
         pointer-events: none;
         padding: 2px 6px;
         border-radius: 6px;
-        background: color-mix(
-          in oklab,
-          var(--perimeter) 12%,
-          transparent
-        );
+        background: color-mix(in oklab, var(--perimeter) 12%, transparent);
         backdrop-filter: blur(2px);
       }
 
@@ -485,7 +481,6 @@
       <span class="icon"><i class="fa-solid fa-layer-group"></i></span
       ><span>Show Layers</span>
     </button>
-
     <button
       id="resetViewBtn"
       class="map-btn reset-view-btn"
@@ -495,7 +490,6 @@
       <span class="icon"><i class="fa-solid fa-compass"></i></span
       ><span>Reset Map View</span>
     </button>
-
     <button
       id="fireSummaryBtn"
       class="map-btn fire-summary-btn"
@@ -572,7 +566,7 @@
         const isMobile = () => innerWidth < 768;
         const ATLANTIC_TZ = 'America/Moncton';
 
-        /* ---------- Utilities (condensed) ---------- */
+        /* ---------- Utilities ---------- */
         const getSavedView = () => {
           try {
             return JSON.parse(localStorage.getItem(LS_KEY) || 'null');
@@ -682,13 +676,14 @@
 
         map.on('moveend', () => saveView(map));
 
-        // Panes (looped)
+        // Panes (with radar & lightning)
         [
           ['alwaysOnTopPopup', 9999],
           ['sentinelPane', 400],
           ['nbBoundaryPane', 405],
           ['perimetersPane', 412],
-          ['radarPane', 413], 
+          ['radarPane', 413],
+          ['lightningPane', 413],
           ['viirsPane', 414],
           ['weatherPane', 415],
           ['aqiPane', 416],
@@ -762,7 +757,6 @@
                   <div><b>Detected:</b> ${fmtDT(p.TIME_DETECTED)}</div>
                   <div><b>Status updated:</b> ${fmtDT(p.FIRE_STAT_DATE)}</div>
                 </div>`;
-
               layer.bindPopup(html, {
                 maxWidth: 340,
                 pane: 'alwaysOnTopPopup'
@@ -775,7 +769,6 @@
                 p.FIRE_ID ??
                 Math.random();
               const id = String(rawId);
-
               fireStore.set(id, {
                 id,
                 props: p,
@@ -783,7 +776,7 @@
                 layer
               });
 
-              // lightweight hover logic
+              // hover/click popup behavior
               let clicked = false;
               let openT = null;
               let closeT = null;
@@ -810,7 +803,6 @@
                     this.openPopup();
                   }, OPEN);
               });
-
               layer.on('mouseout', function () {
                 if (clicked) return;
                 clearTimeout(openT);
@@ -820,13 +812,11 @@
                     this.closePopup();
                   }, CLOSE);
               });
-
               layer.on('click', function () {
                 clicked = !clicked;
                 clear();
                 clicked ? this.openPopup() : this.closePopup();
               });
-
               layer.on('remove', clear);
             }
           })
@@ -840,7 +830,7 @@
           fireStore.delete(id);
         });
 
-        /* ---------- Other operational layers (lazy-ish) ---------- */
+        /* ---------- Other operational layers ---------- */
         const PERIMETER_COLOR = cssVal('--perimeter');
 
         const viirsHotspots = L.esri
@@ -858,13 +848,6 @@
           .addTo(map);
 
         const perimeterLabelLayers = new Set();
-
-        const noaaRadar = L.esri.imageMapLayer({
-          url: 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
-          opacity: 0.7,
-          pane: 'radarPane'
-          });
-
 
         const activefires = L.esri
           .featureLayer({
@@ -896,7 +879,6 @@
             l.getTooltip()?.setOpacity(show ? 1 : 0)
           );
         };
-
         activefires.on('load', setPerimeterLabels);
         map.on('zoomend', setPerimeterLabels);
 
@@ -992,14 +974,11 @@
               icon: L.divIcon({ html: '', iconSize: [0, 0] }),
               interactive: false,
               zIndexOffset: 1000
-            }).bindTooltip(
-              `<span class="city-label">${name}</span>`,
-              {
-                permanent: true,
-                direction: 'top',
-                className: 'city-label-tooltip'
-              }
-            )
+            }).bindTooltip(`<span class="city-label">${name}</span>`, {
+              permanent: true,
+              direction: 'top',
+              className: 'city-label-tooltip'
+            })
           )
         );
 
@@ -1017,20 +996,16 @@
         /* ---------- Planes (fetch only when visible) ---------- */
         const OPEN_SKY_URL = 'https://opensky-network.org/api/states/all';
         const WHITELIST_CALLSIGNS = window.WHITELIST_CALLSIGNS || new Set();
-
         const planesLayer = L.layerGroup();
         const planeMarkers = new Map();
 
         const makePlaneIcon = (heading, callsign) => {
           const ICON_OFFSET = -45;
           const wl = (window.WHITELIST_CALLSIGNS || new Set()).has(callsign);
-
-          // build a single filter chain so it doesn't get overwritten
           const baseShadow = 'drop-shadow(0 2px 2px rgba(0,0,0,.25))';
           const filterChain = wl
             ? `hue-rotate(-90deg) saturate(5) ${baseShadow}`
             : baseShadow;
-
           const rotate = Number.isFinite(heading) ? heading : 0;
 
           return L.divIcon({
@@ -1061,15 +1036,12 @@
             }).bindPopup(html, { pane: 'alwaysOnTopPopup' });
 
             let clicked = false;
-
             m.on('mouseover', function () {
               if (!clicked) this.openPopup();
             });
-
             m.on('mouseout', function () {
               if (!clicked) this.closePopup();
             });
-
             m.on('click', function () {
               clicked = !clicked;
               clicked ? this.openPopup() : this.closePopup();
@@ -1097,17 +1069,13 @@
           try {
             const [lamin, lomin] = NB_BOUNDS[0];
             const [lamax, lomax] = NB_BOUNDS[1];
-
             const r = await fetch(
               `${OPEN_SKY_URL}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
             );
             if (!r.ok) throw new Error(r.statusText);
-
             const data = await r.json();
             const states = Array.isArray(data.states) ? data.states : [];
-
             const seen = new Set();
-
             for (const s of states) {
               const icao24 = s[0];
               const callsign = (s[1] || '').trim().toUpperCase();
@@ -1115,13 +1083,10 @@
               const lat = s[6];
               const vel = s[9];
               const hdg = s[10];
-
               if (!icao24 || lat == null || lon == null) continue;
-
               seen.add(icao24);
               upsertPlane(icao24, lat, lon, hdg, callsign, vel);
             }
-
             pruneMissing(seen);
           } catch (e) {
             console.warn('OpenSky fetch failed:', e);
@@ -1130,13 +1095,11 @@
 
         const OPEN_SKY_INTERVAL_MS = 250000;
         let planesTimer = null;
-
         planesLayer.on('add', () => {
           fetchOpenSky();
           if (!planesTimer)
             planesTimer = setInterval(fetchOpenSky, OPEN_SKY_INTERVAL_MS);
         });
-
         planesLayer.on('remove', () => {
           if (planesTimer) {
             clearInterval(planesTimer);
@@ -1196,16 +1159,55 @@
             const m = L.marker(latlng, { icon });
             const loc = p.location_name_en || '';
             const when = p.observation_datetime_text_en || '';
-
             m.bindTooltip(
               `${loc ? loc + ' — ' : ''}AQHI ${val ?? '—'} • ${label}${
                 when ? ' • ' + when : ''
               }`,
               { direction: 'top', offset: [0, -20], opacity: 0 }
             );
-
             return m;
           }
+        });
+
+        /* ---------- Weather radar + Lightning (OFF by default) ---------- */
+        // NOAA base reflectivity ImageServer (auto-refresh every 2 minutes)
+        const noaaRadar = L.esri.imageMapLayer({
+          url: 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
+          opacity: 0.3, // 30%
+          pane: 'radarPane',
+          refreshInterval: 2 // minutes
+        });
+
+        // GeoMet Lightning Density WMS (auto-refresh while visible)
+        const lightningLayer = L.tileLayer.wms('https://geo.weather.gc.ca/geomet', {
+          layers: 'Lightning_2.5km_Density',
+          version: '1.3.0',
+          format: 'image/png',
+          transparent: true,
+          opacity: 0.4,
+          pane: 'lightningPane'
+        });
+
+        let lightningTimer = null;
+        function startLightningRefresh() {
+          if (!lightningTimer) {
+            lightningTimer = setInterval(() => {
+              // cache-bust param; could also use TIME if the service supports it
+              lightningLayer.setParams({ _: Date.now() });
+            }, 120000); // 2 minutes
+          }
+        }
+        function stopLightningRefresh() {
+          if (lightningTimer) {
+            clearInterval(lightningTimer);
+            lightningTimer = null;
+          }
+        }
+        map.on('overlayadd', (e) => {
+          if (e.layer === lightningLayer) startLightningRefresh();
+        });
+        map.on('overlayremove', (e) => {
+          if (e.layer === lightningLayer) stopLightningRefresh();
         });
 
         /* ---------- Overlays + control ---------- */
@@ -1220,6 +1222,7 @@
           'NB Burn Bans': nbBurnBans,
           'AQHI Risk': aqiLayer,
           'Weather Radar': noaaRadar,
+          'Lightning Density': lightningLayer,
           Smoke: smokeLayer,
           'Fire Risk': fireRiskGroup,
           'Sentinel-2C Imagery': sentinel2c
@@ -1258,6 +1261,8 @@
               '<span class="icons-pack"><i class="fa-solid fa-wind legend-icon"></i></span>',
             'Weather Radar (NOAA)':
               '<span class="icons-pack"><i class="fa-solid fa-radar legend-icon"></i></span>',
+            'Lightning Density (GeoMet)':
+              '<span class="icons-pack"><i class="fa-solid fa-bolt legend-icon"></i></span>',
             Smoke:
               '<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>',
             'Fire Risk':
@@ -1305,7 +1310,6 @@
             }
           });
         }
-
         decorateLayersControl();
         $('.leaflet-control-layers')?.addEventListener('click', () =>
           queueMicrotask(decorateLayersControl)
@@ -1315,14 +1319,12 @@
         const setMapUIHidden = (hidden) => {
           const mapDiv = $('#map');
           const btn = $('#mapToggleBtn');
-
           mapDiv.classList.toggle('map-ui-hidden', hidden);
           btn.querySelector('span:last-child').textContent = hidden
             ? 'Show Layers'
             : 'Hide Layers';
           btn.setAttribute('aria-pressed', String(!hidden));
         };
-
         setMapUIHidden(isMobile());
 
         $('#mapToggleBtn').addEventListener('click', () =>
@@ -1337,7 +1339,6 @@
         /* ---------- Fire Summary ---------- */
         const overlay = $('#fireSummaryOverlay');
         const bodyEl = $('#fs-body');
-
         const chip = (label, n) =>
           `<span class="chip"><span class="dot" style="background:${fireStatusColor(
             label
@@ -1345,7 +1346,6 @@
 
         function buildSummaryHTML() {
           const items = [...fireStore.values()];
-
           let totalArea = 0;
           const counts = {
             'out of control': 0,
@@ -1354,7 +1354,6 @@
             'being patrolled': 0,
             other: 0
           };
-
           let newToday = 0;
           let newYesterday = 0;
 
@@ -1362,10 +1361,8 @@
             const p = it.props || {};
             const sz = +p.FIRE_SIZE;
             if (isFinite(sz)) totalArea += sz;
-
             const key = norm(p.FIRE_STAT_DESC_E);
             counts.hasOwnProperty(key) ? counts[key]++ : counts.other++;
-
             const det = p.TIME_DETECTED != null ? +p.TIME_DETECTED : null;
             if (det != null) {
               if (isToday(det)) newToday++;
@@ -1417,8 +1414,7 @@
               <ol class="summary-list fs-scroll" id="fs-all">${list}</ol>
             </div>
             <div style="margin-top:10px;font-size:12px;color:var(--muted)">
-              “Today / yesterday” uses Atlantic Time (TIME_DETECTED).
-              Source: NB Active Fires (Public_Fires/MapServer/0).
+              “Today / yesterday” uses Atlantic Time (TIME_DETECTED). Source: NB Active Fires (Public_Fires/MapServer/0).
             </div>`;
         }
 
@@ -1426,44 +1422,36 @@
           bodyEl.innerHTML = buildSummaryHTML();
           overlay.hidden = false;
           overlay.style.display = 'flex';
-
           $('#fs-all')?.addEventListener(
             'click',
             (e) => {
               const a = e.target.closest('a[data-fireid]');
               if (!a) return;
-
               e.preventDefault();
-
               const rec = fireStore.get(a.getAttribute('data-fireid'));
               if (!rec) return;
-
               overlay.style.display = 'none';
               overlay.hidden = true;
-
               map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), {
                 duration: 0.6
               });
-
               map.once('moveend', () => rec.layer?.openPopup && rec.layer.openPopup());
             },
             { once: true }
           );
         };
-
         $('#fireSummaryBtn').addEventListener('click', openSummary);
         $('#fs-close').addEventListener('click', () => {
           overlay.style.display = 'none';
           overlay.hidden = true;
         });
-
         overlay.addEventListener('click', (e) => {
           if (e.target === overlay) {
             overlay.style.display = 'none';
             overlay.hidden = true;
           }
         });
-      }); // here
+      });
     </script>
   </body>
 </html>
