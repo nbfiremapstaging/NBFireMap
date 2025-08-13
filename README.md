@@ -50,14 +50,4 @@ An interactive Leaflet + Esri web map that displays **live wildfire status, peri
 | **NB Boundary**                 | [Provinces & Territories of Canada](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0) |
 | **City Locations**              | Static coordinates (local data) |
 
----
-
-## 🚀 Getting Started
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/nb-wildfire-map.git
-cd nb-wildfire-map
-
-# 2. Open in your browser
-# (no build step required — works from a static HTML file)
+Special thanks to the champions of open and free data in New Brunsick!
