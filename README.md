@@ -58,15 +58,13 @@ A Leaflet + Esri-Leaflet web map showing active wildfires, fire perimeters, weat
 - **Sentinel-2 Imagery**  
   [Sentinel2/ImageServer](https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer)
 
-- **Smoke Forecast (Canada)**  
-  Example ArcGIS smoke forecast service.
+- **Wildfire Smoke (Canada, forecast)**  
+  [Hosted/Aug12/ImageServer](https://enterpriseim.esriservices.ca/server/rest/services/Hosted/Aug12/ImageServer) – Forecast smoke layer used in this map.
 
 ### Administrative & Reference
-- **NB Boundary**  
-  Provinces & Territories of Canada (filtered to NB)
-
-- **NB Crown Lands**  
-  [Crown Lands FeatureServer](https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Crown_Lands/FeatureServer/0)
+- **NB Provincial Boundary**  
+  [Provinces_and_Territories_of_Canada/FeatureServer/0](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0)  
+  *(filtered to “New Brunswick”)*
 
 - **NB Burn Bans**  
   [BurnCategories/MapServer](https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer)
