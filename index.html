@@ -36,7 +36,7 @@
         --cont: #fb923c;
         --uc: #facc15;
         --pat: #22c55e;
-        --viirs: #ffd666;
+        --modis: #f59e0b; /* MODIS hotspot color */
         --perimeter: #ef4444;
         --boundary: #0b0f19;
         --fs-12: 12px;
@@ -75,21 +75,20 @@
       .leaflet-top.leaflet-left  { top: 52px !important; }
       .leaflet-top.leaflet-right { top: 72px !important; }
 
-      /* Layers/legend panel */
+      /* Layers/legend panel — desktop wide, mobile can wrap */
       .leaflet-control-layers {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  font-size: var(--fs-14);
-  padding: 8px 14px 8px 8px; /* extra right padding */
-  backdrop-filter: blur(6px);
-  min-width: 260px; /* enough to fit "Fires — Being Patrolled" without wrap */
-  width: auto;
-  max-width: none;
-  white-space: nowrap; /* prevent wrap entirely */
-}
-
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        font-size: var(--fs-14);
+        padding: 8px 40px 8px 14px; /* extra right padding */
+        backdrop-filter: blur(6px);
+        min-width: 260px; /* wide enough for “Fires — Being Patrolled” on desktop */
+        width: auto;
+        max-width: none;
+        white-space: nowrap; /* prevent wrapping by default (desktop) */
+      }
       .leaflet-control-layers-expanded,
       .leaflet-control-layers-list { max-height: none !important; overflow: visible !important; }
       .leaflet-control-layers-overlays label {
@@ -97,14 +96,17 @@
         min-width: max-content; line-height: 1.25;
       }
       .leaflet-control-layers-overlays input { margin: 0; width: max-content; height: 18px; }
-      .leaflet-control-layers-overlays .text {
-  min-width: max-content;
-  white-space: nowrap;
-  overflow: visible;
-}
+      .leaflet-control-layers-overlays .text { min-width: max-content; white-space: nowrap; overflow: visible; text-overflow: clip; }
 
+      /* Mobile: allow wrapping and fit within viewport */
       @media (max-width: 640px) {
-        .leaflet-control-layers { min-width: auto; max-width: calc(100vw - 24px); width: auto; white-space: normal; }
+        .leaflet-control-layers {
+          min-width: auto;
+          max-width: calc(100vw - 24px);
+          width: auto;
+          white-space: normal; /* allow wrapping on mobile */
+        }
+        .leaflet-control-layers-overlays .text { white-space: normal; } /* labels can wrap on mobile */
       }
       @media (max-width: 767.98px) { .leaflet-control-layers { font-size: var(--fs-12); } }
 
@@ -115,7 +117,7 @@
         cursor: pointer; box-shadow: var(--shadow); display: inline-flex; align-items: center; gap: 8px;
         transition: background .2s, transform .06s, box-shadow .2s;
       }
-      .map-btn:hover { background: var(--btn-hover); box-shadow: 0 8px 22px rgba(2,8,20,.08); }
+      .map-btn:hover { background: var(--btn-hover); box-shadow: 0 8px 22px rgba(0,0,0,.08); }
       .map-btn:active { transform: translateY(1px); }
       .map-btn:focus-visible { outline: none; box-shadow: var(--focus); }
       .map-toggle-btn { top: 12px; right: 12px; }
@@ -164,7 +166,7 @@
       .legend-line { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
       .legend-badge { width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; background: #fff; border: 2.5px solid var(--ring); }
       .legend-badge i { font-size: 11px; color: var(--ring); }
-      .legend-viirs-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--viirs); display: inline-block; box-shadow: 0 0 0 1.5px #111827 inset; }
+      .legend-modis-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--modis); display: inline-block; box-shadow: 0 0 0 1.5px #111827 inset; }
 
       /* Footer link */
       .nb-footer { position: fixed; bottom: 10px; left: 0; width: 100%; text-align: center; z-index: 2000; }
@@ -231,7 +233,7 @@
 
         // ⬇ Default view set to screenshot framing
         const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 };
-        const isMobile = () => innerWidth < 768;
+        const isMobile = () => innerWidth < 768;   /* define ONCE here */
         const ATLANTIC_TZ = 'America/Moncton';
 
         /* ---------- Utilities ---------- */
@@ -262,8 +264,6 @@
         const map = L.map('map', {
           center: restored?.center || INITIAL_VIEW.center,
           zoom:   restored?.zoom   || INITIAL_VIEW.zoom,
-          // Removed maxBounds / viscosity so panning is unrestricted
-          // (kept default min/max zooms)
         });
 
         map.on('moveend', () => saveView(map));
@@ -276,7 +276,7 @@
           ['perimetersPane', 412],
           ['radarPane', 413],
           ['lightningPane', 413],
-          ['viirsPane', 414],
+          ['viirsPane', 414],     // reuse this pane for MODIS hotspots
           ['weatherPane', 415],
           ['aqiPane', 416],
           ['firesPane', 420],
@@ -296,7 +296,7 @@
           pane: 'sentinelPane'
         });
 
-        // Keep locate control, but no automatic fitBounds (so default zoom matches screenshot)
+        // Locate control (mobile only)
         if (isMobile()) {
           L.control.locate({
             position: 'topleft', flyTo: true, showPopup: false, keepCurrentZoomLevel: true,
@@ -376,14 +376,21 @@
         const fireStatusLayers = {};
         statusDefs.forEach(d => { fireStatusLayers[d.label] = makeStatusLayer(d); });
 
+        /* ---------- MODIS hotspots (48h ON, 7d OFF by default) ---------- */
+        const modis48 = L.esri.featureLayer({
+          url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
+          pane: 'viirsPane', refreshInterval: 1,
+          pointToLayer: (_f, latlng) => L.circleMarker(latlng, { radius: 5, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.9 })
+        }).addTo(map);
+
+        const modis7d = L.esri.featureLayer({
+          url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1',
+          pane: 'viirsPane', refreshInterval: 1,
+          pointToLayer: (_f, latlng) => L.circleMarker(latlng, { radius: 4, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.65 })
+        }); // NOTE: not added to map (OFF by default)
+
         /* ---------- Other operational layers ---------- */
         const PERIMETER_COLOR = cssVal('--perimeter');
-
-        const viirsHotspots = L.esri.featureLayer({
-          url: 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/ArcGIS/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0',
-          pane: 'viirsPane', refreshInterval: 1,
-          pointToLayer: (_f, latlng) => L.circleMarker(latlng, { radius: 5, color: 'var(--viirs)', fillColor: 'var(--viirs)', fillOpacity: 0.8 })
-        }).addTo(map);
 
         const perimeterLabelLayers = new Set();
 
@@ -494,7 +501,7 @@
           const filterChain = wl ? `hue-rotate(-90deg) saturate(5) ${baseShadow}` : baseShadow;
           const rotate = Number.isFinite(heading) ? heading : 0;
 
-          return L.divIcon({
+        return L.divIcon({
             className: 'plane-div-icon',
             html: `<div style="transform:rotate(${ICON_OFFSET}deg);transform-origin:center;display:inline-block;">
                      <div style="transform:rotate(${rotate}deg);font-size:26px;filter:${filterChain}">✈️</div>
@@ -611,8 +618,11 @@
           // split fire layers:
           ...fireStatusLayers,
 
+          // MODIS hotspots (two separate toggles)
+          'MODIS Hotspots — Last 48 hours': modis48,
+          'MODIS Hotspots — Last 7 days': modis7d,
+
           'Weather Stations': weatherStations,
-          'VIIRS Hotspots': viirsHotspots,
           'Fire Perimeters': activefires,
           Aircraft: planesLayer,
           'Major Cities & Towns': cityMarkers,
@@ -625,17 +635,18 @@
           'Sentinel-2C Imagery': sentinel2c
         };
 
-        const layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+        L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
-        /* ---------- Legend makeover (updated for split layers) ---------- */
+        /* ---------- Legend makeover (updated for split layers + MODIS) ---------- */
         function decorateLayersControl() {
           const list = document.querySelector('.leaflet-control-layers-overlays');
           if (!list) return;
           list.querySelectorAll('.icons-pack,.legend-sub').forEach((el)=>el.remove());
 
           const packs = {
+            'MODIS Hotspots — Last 48 hours':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
+            'MODIS Hotspots — Last 7 days':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
             'Weather Stations':'<span class="icons-pack"><i class="fa-solid fa-location-arrow legend-icon" style="transform:rotate(45deg)"></i></span>',
-            'VIIRS Hotspots':'<span class="icons-pack"><span class="legend-viirs-dot"></span></span>',
             'Fire Perimeters':'<span class="icons-pack"><i class="fa-regular fa-square legend-icon"></i></span>',
             Aircraft:'<span class="icons-pack"><span style="font-size:14px;display:inline-block;transform:rotate(-45deg)">✈️</span></span>',
             'Major Cities & Towns':'<span class="icons-pack"><i class="fa-solid fa-city legend-icon"></i></span>',
@@ -667,6 +678,9 @@
             const name = textSpan.textContent.trim();
             label.insertAdjacentHTML('afterbegin', packs[name] || `<span class="icons-pack"><i class="fa-solid fa-layer-group legend-icon"></i></span>`);
             textSpan.classList.add('text');
+
+            // Add a four-row sublegend only under the first fire-status group (optional)
+            
           });
         }
         decorateLayersControl();
