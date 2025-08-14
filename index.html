@@ -55,10 +55,22 @@
       .leaflet-control-layers-overlays label{display:grid;grid-template-columns:18px 26px 1fr;align-items:center;column-gap:8px;min-width:max-content;line-height:1.25}
       .leaflet-control-layers-overlays input{margin:0;width:max-content;height:18px}
       .leaflet-control-layers-overlays .text{min-width:max-content;white-space:nowrap;overflow:visible;text-overflow:clip}
-      @media (max-width:640px){
-        .leaflet-control-layers{min-width:auto;max-width:calc(100vw - 24px);width:auto;white-space:normal}
-        .leaflet-control-layers-overlays .text{white-space:normal}
-      }
+      /* Mobile: single line labels; width set via JS to fit longest label */
+@media (max-width: 640px) {
+  .leaflet-control-layers {
+    width: var(--layers-w, auto);   /* JS writes this */
+    max-width: calc(100vw - 24px);  /* never exceed screen minus margin */
+    white-space: nowrap;            /* no wrapping */
+    overflow-x: auto;               /* scroll only if absolutely necessary */
+  }
+  .leaflet-control-layers-overlays label {
+    grid-template-columns: 18px 26px auto; /* checkbox + icon + label */
+  }
+  .leaflet-control-layers-overlays .text {
+    white-space: nowrap;            /* keep on one line */
+    min-width: max-content;         /* allow panel to grow to fit text */
+  }
+}
       @media (max-width:767.98px){.leaflet-control-layers{font-size:var(--fs-12)}}
 
       /* Buttons */
@@ -1080,3 +1092,4 @@
     </script>
   </body>
 </html>
+
