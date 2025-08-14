@@ -415,6 +415,7 @@
             url: 'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
             where: def.where,
             pane: 'firesPane',
+            refreshInterval: 30,
             pointToLayer: (f, latlng) => L.marker(latlng, { icon: fireBadgeIcon(f.properties?.FIRE_STAT_DESC_E) }),
             onEachFeature: bindFireFeature
           }).addTo(map); // ON by default
@@ -478,7 +479,7 @@
 
         const nbBurnBans = L.esri.dynamicMapLayer({
           url: 'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
-          opacity: 0.7, refreshInterval: 1, pane: 'perimetersPane'
+          opacity: 0.7, refreshInterval: 30, pane: 'perimetersPane'
         });
 
         const weatherStations = L.esri.featureLayer({
@@ -834,3 +835,4 @@
     </script>
   </body>
 </html>
+
