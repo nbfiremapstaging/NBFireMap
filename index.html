@@ -28,6 +28,7 @@
         --btn-bg:#fff; --btn-border:#d9dee6; --btn-hover:#f2f4f7;
         --link:#2563eb; --focus:0 0 0 3px rgba(37,99,235,.28);
         --oc:#ef4444; --cont:#fb923c; --uc:#facc15; --pat:#22c55e;
+        --mon:#3b82f6; /* NEW: Being Monitored (blue) */
         --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
         --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
       }
@@ -245,7 +246,8 @@
             'out of control': cssVar('--oc'),
             contained: cssVar('--cont'),
             'under control': cssVar('--uc'),
-            'being patrolled': cssVar('--pat')
+            'being patrolled': cssVar('--pat'),
+            'being monitored': cssVar('--mon')          // NEW
           }[norm(s)] || '#9aa0a6');
 
         const severityRank = (s) =>
@@ -253,7 +255,8 @@
             'out of control': 3,
             contained: 2,
             'under control': 1,
-            'being patrolled': 0
+            'being patrolled': 0,
+            'being monitored': 0                         // NEW
           }[norm(s)] ?? -1);
 
         // Atlantic-time day bucketing
@@ -741,7 +744,8 @@
           ['Out of Control','--oc',"FIRE_STAT_DESC_E = 'Out of Control'"],
           ['Contained','--cont',"FIRE_STAT_DESC_E = 'Contained'"],
           ['Under Control','--uc',"FIRE_STAT_DESC_E = 'Under Control'"],
-          ['Being Patrolled','--pat',"FIRE_STAT_DESC_E = 'Being Patrolled'"]
+          ['Being Patrolled','--pat',"FIRE_STAT_DESC_E = 'Being Patrolled'"],
+          ['Being Monitored','--mon',"FIRE_STAT_DESC_E = 'Being Monitored'"] // NEW
         ];
 
         function injectFireStatusPanel(){
@@ -824,7 +828,7 @@
 
         const buildSummaryHTML=()=>{
           const items=[...fireStore.values()];
-          let totalArea=0; const counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,other:0};
+          let totalArea=0; const counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,other:0};
           let newToday=0, newYesterday=0;
 
           for(const it of items){
@@ -834,8 +838,13 @@
             if(det!=null){ if(isToday(det)) newToday++; else if(isYesterday(det)) newYesterday++; }
           }
 
-          const chips=[['Out of Control',counts['out of control']],['Contained',counts['contained']],['Under Control',counts['under control']],['Being Patrolled',counts['being patrolled']]]
-            .map(([l,n])=>chip(l,n)).join('');
+          const chips=[
+            ['Out of Control',counts['out of control']],
+            ['Contained',counts['contained']],
+            ['Under Control',counts['under control']],
+            ['Being Patrolled',counts['being patrolled']],
+            ['Being Monitored',counts['being monitored']]
+          ].map(([l,n])=>chip(l,n)).join('');
 
           const sorted=items.slice().sort((a,b)=>(+b.props.FIRE_SIZE||0)-(+a.props.FIRE_SIZE||0));
           const list=sorted.map((it)=>{
