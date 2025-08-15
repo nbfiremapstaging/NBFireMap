@@ -22,8 +22,6 @@ A Leaflet + Esri‑Leaflet web map showing NB wildfire points, wildfire perimete
 - **Smoke forecast layer** (Canada).
 - Mobile‑friendly UI with **Show/Hide Layers**, **Reset Map View**, and **Fire Summary** buttons.
 
-> Note: Provincial boundary, burn bans, crown lands, Sentinel‑2 imagery, VIIRS hotspots, and aircraft tracking are not included in this build.
-
 ---
 
 ## Data Sources
