@@ -1,0 +1,169 @@
+name: Fetch NB Fire Feeds
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Ensure jq is available
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+
+      - name: Fetch and verify feeds (with cleanup)
+        id: fetch
+        env:
+          BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
+          QUERY: '?where=1%3D1&outFields=*&f=json'
+          TABLE_NAME: SDEOWNER.V_FIRE_DASHBOARD_SUM
+        run: |
+          set -euo pipefail
+
+          cleanup_snapshots() {
+            # remove any 10× snapshot sets that might exist
+            rm -f active_fires0*.json out_fires0*.json v_fire_dashboard_sum0*.json || true
+          }
+          trap cleanup_snapshots EXIT
+
+          download_ten() {
+            local url="$1" prefix="$2"
+            rm -f "${prefix}"*.json || true
+            for i in $(seq -w 01 10); do
+              tmpfile="$(mktemp)"
+              if ! curl -sS --fail --retry 3 --retry-delay 2 --retry-connrefused --max-time 60 "$url" -o "$tmpfile"; then
+                echo "Curl failed for ${url}"
+                rm -f "$tmpfile"
+                return 1
+              fi
+              if ! jq -e type "$tmpfile" >/dev/null 2>&1; then
+                echo "Invalid JSON for ${url}"
+                rm -f "$tmpfile"
+                return 1
+              fi
+              mv "$tmpfile" "${prefix}${i}.json"
+              sleep 1
+            done
+          }
+
+          all_match() {
+            local prefix="$1"
+            # if any file missing, not a match
+            ls ${prefix}*.json >/dev/null 2>&1 || return 1
+            local uniq_count
+            uniq_count=$(sha256sum ${prefix}*.json | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
+            test "$uniq_count" -eq 1
+          }
+
+          get_table_id() {
+            # read service metadata to find the table id by name
+            local meta
+            if ! meta="$(curl -sS --fail "$BASE?f=pjson")"; then
+              echo "Failed to read service metadata"; return 1
+            fi
+            echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '
+              .tables[] | select(.name==$NAME) | .id
+            ' 2>/dev/null | tr -d '\r\n'
+          }
+
+          attempt_fetch_all() {
+            local ok=true
+
+            echo "::group::Attempt: active fires (layer 0)"
+            if download_ten "$BASE/0/query$QUERY" "active_fires"; then
+              if all_match "active_fires"; then
+                cp active_fires01.json active_fires.json
+                echo "Active fires stable."
+              else
+                echo "Active fires NOT stable."
+                ok=false
+              fi
+            else
+              echo "Active fires download failed."
+              ok=false
+            fi
+            rm -f active_fires0*.json || true
+            echo "::endgroup::"
+
+            echo "::group::Attempt: out fires (layer 1)"
+            if download_ten "$BASE/1/query$QUERY" "out_fires"; then
+              if all_match "out_fires"; then
+                cp out_fires01.json out_fires.json
+                echo "Out fires stable."
+              else
+                echo "Out fires NOT stable."
+                ok=false
+              fi
+            else
+              echo "Out fires download failed."
+              ok=false
+            fi
+            rm -f out_fires0*.json || true
+            echo "::endgroup::"
+
+            echo "::group::Attempt: table $TABLE_NAME"
+            local tid
+            tid="$(get_table_id || true)"
+            if [ -z "${tid:-}" ]; then
+              echo "Could not find table id for $TABLE_NAME in service metadata."
+              ok=false
+            else
+              if download_ten "$BASE/$tid/query$QUERY" "v_fire_dashboard_sum"; then
+                if all_match "v_fire_dashboard_sum"; then
+                  cp v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
+                  echo "Table $TABLE_NAME stable."
+                else
+                  echo "Table $TABLE_NAME NOT stable."
+                  ok=false
+                fi
+              else
+                echo "Table $TABLE_NAME download failed."
+                ok=false
+              fi
+            fi
+            rm -f v_fire_dashboard_sum0*.json || true
+            echo "::endgroup::"
+
+            $ok
+          }
+
+          # First attempt
+          if attempt_fetch_all; then
+            echo "stable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Not all datasets stable. Waiting 10 minutes, then retrying…"
+            sleep 600
+            if attempt_fetch_all; then
+              echo "stable=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "stable=false" >> "$GITHUB_OUTPUT"
+              echo "Datasets were not stable after two attempts; leaving previous JSONs unchanged."
+              exit 0
+            fi
+          fi
+
+      - name: Commit updated JSON (if changed)
+        if: steps.fetch.outputs.stable == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add active_fires.json out_fires.json v_fire_dashboard_sum.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git commit -m "Update fire feeds (${ts})"
+            git push
+          fi
