@@ -60,6 +60,49 @@ jobs:
                   time.sleep(1)
               raise RuntimeError(f"Failed to fetch after 3 HTTP attempts: {url}")
 
+          def get_all_field_names(url):
+              """
+              Fetch the authoritative field list from the service (f=json).
+              Tries layer metadata endpoint first (…/layer), then a 1=0 query fallback.
+              """
+              # Try layer metadata (strip '/query' if present)
+              meta_url = url.rsplit("/query", 1)[0]
+              try:
+                  resp = SESSION.get(meta_url, params={"f": "json"}, timeout=60)
+                  if resp.status_code == 200:
+                      meta = resp.json()
+                      if isinstance(meta, dict) and isinstance(meta.get("fields"), list):
+                          return [f["name"] for f in meta["fields"] if "name" in f]
+              except Exception as e:
+                  log(f"Field meta fetch error: {e}")
+
+              # Fallback tiny query that returns 'fields'
+              params = {
+                  "where": "1=0",
+                  "outFields": "*",
+                  "returnGeometry": "false",
+                  "f": "json"
+              }
+              resp = arcgis_query(url, params)
+              data = resp.json()
+              return [f["name"] for f in data.get("fields", []) if "name" in f]
+
+          def pad_geojson_properties_with_all_fields(geojson_obj, all_field_names):
+              """
+              Ensure every feature's properties has all field names. Missing ones set to None.
+              Keeps existing keys/values untouched.
+              """
+              feats = geojson_obj.get("features", [])
+              for f in feats:
+                  props = f.get("properties")
+                  if props is None or not isinstance(props, dict):
+                      props = {}
+                      f["properties"] = props
+                  for name in all_field_names:
+                      if name not in props:
+                          props[name] = None
+              return geojson_obj
+
           def features_to_signature(feature_collection):
               """
               Build a deterministic signature for a GeoJSON FeatureCollection
@@ -73,15 +116,12 @@ jobs:
                       for key in ("OBJECTID", "ObjectID", "objectid"):
                           if key in props:
                               return (0, props[key])
-                  # fallback: stable json of props
                   return (1, hashlib.sha256(json.dumps(props, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest())
 
-              # Normalize to properties for GeoJSON responses
               norm = []
               for f in feats:
                   props = f.get("properties", f.get("attributes", {}))
                   if props is None: props = {}
-                  # Concatenate all string attribute values for the feature
                   strings = []
                   for k, v in props.items():
                       if isinstance(v, str):
@@ -96,7 +136,7 @@ jobs:
           def table_to_signature(table_json):
               """
               Build a deterministic signature for an ArcGIS table (f=json with fields + features).
-              Uses attributes string fields only.
+              Uses attributes' string fields only.
               """
               feats = table_json.get("features", [])
               rows = []
@@ -139,12 +179,10 @@ jobs:
                   log(f"{kind}: copy {i+1}/{copies} -> features={count} sig={sig[:12]}")
                   time.sleep(1)
 
-              # All copies must match
               ok = all(sigs[0] == s for s in sigs[1:])
               return payloads, ok, sigs[0]
 
           def add_timestamp_to_geojson(data, timestamp):
-              # Ensure proper GeoJSON structure (FeatureCollection, features list)
               if data.get("type") != "FeatureCollection":
                   raise RuntimeError("GeoJSON did not contain a FeatureCollection")
               feats = data.get("features", [])
@@ -165,6 +203,15 @@ jobs:
               return data
 
           def attempt_fetch(kind, url, is_geojson, outfile, max_attempts=5):
+              # If emitting GeoJSON, gather the authoritative field list once up front
+              all_field_names = None
+              if is_geojson:
+                  try:
+                      all_field_names = get_all_field_names(url)
+                      log(f"{kind}: fetched {len(all_field_names)} field names from schema")
+                  except Exception as e:
+                      log(f"{kind}: failed to fetch field list (will still attempt fetch): {e}")
+
               for attempt in range(1, max_attempts + 1):
                   log(f"=== {kind}: attempt {attempt}/{max_attempts} ===")
                   def params_geo():
@@ -187,17 +234,20 @@ jobs:
                       log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
                       continue
 
-                  # Use the first payload as the canonical one, add timestamp
                   ts = int(time.time())
                   if is_geojson:
-                      final = add_timestamp_to_geojson(payloads[0], ts)
+                      final = payloads[0]
+                      # Fill in any missing attributes so output matches current structure + added fields
+                      if all_field_names:
+                          final = pad_geojson_properties_with_all_fields(final, all_field_names)
+                      final = add_timestamp_to_geojson(final, ts)
                   else:
                       final = add_timestamp_to_table(payloads[0], ts)
 
-                  # Write file
                   with open(outfile, "w", encoding="utf-8") as f:
                       json.dump(final, f, ensure_ascii=False, indent=2)
-                  log(f"{kind}: wrote {outfile} (features/signature {sig[0] if isinstance(sig, tuple) else ''})")
+                  feat_count = sig[0] if isinstance(sig, tuple) else ""
+                  log(f"{kind}: wrote {outfile} (features={feat_count})")
                   return True
 
               log(f"{kind}: FAILED after {max_attempts} attempts")
