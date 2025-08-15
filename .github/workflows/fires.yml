@@ -21,11 +21,11 @@ jobs:
       OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true"
       SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true"
 
-      COPIES_PER_PASS: "4"
-      SLEEP_BETWEEN_COPIES_SEC: "1"
+      COPIES_PER_PASS: "10"
+      SLEEP_BETWEEN_COPIES_SEC: "8"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
-      CHUNK_SIZE: "800"
+      CHUNK_SIZE: "800"   # a bit smaller than 1000 just to keep chunk sizes tame
 
     steps:
       - name: Checkout
@@ -41,20 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      # Clean up any previously-committed files in wrong locations or with wrong names
-      - name: Clean old/misplaced outputs
-        shell: bash
-        run: |
-          set -euxo pipefail
-          # Remove any duplicates not in repo root
-          find . -type f -name 'active_fires.geojson' ! -path './active_fires.geojson' -delete || true
-          find . -type f -name 'out_fires.geojson'    ! -path './out_fires.geojson'    -delete || true
-          find . -type f -name 'sums_table.json'      ! -path './sums_table.json'      -delete || true
-          # Remove old/mistyped filenames anywhere
-          find . -type f -name 'sums_table.geojson' -delete || true
-          find . -type f -name 'out_fires_geojson'  -delete || true
-
-      - name: Fetch ERD layers (strict verify; write only on success)
+      - name: Fetch ERD layers (strict multi-copy; atomic writes; keep old on failure)
         id: fetch
         shell: python
         env:
@@ -219,6 +206,15 @@ jobs:
                               return False, {"reason": "string attr mismatch", "oid": oid, "field": fn, "copy": i}
               return True, {"reason": "all good"}
 
+          # atomic write helper
+          def atomic_write_json(path, data):
+              tmp = path + ".tmp"
+              with open(tmp, "w", encoding="utf-8") as f:
+                  json.dump(data, f, ensure_ascii=False, indent=2)
+                  f.flush()
+                  os.fsync(f.fileno())
+              os.replace(tmp, path)
+
           # ---------- main driver ----------
           remaining = dict(targets)
           results   = {fn: None for fn in targets}
@@ -247,7 +243,7 @@ jobs:
 
                   counts_ok = all(m.get("ok_len") for m in metas)
                   if not counts_ok:
-                      print("  ✖ Count mismatch across copies — will retry.", flush=True)
+                      print("  ✖ Count mismatch across copies — will retry (not writing).", flush=True)
                       results[fname] = False
                       failed_this_pass[fname] = url
                       print("::endgroup::")
@@ -261,18 +257,16 @@ jobs:
                       if fname == "sums_table.json":
                           # Write plain JSON (attribute rows) for the table
                           rows = fc_to_rows_with_stamp(copies[0], ts)
-                          with open(fname, "w", encoding="utf-8") as f:
-                              json.dump({"rows": rows}, f, ensure_ascii=False, indent=2)
+                          atomic_write_json(fname, {"rows": rows})
                           print(f"  → Wrote {fname} (rows JSON) with ERD_FETCH_TIME={ts}", flush=True)
                       else:
                           final = stamp_fetch_time_on_fc(copies[0], ts)
-                          with open(fname, "w", encoding="utf-8") as f:
-                              json.dump(final, f, ensure_ascii=False, indent=2)
+                          atomic_write_json(fname, final)
                           print(f"  → Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
 
                       results[fname] = True
                   else:
-                      print(f"  ✖ Verification failed: {report}", flush=True)
+                      print(f"  ✖ Verification failed: {report} — not writing; will retry.", flush=True)
                       results[fname] = False
                       failed_this_pass[fname] = url
 
@@ -286,30 +280,25 @@ jobs:
 
           # ---------- summary ----------
           print("\n=== SUMMARY ===", flush=True)
-          ok_all = True
           lines = []
+          ok_any = False
           for fn in targets:
               status = results.get(fn)
               if status is True:
-                  msg = f"{fn}: OK"
-              elif status is False:
-                  msg = f"{fn}: FAILED"
-                  ok_all = False
-              else:
-                  msg = f"{fn}: SKIPPED?"
-                  ok_all = False
+                  ok_any = True
+              msg = f"{fn}: {'UPDATED' if status else 'KEPT_OLD'}"
               print(" " + msg, flush=True)
               lines.append(f"- {msg}")
 
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
               Path(summary_path).write_text(
-                  "### ERD Fetch (GeoJSON; string-attrs only; POST + local conversion)\n"
+                  "### ERD Fetch (strict; atomic writes; keep old on failure)\n"
                   + "\n".join(lines) + "\n"
               )
 
-          if not ok_all:
-              sys.exit(1)
+          # Do not fail the job just because some targets didn't pass.
+          sys.exit(0)
 
       - name: Commit updated data
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -319,5 +308,3 @@ jobs:
             active_fires.geojson
             out_fires.geojson
             sums_table.json
-          # Stage deletions from the cleanup step, too
-          commit_options: '--all'
