@@ -21,8 +21,8 @@ jobs:
       OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true"
       SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true"
 
-      COPIES_PER_PASS: "10"
-      SLEEP_BETWEEN_COPIES_SEC: "8"
+      COPIES_PER_PASS: "4"
+      SLEEP_BETWEEN_COPIES_SEC: "1"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
       CHUNK_SIZE: "800"
