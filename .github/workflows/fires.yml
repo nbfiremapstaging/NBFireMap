@@ -17,13 +17,18 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      # Original endpoints kept for clarity, but the code will rebuild clean base query URLs.
       ACTIVE_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
       OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
       SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
+
       COPIES_PER_PASS: "10"
       SLEEP_BETWEEN_COPIES_SEC: "8"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
+
+      # IDs-first chunk size (ArcGIS is fine with ~1000)
+      CHUNK_SIZE: "1000"
 
     steps:
       - name: Checkout
@@ -39,14 +44,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (verbose, attrs-only, retry failed)
+      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (IDs-first, attrs-only compare, retry failed)
         id: fetch
         shell: python
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          import os, json, time, hashlib, sys, datetime, requests, copy
+          import os, json, time, hashlib, sys, datetime, requests, copy, math
           from pathlib import Path
+          from urllib.parse import urlparse
 
           # ---------- config ----------
           targets = {
@@ -59,14 +65,96 @@ jobs:
           SLEEP_COPIES = int(os.environ.get("SLEEP_BETWEEN_COPIES_SEC", "8"))
           SLEEP_PASSES = int(os.environ.get("SLEEP_BETWEEN_PASSES_SEC", "60"))
           MAX_PASSES   = int(os.environ.get("MAX_PASSES", "5"))
+          CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "1000"))
 
           session = requests.Session()
-          session.headers.update({"User-Agent": "github-actions-fetch-erd/1.0"})
+          session.headers.update({
+              "User-Agent": "github-actions-fetch-erd/2.0",
+              "Cache-Control": "no-cache",
+              "Pragma": "no-cache",
+          })
 
-          def fetch_once(url):
-              r = session.get(url, timeout=60)
+          def _layer_base(url):
+              """
+              Normalize to a deterministic base query:
+                <layer>/query?where=1=1&outFields=*
+              Ignores any other params from the provided URL.
+              """
+              if "/query?" in url:
+                  base = url.split("/query?")[0]
+              else:
+                  base = url.rstrip("/")
+              return base + "/query?where=1%3D1&outFields=*"
+
+          def _ts():
+              return str(int(time.time() * 1000))
+
+          def req(url, timeout=60):
+              r = session.get(url + ("&_ts=" + _ts()), timeout=timeout)
               r.raise_for_status()
               return r.json()
+
+          def get_all_ids(base):
+              j = req(base + "&returnIdsOnly=true&f=json")
+              ids = j.get("objectIds") or []
+              ids = [int(x) for x in ids]
+              ids.sort()
+              # For verification:
+              cnt = req(base + "&returnCountOnly=true&f=json").get("count", 0)
+              return ids, int(cnt)
+
+          def fetch_chunk(base, id_chunk):
+              ids_str = ","".join(str(i) for i in id_chunk)
+              url = (base
+                     + f"&objectIds={ids_str}"
+                     + "&orderByFields=OBJECTID"
+                     + "&returnGeometry=true"
+                     + "&f=json")
+              return req(url)
+
+          def fetch_full_ids_first(url):
+              """
+              Deterministically fetch ALL features for a layer/table using IDs-first.
+              Returns the full ESRI JSON (features + fields + geometryType + spatialReference, if available)
+              along with a couple of metadata bits.
+              """
+              base = _layer_base(url)
+
+              ids, expected_count = get_all_ids(base)
+              features = []
+              fields = None
+              geometryType = None
+              spatialReference = None
+              objectIdFieldName = None
+
+              for start in range(0, len(ids), CHUNK_SIZE):
+                  chunk = ids[start:start+CHUNK_SIZE]
+                  j = fetch_chunk(base, chunk)
+                  feats = j.get("features") or []
+                  features.extend(feats)
+                  # Grab metadata the first time we see it
+                  if fields is None: fields = j.get("fields")
+                  if geometryType is None: geometryType = j.get("geometryType")
+                  if spatialReference is None: spatialReference = j.get("spatialReference")
+                  if objectIdFieldName is None: objectIdFieldName = j.get("objectIdFieldName")
+
+              ok_len = (len(ids) == expected_count == len(features))
+              meta = {
+                  "ids_len": len(ids),
+                  "expected_count": expected_count,
+                  "fetched_len": len(features),
+                  "ok_len": ok_len,
+              }
+
+              esri = {
+                  "features": features,
+              }
+              if fields is not None: esri["fields"] = fields
+              if geometryType is not None: esri["geometryType"] = geometryType
+              if spatialReference is not None: esri["spatialReference"] = spatialReference
+              if objectIdFieldName is not None: esri["objectIdFieldName"] = objectIdFieldName
+
+              return esri, meta
 
           def extract_attrs(esri_json):
               """
@@ -115,7 +203,7 @@ jobs:
           remaining = dict(targets)   # fname -> url
           results   = {fn: None for fn in targets}  # True/False as we finish
 
-          print(f"\n=== Starting fetch (attributes-only verification) ===", flush=True)
+          print(f"\n=== Starting fetch (IDs-first, attributes-only verification across copies) ===", flush=True)
           for attempt in range(1, MAX_PASSES + 1):
               if not remaining:
                   break
@@ -125,28 +213,40 @@ jobs:
 
               for fname, url in list(remaining.items()):
                   print(f"::group::Processing {fname}")
-                  print(f"Fetching {COPIES} copies…", flush=True)
+                  print(f"Fetching {COPIES} full copies via IDs-first…", flush=True)
 
                   copies = []
                   digests = []
                   attrs_norms = []
+                  metas = []
 
                   for i in range(COPIES):
-                      data = fetch_once(url)
-                      attrs_norm, digest = extract_attrs(data)
-                      copies.append(data)
+                      esri, meta = fetch_full_ids_first(url)
+                      metas.append(meta)
+
+                      # Basic sanity on counts
+                      if not meta["ok_len"]:
+                          print(f"  Copy {i+1}/{COPIES}: count mismatch "
+                                f"(ids={meta['ids_len']}, expected={meta['expected_count']}, fetched={meta['fetched_len']})", flush=True)
+                      else:
+                          print(f"  Copy {i+1}/{COPIES}: fetched {meta['fetched_len']} features (OK).", flush=True)
+
+                      attrs_norm, digest = extract_attrs(esri)
+                      copies.append(esri)
                       attrs_norms.append(attrs_norm)
                       digests.append(digest)
-                      print(f"  Copy {i+1}/{COPIES}: attrs-digest {digest[:12]}…", flush=True)
+                      print(f"    attrs-digest {digest[:12]}…", flush=True)
+
                       if i < COPIES - 1:
                           time.sleep(SLEEP_COPIES)
 
                   # Verify equality of ONLY attributes (ignore geometry/fields/etc for stability)
                   first = attrs_norms[0]
                   all_match = all(an == first for an in attrs_norms[1:])
+                  counts_all_ok = all(m.get("ok_len") for m in metas)
 
-                  if all_match:
-                      print(f"✅ Attributes match across {COPIES} copies.")
+                  if all_match and counts_all_ok:
+                      print(f"✅ Attributes match across {COPIES} copies and counts verified.")
                       ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
                       final = adorn_fetch_time(copies[0], ts)
                       with open(fname, "w", encoding="utf-8") as f:
@@ -156,7 +256,8 @@ jobs:
                       remaining.pop(fname, None)
                   else:
                       uniq = len(set(digests))
-                      print(f"❌ Attribute mismatch detected ({uniq} unique attrs digests).", flush=True)
+                      print(f"❌ Mismatch detected. Unique attrs digests: {uniq}. "
+                            f"Counts all OK? {counts_all_ok}. Will retry if attempts remain.", flush=True)
                       results[fname] = False
                       failed_this_pass[fname] = url
                   print("::endgroup::")
@@ -187,7 +288,7 @@ jobs:
           # Write run summary (appears atop the job UI)
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
-              Path(summary_path).write_text("### ERD Fetch (attributes-only)\n" + "\n".join(lines) + "\n")
+              Path(summary_path).write_text("### ERD Fetch (IDs-first, attributes-only)\n" + "\n".join(lines) + "\n")
 
           if not ok_all:
               sys.exit(1)
@@ -195,8 +296,9 @@ jobs:
       - name: Commit updated JSONs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update ERD fires JSONs (verified copies + ERD_FETCH_TIME)"
+          commit_message: "chore(data): update ERD fires JSONs (IDs-first verified copies + ERD_FETCH_TIME)"
           file_pattern: |
             active_fires.json
             out_fires.json
             sums_table.json
+
