@@ -21,7 +21,7 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      - name: Fetch and verify feeds with partial overwrites (up to 5 passes, 5-in-a-row, 30s pause between passes)
+      - name: Fetch and verify feeds with partial overwrites (up to 5 passes, 5-in-a-row, 30s pause)
         id: fetch
         env:
           BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
@@ -31,8 +31,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Only delete numbered temp copies like foo01.json .. foo99.json (keep foo.json!)
           cleanup_prefix() {
-            rm -f "${1}"*.json || true
+            rm -f "${1}"[0-9][0-9].json || true
           }
 
           download_n() {
@@ -57,9 +58,9 @@ jobs:
 
           all_match() {
             local prefix="$1"
-            ls ${prefix}*.json >/dev/null 2>&1 || return 1
+            ls ${prefix}[0-9][0-9].json >/dev/null 2>&1 || return 1
             local uniq_count
-            uniq_count=$(sha256sum ${prefix}*.json | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
+            uniq_count=$(sha256sum ${prefix}[0-9][0-9].json | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
             test "$uniq_count" -eq 1
           }
 
@@ -71,12 +72,27 @@ jobs:
             echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '.tables[] | select(.name==$NAME) | .id' 2>/dev/null | tr -d '\r\n'
           }
 
-          # Track which datasets still need work
+          # Add UPDATED_FROM_ERD to every feature.attributes and write to target file
+          write_with_timestamp() {
+            local src="$1" dest="$2"
+            local ts
+            ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            # If it has .features (array), add/merge UPDATED_FROM_ERD inside each .attributes
+            # Otherwise, leave structure unchanged.
+            jq --arg ts "$ts" '
+              if (.features | type) == "array" then
+                .features = (.features | map(.attributes = ((.attributes // {}) + {"UPDATED_FROM_ERD": $ts})))
+              else
+                .
+              end
+            ' "$src" > "${dest}.tmp"
+            mv "${dest}.tmp" "$dest"
+          }
+
           ACTIVE_NEEDED=true
           OUT_NEEDED=true
           TABLE_NEEDED=true
 
-          # Resolve table ID once
           TID="$(get_table_id || true)"
           if [ -z "${TID:-}" ]; then
             echo "Could not find table id for $TABLE_NAME in service metadata."
@@ -85,7 +101,6 @@ jobs:
 
           ANY_CHANGED=false
 
-          # Up to 5 passes
           for pass in 1 2 3 4 5; do
             echo "::group::Pass $pass"
 
@@ -93,7 +108,8 @@ jobs:
               echo "Attempt: active fires (layer 0)"
               if download_n "$BASE/0/query$QUERY" "active_fires" "$COPIES"; then
                 if all_match "active_fires"; then
-                  cp -f active_fires01.json active_fires.json
+                  # write final file with timestamp
+                  write_with_timestamp active_fires01.json active_fires.json
                   echo "Active fires stabilized on pass $pass"
                   ACTIVE_NEEDED=false
                   ANY_CHANGED=true
@@ -110,7 +126,7 @@ jobs:
               echo "Attempt: out fires (layer 1)"
               if download_n "$BASE/1/query$QUERY" "out_fires" "$COPIES"; then
                 if all_match "out_fires"; then
-                  cp -f out_fires01.json out_fires.json
+                  write_with_timestamp out_fires01.json out_fires.json
                   echo "Out fires stabilized on pass $pass"
                   OUT_NEEDED=false
                   ANY_CHANGED=true
@@ -128,7 +144,7 @@ jobs:
               if [ -n "${TID:-}" ]; then
                 if download_n "$BASE/$TID/query$QUERY" "v_fire_dashboard_sum" "$COPIES"; then
                   if all_match "v_fire_dashboard_sum"; then
-                    cp -f v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
+                    write_with_timestamp v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
                     echo "Table $TABLE_NAME stabilized on pass $pass"
                     TABLE_NEEDED=false
                     ANY_CHANGED=true
