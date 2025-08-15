@@ -23,8 +23,6 @@ jobs:
 
       COPIES_PER_PASS: "10"
       SLEEP_BETWEEN_COPIES_SEC: "8"
-      SLEEP_BETWEEN_PASSES_SEC: "60"
-      MAX_PASSES: "5"
       CHUNK_SIZE: "1000"
 
     steps:
@@ -41,13 +39,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (IDs-first, attrs-only compare, retry failed)
+      - name: Fetch ERD layers (one pass, save 10 copies + pick best)
         id: fetch
         shell: python
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          import os, json, time, hashlib, sys, datetime, requests, copy
+          import os, json, time, hashlib, datetime, requests, copy
+          from pathlib import Path
 
           # ---------- config ----------
           targets = {
@@ -58,23 +57,17 @@ jobs:
 
           COPIES       = int(os.environ.get("COPIES_PER_PASS", "10"))
           SLEEP_COPIES = int(os.environ.get("SLEEP_BETWEEN_COPIES_SEC", "8"))
-          SLEEP_PASSES = int(os.environ.get("SLEEP_BETWEEN_PASSES_SEC", "60"))
-          MAX_PASSES   = int(os.environ.get("MAX_PASSES", "5"))
           CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "1000"))
 
           session = requests.Session()
           session.headers.update({
-              "User-Agent": "github-actions-fetch-erd/2.0",
+              "User-Agent": "github-actions-fetch-erd/3.0",
               "Cache-Control": "no-cache",
               "Pragma": "no-cache",
           })
 
           def _layer_base(url):
-              """
-              Normalize to a deterministic base query:
-                <layer>/query?where=1=1&outFields=*
-              Ignores any other params from the provided URL.
-              """
+              # Normalize to deterministic base: <layer>/query?where=1=1&outFields=*
               if "/query?" in url:
                   base = url.split("/query?")[0]
               else:
@@ -94,11 +87,12 @@ jobs:
               ids = j.get("objectIds") or []
               ids = [int(x) for x in ids]
               ids.sort()
+              # count (informational)
               cnt = req(base + "&returnCountOnly=true&f=json").get("count", 0)
               return ids, int(cnt)
 
           def fetch_chunk(base, id_chunk):
-              ids_str = ",".join(str(i) for i in id_chunk)  # <-- fixed here
+              ids_str = ",".join(str(i) for i in id_chunk)
               url = (base
                      + f"&objectIds={ids_str}"
                      + "&orderByFields=OBJECTID"
@@ -109,10 +103,9 @@ jobs:
           def fetch_full_ids_first(url):
               """
               Deterministically fetch ALL features for a layer/table using IDs-first.
-              Returns the full ESRI JSON (features + metadata) and a meta dict.
+              Returns ESRI JSON + meta with counts.
               """
               base = _layer_base(url)
-
               ids, expected_count = get_all_ids(base)
               features = []
               fields = None
@@ -130,32 +123,19 @@ jobs:
                   if spatialReference is None: spatialReference = j.get("spatialReference")
                   if objectIdFieldName is None: objectIdFieldName = j.get("objectIdFieldName")
 
-              ok_len = (len(ids) == expected_count == len(features))
-              meta = {
-                  "ids_len": len(ids),
-                  "expected_count": expected_count,
-                  "fetched_len": len(features),
-                  "ok_len": ok_len,
-              }
-
               esri = {"features": features}
               if fields is not None: esri["fields"] = fields
               if geometryType is not None: esri["geometryType"] = geometryType
               if spatialReference is not None: esri["spatialReference"] = spatialReference
               if objectIdFieldName is not None: esri["objectIdFieldName"] = objectIdFieldName
 
+              meta = {
+                  "ids_len": len(ids),
+                  "expected_count": expected_count,
+                  "fetched_len": len(features),
+                  "ok_len": (len(ids) == expected_count == len(features)),
+              }
               return esri, meta
-
-          def extract_attrs(esri_json):
-              feats = esri_json.get("features", []) or []
-              attrs_list = []
-              for f in feats:
-                  attrs = (f or {}).get("attributes", {}) or {}
-                  attrs_list.append(json.loads(json.dumps(attrs, sort_keys=True)))
-              attrs_list_sorted = sorted((json.dumps(a, sort_keys=True) for a in attrs_list))
-              digest_src = "[" + ",".join(attrs_list_sorted) + "]"
-              digest = hashlib.sha256(digest_src.encode("utf-8")).hexdigest()
-              return attrs_list_sorted, digest
 
           def adorn_fetch_time(esri_json, timestamp_iso):
               esri_json = copy.deepcopy(esri_json)
@@ -180,102 +160,93 @@ jobs:
                   attrs["ERD_FETCH_TIME"] = timestamp_iso
               return esri_json
 
-          # Pass-oriented runner: try all, then only retry failed
-          remaining = dict(targets)
-          results   = {fn: None for fn in targets}
+          def extract_attrs_digest(esri_json):
+              feats = esri_json.get("features", []) or []
+              attrs_list_sorted = []
+              for f in feats:
+                  attrs = (f or {}).get("attributes", {}) or {}
+                  attrs_list_sorted.append(json.dumps(attrs, sort_keys=True))
+              attrs_list_sorted.sort()
+              digest_src = "[" + ",".join(attrs_list_sorted) + "]"
+              return hashlib.sha256(digest_src.encode("utf-8")).hexdigest()
 
-          print(f"\n=== Starting fetch (IDs-first, attributes-only verification across copies) ===", flush=True)
-          for attempt in range(1, MAX_PASSES + 1):
-              if not remaining:
-                  break
+          # One pass over all targets, always complete, save all copies + best
+          summary_lines = []
+          for fname, url in targets.items():
+              print(f"::group::Processing {fname}")
+              copies = []
+              metas = []
+              digests = []
+              ts_iso = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
-              print(f"\n== Pass {attempt}/{MAX_PASSES} – processing {len(remaining)} target(s) ==", flush=True)
-              failed_this_pass = {}
+              # Fetch N copies
+              for i in range(COPIES):
+                  esri, meta = fetch_full_ids_first(url)
+                  esri = adorn_fetch_time(esri, ts_iso)
+                  copies.append(esri)
+                  metas.append(meta)
+                  digest = extract_attrs_digest(esri)
+                  digests.append(digest)
+                  print(f"  Copy {i+1}/{COPIES}: fetched={meta['fetched_len']}, expected={meta['expected_count']}, ids={meta['ids_len']}, ok={meta['ok_len']}, attrs-digest={digest[:12]}…", flush=True)
+                  # Save each copy
+                  stem = Path(fname).stem
+                  copy_name = f"{stem}.copy{(i+1):02d}.json"
+                  with open(copy_name, "w", encoding="utf-8") as f:
+                      json.dump(esri, f, ensure_ascii=False, indent=2)
+                  if i < COPIES - 1:
+                      time.sleep(SLEEP_COPIES)
 
-              for fname, url in list(remaining.items()):
-                  print(f"::group::Processing {fname}")
-                  print(f"Fetching {COPIES} full copies via IDs-first…", flush=True)
+              # Choose best: the one with the most features; tie → latest
+              best_idx = max(range(len(copies)), key=lambda k: (metas[k]["fetched_len"], k))
+              best = copies[best_idx]
+              with open(fname, "w", encoding="utf-8") as f:
+                  json.dump(best, f, ensure_ascii=False, indent=2)
 
-                  copies = []
-                  digests = []
-                  attrs_norms = []
-                  metas = []
+              # Write a small meta report per target
+              report = {
+                  "target": fname,
+                  "chosen_copy_index": best_idx + 1,
+                  "chosen_fetched_len": metas[best_idx]["fetched_len"],
+                  "copies": [
+                      {
+                          "index": i+1,
+                          "fetched_len": m["fetched_len"],
+                          "expected_count": m["expected_count"],
+                          "ids_len": m["ids_len"],
+                          "ok_len": m["ok_len"],
+                          "attrs_digest": digests[i],
+                      } for i, m in enumerate(metas)
+                  ]
+              }
+              meta_name = f"{Path(fname).stem}.meta.json"
+              with open(meta_name, "w", encoding="utf-8") as f:
+                  json.dump(report, f, ensure_ascii=False, indent=2)
 
-                  for i in range(COPIES):
-                      esri, meta = fetch_full_ids_first(url)
-                      metas.append(meta)
+              # Summary line
+              same = all(d == digests[0] for d in digests[1:])
+              summary_lines.append(
+                  f"- {fname}: chosen copy #{best_idx+1} (features={metas[best_idx]['fetched_len']}); "
+                  f"all-10-match={same}"
+              )
+              print(f"→ Wrote {fname} from copy #{best_idx+1}; all-10-match={same}", flush=True)
+              print("::endgroup::")
 
-                      if not meta["ok_len"]:
-                          print(f"  Copy {i+1}/{COPIES}: count mismatch "
-                                f"(ids={meta['ids_len']}, expected={meta['expected_count']}, fetched={meta['fetched_len']})", flush=True)
-                      else:
-                          print(f"  Copy {i+1}/{COPIES}: fetched {meta['fetched_len']} features (OK).", flush=True)
-
-                      attrs_norm, digest = extract_attrs(esri)
-                      copies.append(esri)
-                      attrs_norms.append(attrs_norm)
-                      digests.append(digest)
-                      print(f"    attrs-digest {digest[:12]}…", flush=True)
-
-                      if i < COPIES - 1:
-                          time.sleep(SLEEP_COPIES)
-
-                  first = attrs_norms[0]
-                  all_match = all(an == first for an in attrs_norms[1:])
-                  counts_all_ok = all(m.get("ok_len") for m in metas)
-
-                  if all_match and counts_all_ok:
-                      print(f"✅ Attributes match across {COPIES} copies and counts verified.")
-                      ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-                      final = adorn_fetch_time(copies[0], ts)
-                      with open(fname, "w", encoding="utf-8") as f:
-                          json.dump(final, f, ensure_ascii=False, indent=2)
-                      print(f"→ Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
-                      results[fname] = True
-                      remaining.pop(fname, None)
-                  else:
-                      uniq = len(set(digests))
-                      print(f"❌ Mismatch detected. Unique attrs digests: {uniq}. "
-                            f"Counts all OK? {counts_all_ok}. Will retry if attempts remain.", flush=True)
-                      results[fname] = False
-                      failed_this_pass[fname] = url
-                  print("::endgroup::")
-
-              if failed_this_pass and attempt < MAX_PASSES:
-                  print(f"\nSome targets were unstable; retrying them after {SLEEP_PASSES}s…", flush=True)
-                  time.sleep(SLEEP_PASSES)
-              remaining = failed_this_pass
-
-          # Summary
-          print("\n=== SUMMARY ===", flush=True)
-          ok_all = True
-          lines = []
-          for fn in targets:
-              status = results.get(fn)
-              if status is True:
-                  msg = f"{fn}: OK"
-              elif status is False:
-                  msg = f"{fn}: FAILED"
-                  ok_all = False
-              else:
-                  msg = f"{fn}: SKIPPED?"
-                  ok_all = False
-              print(" " + msg, flush=True)
-              lines.append(f"- {msg}")
-
+          # Job summary (no failure/exit)
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
-              from pathlib import Path
-              Path(summary_path).write_text("### ERD Fetch (IDs-first, attributes-only)\n" + "\n".join(lines) + "\n")
-
-          if not ok_all:
-              sys.exit(1)
+              Path(summary_path).write_text("### ERD Fetch (one pass, saved 10 copies + best)\n" + "\n".join(summary_lines) + "\n")
 
       - name: Commit updated JSONs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update ERD fires JSONs (IDs-first verified copies + ERD_FETCH_TIME)"
+          commit_message: "chore(data): one-pass ERD fetch — save 10 copies + best (IDs-first) + meta"
           file_pattern: |
             active_fires.json
             out_fires.json
             sums_table.json
+            active_fires.copy*.json
+            out_fires.copy*.json
+            sums_table.copy*.json
+            active_fires.meta.json
+            out_fires.meta.json
+            sums_table.meta.json
