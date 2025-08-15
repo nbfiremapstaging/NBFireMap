@@ -27,9 +27,6 @@ jobs:
       MAX_PASSES: "5"
       CHUNK_SIZE: "1000"
 
-      # distance tolerance for point coords (meters)
-      TOL_METERS: "10"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,18 +41,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers (GeoJSON; compare text attrs + coord closeness; retry failed)
+      - name: Fetch ERD layers (GeoJSON; compare string attrs only; retry failed)
         id: fetch
         shell: python
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          import os, json, time, sys, datetime, requests, copy, math
+          import os, json, time, sys, datetime, requests, copy
           from pathlib import Path
           from urllib.parse import urlencode
 
           # ---------- config ----------
-          # final outputs end with .geojson so GitHub renders them
           targets = {
               "active_fires.geojson": os.environ["ACTIVE_URL"],
               "out_fires.geojson":    os.environ["OUT_URL"],
@@ -67,11 +63,10 @@ jobs:
           SLEEP_PASSES = int(os.environ.get("SLEEP_BETWEEN_PASSES_SEC", "60"))
           MAX_PASSES   = int(os.environ.get("MAX_PASSES", "5"))
           CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "1000"))
-          TOL_METERS   = float(os.environ.get("TOL_METERS", "10"))
 
           session = requests.Session()
           session.headers.update({
-              "User-Agent": "github-actions-fetch-erd/geojson-1.0",
+              "User-Agent": "github-actions-fetch-erd/geojson-strings-only/1.0",
               "Cache-Control": "no-cache",
               "Pragma": "no-cache",
           })
@@ -98,7 +93,7 @@ jobs:
               return r.json()
 
           def layer_info(url):
-              # read layer metadata once (fields, geometryType, objectIdField)
+              # read layer/table metadata (fields, geometryType, objectIdField)
               info = req_json(_layer_url(url) + "?f=json")
               fields = info.get("fields") or []
               gtype  = info.get("geometryType")
@@ -108,13 +103,16 @@ jobs:
           def get_all_ids(base):
               j = req_json(base + "&returnIdsOnly=true&f=json")
               ids = j.get("objectIds") or []
-              ids = [int(x) for x in ids]
+              try:
+                  ids = [int(x) for x in ids]
+              except Exception:
+                  ids = list(ids)
               ids.sort()
               cnt = req_json(base + "&returnCountOnly=true&f=json").get("count", 0)
               return ids, int(cnt)
 
           def fetch_chunk_geojson(base, id_chunk):
-              # Ask ArcGIS for GeoJSON directly; it returns WGS84 lon/lat
+              # Ask ArcGIS for GeoJSON directly; returns WGS84, geometry null for tables
               qs = "&" + urlencode({
                   "objectIds": ",".join(str(i) for i in id_chunk),
                   "orderByFields": "OBJECTID",
@@ -126,7 +124,7 @@ jobs:
           def fetch_full_geojson(url):
               """
               Deterministic all-rows fetch:
-                - read schema (f=json, once)
+                - read schema (f=json)
                 - get IDs (returnIdsOnly)
                 - chunk features as GeoJSON (f=geojson)
               Returns (feature_collection, meta, schema)
@@ -142,17 +140,14 @@ jobs:
                   feats = gj.get("features") or []
                   features.extend(feats)
 
-              fc = {
-                  "type": "FeatureCollection",
-                  "features": features,
-              }
+              fc = { "type": "FeatureCollection", "features": features }
               meta = {
                   "ids_len": len(ids),
                   "expected_count": expected_count,
                   "fetched_len": len(features),
                   "ok_len": (len(ids) == expected_count == len(features)),
               }
-              schema = {"fields": fields, "geometryType": gtype, "oid_field": oidf}
+              schema = { "fields": fields, "geometryType": gtype, "oid_field": oidf }
               return fc, meta, schema
 
           def stamp_fetch_time(fc, ts_iso):
@@ -162,7 +157,7 @@ jobs:
                   props["ERD_FETCH_TIME"] = ts_iso
               return out
 
-          # ---- comparison helpers (string props + point closeness) ----
+          # ---- comparison helpers (string properties only) ----
           def string_field_names(fields):
               names = []
               for f in (fields or []):
@@ -184,33 +179,11 @@ jobs:
                           m[str(oid)] = feat
               return m
 
-          def haversine_m(lon1, lat1, lon2, lat2):
-              R = 6371000.0
-              dlat = math.radians(lat2 - lat1)
-              dlon = math.radians(lon2 - lon1)
-              a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1))*math.cos(math.radians(lat2))*math.sin(dlon/2)**2
-              c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-              return R * c
-
-          def point_dist_m(geom1, geom2):
-              if not geom1 or not geom2:
-                  return float("inf")
-              if geom1.get("type") != "Point" or geom2.get("type") != "Point":
-                  return 0.0  # we only enforce for points; others considered OK
-              coords1 = geom1.get("coordinates") or []
-              coords2 = geom2.get("coordinates") or []
-              if len(coords1) < 2 or len(coords2) < 2:
-                  return float("inf")
-              lon1, lat1 = float(coords1[0]), float(coords1[1])
-              lon2, lat2 = float(coords2[0]), float(coords2[1])
-              return haversine_m(lon1, lat1, lon2, lat2)
-
-          def copies_match_text_and_coords_geojson(copies, schema):
+          def copies_match_string_props_only(copies, schema):
               if not copies:
                   return False, {"reason": "no copies"}
 
               fields = schema.get("fields") or []
-              gtype  = schema.get("geometryType")
               oidf   = schema.get("oid_field") or "OBJECTID"
               sfields = string_field_names(fields)
 
@@ -222,29 +195,21 @@ jobs:
                   if set(m.keys()) != base_oids:
                       return False, {"reason": f"OID set mismatch at copy {i}"}
 
-              # per-oid checks (strings + point coords closeness)
+              # per-oid string property equality
               for oid in sorted(base_oids):
-                  base_feat = maps[0][oid]
-                  base_props = base_feat.get("properties") or {}
+                  base_props = (maps[0][oid].get("properties") or {})
                   for i, m in enumerate(maps[1:], start=2):
-                      feat = m[oid]
-                      props = feat.get("properties") or {}
-                      # string props equal
+                      props = (m[oid].get("properties") or {})
                       for fn in sfields:
                           if str(base_props.get(fn)) != str(props.get(fn)):
-                              return False, {"reason": "text attr mismatch", "oid": oid, "field": fn, "copy": i}
-                      # coordinates closeness only for points
-                      if gtype == "esriGeometryPoint":
-                          d = point_dist_m(base_feat.get("geometry"), feat.get("geometry"))
-                          if not (d == d) or d > TOL_METERS:
-                              return False, {"reason": "geom too far", "oid": oid, "copy": i, "distance_m": d}
+                              return False, {"reason": "string attr mismatch", "oid": oid, "field": fn, "copy": i}
               return True, {"reason": "all good"}
 
           # ---------- main driver ----------
           remaining = dict(targets)
           results   = {fn: None for fn in targets}
 
-          print(f"\n=== Starting fetch (GeoJSON; verify text attrs + coordinate closeness) ===", flush=True)
+          print(f"\n=== Starting fetch (GeoJSON; verify string attributes only) ===", flush=True)
           for attempt in range(1, MAX_PASSES + 1):
               if not remaining:
                   break
@@ -266,6 +231,7 @@ jobs:
                       if i < COPIES - 1:
                           time.sleep(SLEEP_COPIES)
 
+                  # all copies must have full counts
                   counts_ok = all(m.get("ok_len") for m in metas)
                   if not counts_ok:
                       print("  ✖ Count mismatch across copies — will retry.", flush=True)
@@ -274,9 +240,9 @@ jobs:
                       print("::endgroup::")
                       continue
 
-                  match, report = copies_match_text_and_coords_geojson(copies, schema)
+                  match, report = copies_match_string_props_only(copies, schema)
                   if match:
-                      print("  ✅ Text attributes match and coordinates are within tolerance across copies.", flush=True)
+                      print("  ✅ String attributes match across copies.", flush=True)
                       ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
                       final = stamp_fetch_time(copies[0], ts)
                       with open(fname, "w", encoding="utf-8") as f:
@@ -316,8 +282,7 @@ jobs:
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
               Path(summary_path).write_text(
-                  "### ERD Fetch (GeoJSON; text-attrs + coord closeness)\n"
-                  f"- Tolerance: {TOL_METERS} m\n"
+                  "### ERD Fetch (GeoJSON; string-attrs only)\n"
                   + "\n".join(lines) + "\n"
               )
 
@@ -327,7 +292,7 @@ jobs:
       - name: Commit updated GeoJSONs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update ERD fires GeoJSONs (text-attrs + coord closeness verified)"
+          commit_message: "chore(data): update ERD fires GeoJSONs (string attributes verified across copies)"
           file_pattern: |
             active_fires.geojson
             out_fires.geojson
