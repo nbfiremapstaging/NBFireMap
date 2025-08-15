@@ -1,30 +1,22 @@
-name: Fetch ERD Fires JSON
+name: Fetch ERD Fire Datasets
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "38 * * * *"
-
-permissions:
-  contents: write
-
-concurrency:
-  group: fetch-erd-fires
-  cancel-in-progress: false
+    # Runs at 21 minutes after every hour (UTC)
+    - cron: "21 * * * *"
+  workflow_dispatch: {}
 
 jobs:
   fetch-and-commit:
     runs-on: ubuntu-latest
-
     env:
-      ACTIVE_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
-      OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
-      SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
-
-      COPIES_PER_PASS: "1"
-      SLEEP_BETWEEN_COPIES_SEC: "4"
-      CHUNK_SIZE: "1000"
-
+      PYTHONUNBUFFERED: "1"
+      ACTIVE_FIRES_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query"
+      OUT_FIRES_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query"
+      SUMS_TABLE_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query"
+      ACTIVE_FIRES_FILE: "active_fires.geojson"
+      OUT_FIRES_FILE: "out_fires.geojson"
+      SUMS_TABLE_FILE: "sums_table.json"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,219 +26,225 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers (one pass, save 10 copies + pick best)
-        id: fetch
-        shell: python
-        env:
-          PYTHONUNBUFFERED: "1"
+      - name: Fetch ERD layers, validate, and write files
+        shell: bash
         run: |
-          import os, json, time, hashlib, datetime, requests, copy
-          from pathlib import Path
+          set -euo pipefail
 
-          # ---------- config ----------
-          targets = {
-              "active_fires.json": os.environ["ACTIVE_URL"],
-              "out_fires.json":    os.environ["OUT_URL"],
-              "sums_table.json":   os.environ["SUMS_URL"],
-          }
+          python -u - << 'PYCODE'
+          import os, sys, time, json, hashlib
+          import requests
 
-          COPIES       = int(os.environ.get("COPIES_PER_PASS", "10"))
-          SLEEP_COPIES = int(os.environ.get("SLEEP_BETWEEN_COPIES_SEC", "8"))
-          CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "1000"))
+          SESSION = requests.Session()
+          SESSION.headers.update({"User-Agent": "github-actions ERD fetcher"})
 
-          session = requests.Session()
-          session.headers.update({
-              "User-Agent": "github-actions-fetch-erd/3.0",
-              "Cache-Control": "no-cache",
-              "Pragma": "no-cache",
-          })
+          def log(msg):
+              ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+              print(f"[{ts} UTC] {msg}", flush=True)
 
-          def _layer_base(url):
-              # Normalize to deterministic base: <layer>/query?where=1=1&outFields=*
-              if "/query?" in url:
-                  base = url.split("/query?")[0]
-              else:
-                  base = url.rstrip("/")
-              return base + "/query?where=1%3D1&outFields=*"
+          def arcgis_query(url, params):
+              """Perform a GET with retries for transient HTTP errors."""
+              for attempt in range(1, 4):
+                  try:
+                      resp = SESSION.get(url, params=params, timeout=60)
+                      if resp.status_code == 200:
+                          return resp
+                      log(f"HTTP {resp.status_code} from {url} (attempt {attempt})")
+                  except Exception as e:
+                      log(f"Request error (attempt {attempt}): {e}")
+                  time.sleep(1)
+              raise RuntimeError(f"Failed to fetch after 3 HTTP attempts: {url}")
 
-          def _ts():
-              return str(int(time.time() * 1000))
-
-          def req(url, timeout=60):
-              r = session.get(url + ("&_ts=" + _ts()), timeout=timeout)
-              r.raise_for_status()
-              return r.json()
-
-          def get_all_ids(base):
-              j = req(base + "&returnIdsOnly=true&f=json")
-              ids = j.get("objectIds") or []
-              ids = [int(x) for x in ids]
-              ids.sort()
-              # count (informational)
-              cnt = req(base + "&returnCountOnly=true&f=json").get("count", 0)
-              return ids, int(cnt)
-
-          def fetch_chunk(base, id_chunk):
-              ids_str = ",".join(str(i) for i in id_chunk)
-              url = (base
-                     + f"&objectIds={ids_str}"
-                     + "&orderByFields=OBJECTID"
-                     + "&returnGeometry=true"
-                     + "&f=json")
-              return req(url)
-
-          def fetch_full_ids_first(url):
+          def features_to_signature(feature_collection):
               """
-              Deterministically fetch ALL features for a layer/table using IDs-first.
-              Returns ESRI JSON + meta with counts.
+              Build a deterministic signature for a GeoJSON FeatureCollection
+              based on count and string-attribute concat per feature.
+              Sorting by OBJECTID (common) when present, else by a properties dump.
               """
-              base = _layer_base(url)
-              ids, expected_count = get_all_ids(base)
-              features = []
-              fields = None
-              geometryType = None
-              spatialReference = None
-              objectIdFieldName = None
+              feats = feature_collection.get("features", [])
+              def feature_key(f):
+                  props = f.get("properties", {}) if "properties" in f else f.get("attributes", {})
+                  if isinstance(props, dict):
+                      for key in ("OBJECTID", "ObjectID", "objectid"):
+                          if key in props:
+                              return (0, props[key])
+                  # fallback: stable json of props
+                  return (1, hashlib.sha256(json.dumps(props, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest())
 
-              for start in range(0, len(ids), CHUNK_SIZE):
-                  chunk = ids[start:start+CHUNK_SIZE]
-                  j = fetch_chunk(base, chunk)
-                  feats = j.get("features") or []
-                  features.extend(feats)
-                  if fields is None: fields = j.get("fields")
-                  if geometryType is None: geometryType = j.get("geometryType")
-                  if spatialReference is None: spatialReference = j.get("spatialReference")
-                  if objectIdFieldName is None: objectIdFieldName = j.get("objectIdFieldName")
-
-              esri = {"features": features}
-              if fields is not None: esri["fields"] = fields
-              if geometryType is not None: esri["geometryType"] = geometryType
-              if spatialReference is not None: esri["spatialReference"] = spatialReference
-              if objectIdFieldName is not None: esri["objectIdFieldName"] = objectIdFieldName
-
-              meta = {
-                  "ids_len": len(ids),
-                  "expected_count": expected_count,
-                  "fetched_len": len(features),
-                  "ok_len": (len(ids) == expected_count == len(features)),
-              }
-              return esri, meta
-
-          def adorn_fetch_time(esri_json, timestamp_iso):
-              esri_json = copy.deepcopy(esri_json)
-              fields = esri_json.get("fields", [])
-              if not isinstance(fields, list):
-                  fields = []
-              if not any((f or {}).get("name") == "ERD_FETCH_TIME" for f in fields):
-                  fields.append({
-                      "name": "ERD_FETCH_TIME",
-                      "type": "esriFieldTypeString",
-                      "alias": "ERD_FETCH_TIME",
-                      "sqlType": "sqlTypeOther",
-                      "length": 32,
-                      "nullable": True,
-                      "editable": False,
-                      "domain": None,
-                      "defaultValue": None
-                  })
-              esri_json["fields"] = fields
-              for feat in esri_json.get("features", []) or []:
-                  attrs = feat.setdefault("attributes", {})
-                  attrs["ERD_FETCH_TIME"] = timestamp_iso
-              return esri_json
-
-          def extract_attrs_digest(esri_json):
-              feats = esri_json.get("features", []) or []
-              attrs_list_sorted = []
+              # Normalize to properties for GeoJSON responses
+              norm = []
               for f in feats:
-                  attrs = (f or {}).get("attributes", {}) or {}
-                  attrs_list_sorted.append(json.dumps(attrs, sort_keys=True))
-              attrs_list_sorted.sort()
-              digest_src = "[" + ",".join(attrs_list_sorted) + "]"
-              return hashlib.sha256(digest_src.encode("utf-8")).hexdigest()
+                  props = f.get("properties", f.get("attributes", {}))
+                  if props is None: props = {}
+                  # Concatenate all string attribute values for the feature
+                  strings = []
+                  for k, v in props.items():
+                      if isinstance(v, str):
+                          strings.append(v)
+                  strings.sort()
+                  norm.append(("".join(strings), feature_key(f)))
 
-          # One pass over all targets, always complete, save all copies + best
-          summary_lines = []
-          for fname, url in targets.items():
-              print(f"::group::Processing {fname}")
-              copies = []
-              metas = []
-              digests = []
-              ts_iso = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+              norm.sort(key=lambda t: t[1])
+              concat = "|".join(s for s, _ in norm)
+              return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
 
-              # Fetch N copies
-              for i in range(COPIES):
-                  esri, meta = fetch_full_ids_first(url)
-                  esri = adorn_fetch_time(esri, ts_iso)
-                  copies.append(esri)
-                  metas.append(meta)
-                  digest = extract_attrs_digest(esri)
-                  digests.append(digest)
-                  print(f"  Copy {i+1}/{COPIES}: fetched={meta['fetched_len']}, expected={meta['expected_count']}, ids={meta['ids_len']}, ok={meta['ok_len']}, attrs-digest={digest[:12]}…", flush=True)
-                  # Save each copy
-                  stem = Path(fname).stem
-                  copy_name = f"{stem}.copy{(i+1):02d}.json"
-                  with open(copy_name, "w", encoding="utf-8") as f:
-                      json.dump(esri, f, ensure_ascii=False, indent=2)
-                  if i < COPIES - 1:
-                      time.sleep(SLEEP_COPIES)
+          def table_to_signature(table_json):
+              """
+              Build a deterministic signature for an ArcGIS table (f=json with fields + features).
+              Uses attributes string fields only.
+              """
+              feats = table_json.get("features", [])
+              rows = []
+              for f in feats:
+                  attrs = f.get("attributes", {}) or {}
+                  strings = []
+                  for k, v in attrs.items():
+                      if isinstance(v, str):
+                          strings.append(v)
+                  strings.sort()
+                  rows.append("".join(strings))
+              rows.sort()
+              concat = "|".join(rows)
+              return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
 
-              # Choose best: the one with the most features; tie → latest
-              best_idx = max(range(len(copies)), key=lambda k: (metas[k]["fetched_len"], k))
-              best = copies[best_idx]
-              with open(fname, "w", encoding="utf-8") as f:
-                  json.dump(best, f, ensure_ascii=False, indent=2)
+          def download_copies(kind, url, params_builder, is_geojson=True, copies=4):
+              """
+              Download multiple copies, 1s apart, return list of parsed payloads and a similarity verdict.
+              """
+              payloads = []
+              sigs = []
+              for i in range(copies):
+                  params = params_builder()
+                  resp = arcgis_query(url, params)
+                  try:
+                      data = resp.json()
+                  except Exception as e:
+                      raise RuntimeError(f"Invalid JSON for {kind}: {e}")
 
-              # Write a small meta report per target
-              report = {
-                  "target": fname,
-                  "chosen_copy_index": best_idx + 1,
-                  "chosen_fetched_len": metas[best_idx]["fetched_len"],
-                  "copies": [
-                      {
-                          "index": i+1,
-                          "fetched_len": m["fetched_len"],
-                          "expected_count": m["expected_count"],
-                          "ids_len": m["ids_len"],
-                          "ok_len": m["ok_len"],
-                          "attrs_digest": digests[i],
-                      } for i, m in enumerate(metas)
-                  ]
-              }
-              meta_name = f"{Path(fname).stem}.meta.json"
-              with open(meta_name, "w", encoding="utf-8") as f:
-                  json.dump(report, f, ensure_ascii=False, indent=2)
+                  # ArcGIS errors come back as JSON too
+                  if isinstance(data, dict) and data.get("error"):
+                      raise RuntimeError(f"ArcGIS error for {kind}: {data['error']}")
 
-              # Summary line
-              same = all(d == digests[0] for d in digests[1:])
-              summary_lines.append(
-                  f"- {fname}: chosen copy #{best_idx+1} (features={metas[best_idx]['fetched_len']}); "
-                  f"all-10-match={same}"
-              )
-              print(f"→ Wrote {fname} from copy #{best_idx+1}; all-10-match={same}", flush=True)
-              print("::endgroup::")
+                  payloads.append(data)
+                  if is_geojson:
+                      count, sig = features_to_signature(data)
+                  else:
+                      count, sig = table_to_signature(data)
+                  sigs.append((count, sig))
+                  log(f"{kind}: copy {i+1}/{copies} -> features={count} sig={sig[:12]}")
+                  time.sleep(1)
 
-          # Job summary (no failure/exit)
-          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-          if summary_path:
-              Path(summary_path).write_text("### ERD Fetch (one pass, saved 10 copies + best)\n" + "\n".join(summary_lines) + "\n")
+              # All copies must match
+              ok = all(sigs[0] == s for s in sigs[1:])
+              return payloads, ok, sigs[0]
 
-      - name: Commit updated JSONs
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore(data): one-pass ERD fetch — save 10 copies + best (IDs-first) + meta"
-          file_pattern: |
-            active_fires.json
-            out_fires.json
-            sums_table.json
-            active_fires.copy*.json
-            out_fires.copy*.json
-            sums_table.copy*.json
-            active_fires.meta.json
-            out_fires.meta.json
-            sums_table.meta.json
+          def add_timestamp_to_geojson(data, timestamp):
+              # Ensure proper GeoJSON structure (FeatureCollection, features list)
+              if data.get("type") != "FeatureCollection":
+                  raise RuntimeError("GeoJSON did not contain a FeatureCollection")
+              feats = data.get("features", [])
+              for f in feats:
+                  if "properties" not in f or not isinstance(f["properties"], dict):
+                      f["properties"] = {}
+                  f["properties"]["FETCHED_FROM_ERD"] = int(timestamp)
+              return data
+
+          def add_timestamp_to_table(data, timestamp):
+              feats = data.get("features", [])
+              for f in feats:
+                  attrs = f.get("attributes")
+                  if attrs is None or not isinstance(attrs, dict):
+                      f["attributes"] = {}
+                      attrs = f["attributes"]
+                  attrs["FETCHED_FROM_ERD"] = int(timestamp)
+              return data
+
+          def attempt_fetch(kind, url, is_geojson, outfile, max_attempts=5):
+              for attempt in range(1, max_attempts + 1):
+                  log(f"=== {kind}: attempt {attempt}/{max_attempts} ===")
+                  def params_geo():
+                      return {
+                          "where": "1=1",
+                          "outFields": "*",
+                          "outSR": "4326",
+                          "f": "geojson"
+                      }
+                  def params_table():
+                      return {
+                          "where": "1=1",
+                          "outFields": "*",
+                          "returnGeometry": "false",
+                          "f": "json"
+                      }
+                  params_builder = params_geo if is_geojson else params_table
+                  payloads, ok, sig = download_copies(kind, url, params_builder, is_geojson=is_geojson, copies=4)
+                  if not ok:
+                      log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
+                      continue
+
+                  # Use the first payload as the canonical one, add timestamp
+                  ts = int(time.time())
+                  if is_geojson:
+                      final = add_timestamp_to_geojson(payloads[0], ts)
+                  else:
+                      final = add_timestamp_to_table(payloads[0], ts)
+
+                  # Write file
+                  with open(outfile, "w", encoding="utf-8") as f:
+                      json.dump(final, f, ensure_ascii=False, indent=2)
+                  log(f"{kind}: wrote {outfile} (features/signature {sig[0] if isinstance(sig, tuple) else ''})")
+                  return True
+
+              log(f"{kind}: FAILED after {max_attempts} attempts")
+              return False
+
+          # Orchestrate all three datasets
+          success_all = True
+          success_all &= attempt_fetch(
+              kind="active_fires (layer 0)",
+              url=os.environ["ACTIVE_FIRES_URL"],
+              is_geojson=True,
+              outfile=os.environ["ACTIVE_FIRES_FILE"]
+          )
+          success_all &= attempt_fetch(
+              kind="out_fires (layer 1)",
+              url=os.environ["OUT_FIRES_URL"],
+              is_geojson=True,
+              outfile=os.environ["OUT_FIRES_FILE"]
+          )
+          success_all &= attempt_fetch(
+              kind="sums_table (layer 2)",
+              url=os.environ["SUMS_TABLE_URL"],
+              is_geojson=False,
+              outfile=os.environ["SUMS_TABLE_FILE"]
+          )
+
+          if not success_all:
+              log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
+          else:
+              log("All datasets fetched and validated successfully.")
+
+          PYCODE
+
+      - name: Commit and push (if changed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain
+          CHANGED="$(git status --porcelain)"
+          if [ -n "$CHANGED" ]; then
+            echo "Changes detected; committing…"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" || true
+            git commit -m "Update ERD fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+            echo "Pushed updates."
+          else
+            echo "No changes to commit."
+          fi
