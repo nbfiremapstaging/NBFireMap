@@ -55,7 +55,7 @@ jobs:
           targets = {
               "active_fires.geojson": os.environ["ACTIVE_URL"],
               "out_fires.geojson":    os.environ["OUT_URL"],
-              "sums_table.geojson":   os.environ["SUMS_URL"],
+              "sums_table.json":      os.environ["SUMS_URL"],   # <-- changed to .json
           }
 
           COPIES       = int(os.environ.get("COPIES_PER_PASS", "10"))
@@ -227,6 +227,15 @@ jobs:
                               return False, {"reason": "string attr mismatch", "oid": oid, "field": fn, "copy": i}
               return True, {"reason": "all good"}
 
+          # Convert a FeatureCollection to attribute rows (for sums_table.json)
+          def fc_to_rows_with_stamp(fc, ts_iso):
+              rows = []
+              for feat in (fc.get("features") or []):
+                  props = dict((feat or {}).get("properties") or {})
+                  props["ERD_FETCH_TIME"] = ts_iso
+                  rows.append(props)
+              return rows
+
           # ---------- main driver ----------
           remaining = dict(targets)
           results   = {fn: None for fn in targets}
@@ -265,10 +274,20 @@ jobs:
                   if match:
                       print("  ✅ String attributes match across copies.", flush=True)
                       ts = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat().replace("+00:00","Z")
-                      final = stamp_fetch_time(copies[0], ts)
-                      with open(fname, "w", encoding="utf-8") as f:
-                          json.dump(final, f, ensure_ascii=False, indent=2)
-                      print(f"  → Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
+
+                      if fname == "sums_table.json":
+                          # Write plain JSON (attributes-only rows) for the sums table
+                          rows = fc_to_rows_with_stamp(copies[0], ts)
+                          with open(fname, "w", encoding="utf-8") as f:
+                              json.dump({"rows": rows}, f, ensure_ascii=False, indent=2)
+                          print(f"  → Wrote {fname} (rows JSON) with ERD_FETCH_TIME={ts}", flush=True)
+                      else:
+                          # Write GeoJSON for map layers
+                          final = stamp_fetch_time(copies[0], ts)
+                          with open(fname, "w", encoding="utf-8") as f:
+                              json.dump(final, f, ensure_ascii=False, indent=2)
+                          print(f"  → Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
+
                       results[fname] = True
                   else:
                       print(f"  ✖ Verification failed: {report}", flush=True)
@@ -317,4 +336,4 @@ jobs:
           file_pattern: |
             active_fires.geojson
             out_fires.geojson
-            sums_table.geojson
+            sums_table.json
