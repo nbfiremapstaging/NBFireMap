@@ -37,7 +37,7 @@ jobs:
           set -euo pipefail
 
           python -u - << 'PYCODE'
-          import os, sys, time, json, hashlib
+          import os, time, json, hashlib
           import requests
 
           SESSION = requests.Session()
@@ -47,254 +47,36 @@ jobs:
               ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
               print(f"[{ts} UTC] {msg}", flush=True)
 
-          def arcgis_query(url, params):
-              """Perform a GET with retries for transient HTTP errors."""
-              for attempt in range(1, 4):
+          def arcgis_get(url, params, *, attempts=3, timeout=60):
+              for attempt in range(1, attempts + 1):
                   try:
-                      resp = SESSION.get(url, params=params, timeout=60)
-                      if resp.status_code == 200:
-                          return resp
-                      log(f"HTTP {resp.status_code} from {url} (attempt {attempt})")
+                      r = SESSION.get(url, params=params, timeout=timeout)
+                      if r.status_code == 200:
+                          return r
+                      log(f"HTTP {r.status_code} from {url} (attempt {attempt})")
                   except Exception as e:
                       log(f"Request error (attempt {attempt}): {e}")
                   time.sleep(1)
-              raise RuntimeError(f"Failed to fetch after 3 HTTP attempts: {url}")
+              raise RuntimeError(f"Failed after {attempts} attempts: {url}")
 
-          def get_all_field_names(url):
-              """
-              Fetch the authoritative field list from the service (f=json).
-              Tries layer metadata endpoint first (…/layer), then a 1=0 query fallback.
-              """
-              # Try layer metadata (strip '/query' if present)
+          # ---------- Schema helpers ----------
+          def fetch_layer_meta(url):
+              """Fetch layer metadata (fields, objectIdField, etc.)."""
               meta_url = url.rsplit("/query", 1)[0]
-              try:
-                  resp = SESSION.get(meta_url, params={"f": "json"}, timeout=60)
-                  if resp.status_code == 200:
-                      meta = resp.json()
-                      if isinstance(meta, dict) and isinstance(meta.get("fields"), list):
-                          return [f["name"] for f in meta["fields"] if "name" in f]
-              except Exception as e:
-                  log(f"Field meta fetch error: {e}")
+              r = arcgis_get(meta_url, {"f": "json"})
+              meta = r.json()
+              if not isinstance(meta, dict):
+                  raise RuntimeError("Layer metadata not a dict")
+              return meta
 
-              # Fallback tiny query that returns 'fields'
-              params = {
-                  "where": "1=0",
-                  "outFields": "*",
-                  "returnGeometry": "false",
-                  "f": "json"
-              }
-              resp = arcgis_query(url, params)
-              data = resp.json()
-              return [f["name"] for f in data.get("fields", []) if "name" in f]
-
-          def pad_geojson_properties_with_all_fields(geojson_obj, all_field_names):
-              """
-              Ensure every feature's properties has all field names. Missing ones set to None.
-              Keeps existing keys/values untouched.
-              """
-              feats = geojson_obj.get("features", [])
-              for f in feats:
-                  props = f.get("properties")
-                  if props is None or not isinstance(props, dict):
-                      props = {}
-                      f["properties"] = props
-                  for name in all_field_names:
-                      if name not in props:
-                          props[name] = None
-              return geojson_obj
-
-          def features_to_signature(feature_collection):
-              """
-              Build a deterministic signature for a GeoJSON FeatureCollection
-              based on count and string-attribute concat per feature.
-              Sorting by OBJECTID (common) when present, else by a properties dump.
-              """
-              feats = feature_collection.get("features", [])
-              def feature_key(f):
-                  props = f.get("properties", {}) if "properties" in f else f.get("attributes", {})
-                  if isinstance(props, dict):
-                      for key in ("OBJECTID", "ObjectID", "objectid"):
-                          if key in props:
-                              return (0, props[key])
-                  return (1, hashlib.sha256(json.dumps(props, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest())
-
-              norm = []
-              for f in feats:
-                  props = f.get("properties", f.get("attributes", {}))
-                  if props is None: props = {}
-                  strings = []
-                  for k, v in props.items():
-                      if isinstance(v, str):
-                          strings.append(v)
-                  strings.sort()
-                  norm.append(("".join(strings), feature_key(f)))
-
-              norm.sort(key=lambda t: t[1])
-              concat = "|".join(s for s, _ in norm)
-              return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
-
-          def table_to_signature(table_json):
-              """
-              Build a deterministic signature for an ArcGIS table (f=json with fields + features).
-              Uses attributes' string fields only.
-              """
-              feats = table_json.get("features", [])
-              rows = []
-              for f in feats:
-                  attrs = f.get("attributes", {}) or {}
-                  strings = []
-                  for k, v in attrs.items():
-                      if isinstance(v, str):
-                          strings.append(v)
-                  strings.sort()
-                  rows.append("".join(strings))
-              rows.sort()
-              concat = "|".join(rows)
-              return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
-
-          def download_copies(kind, url, params_builder, is_geojson=True, copies=4):
-              """
-              Download multiple copies, 1s apart, return list of parsed payloads and a similarity verdict.
-              """
-              payloads = []
-              sigs = []
-              for i in range(copies):
-                  params = params_builder()
-                  resp = arcgis_query(url, params)
-                  try:
-                      data = resp.json()
-                  except Exception as e:
-                      raise RuntimeError(f"Invalid JSON for {kind}: {e}")
-
-                  # ArcGIS errors come back as JSON too
-                  if isinstance(data, dict) and data.get("error"):
-                      raise RuntimeError(f"ArcGIS error for {kind}: {data['error']}")
-
-                  payloads.append(data)
-                  if is_geojson:
-                      count, sig = features_to_signature(data)
-                  else:
-                      count, sig = table_to_signature(data)
-                  sigs.append((count, sig))
-                  log(f"{kind}: copy {i+1}/{copies} -> features={count} sig={sig[:12]}")
-                  time.sleep(1)
-
-              ok = all(sigs[0] == s for s in sigs[1:])
-              return payloads, ok, sigs[0]
-
-          def add_timestamp_to_geojson(data, timestamp):
-              if data.get("type") != "FeatureCollection":
-                  raise RuntimeError("GeoJSON did not contain a FeatureCollection")
-              feats = data.get("features", [])
-              for f in feats:
-                  if "properties" not in f or not isinstance(f["properties"], dict):
-                      f["properties"] = {}
-                  f["properties"]["FETCHED_FROM_ERD"] = int(timestamp)
-              return data
-
-          def add_timestamp_to_table(data, timestamp):
-              feats = data.get("features", [])
-              for f in feats:
-                  attrs = f.get("attributes")
-                  if attrs is None or not isinstance(attrs, dict):
-                      f["attributes"] = {}
-                      attrs = f["attributes"]
-                  attrs["FETCHED_FROM_ERD"] = int(timestamp)
-              return data
-
-          def attempt_fetch(kind, url, is_geojson, outfile, max_attempts=5):
-              # If emitting GeoJSON, gather the authoritative field list once up front
-              all_field_names = None
-              if is_geojson:
-                  try:
-                      all_field_names = get_all_field_names(url)
-                      log(f"{kind}: fetched {len(all_field_names)} field names from schema")
-                  except Exception as e:
-                      log(f"{kind}: failed to fetch field list (will still attempt fetch): {e}")
-
-              for attempt in range(1, max_attempts + 1):
-                  log(f"=== {kind}: attempt {attempt}/{max_attempts} ===")
-                  def params_geo():
-                      return {
-                          "where": "1=1",
-                          "outFields": "*",
-                          "outSR": "4326",
-                          "f": "geojson"
-                      }
-                  def params_table():
-                      return {
-                          "where": "1=1",
-                          "outFields": "*",
-                          "returnGeometry": "false",
-                          "f": "json"
-                      }
-                  params_builder = params_geo if is_geojson else params_table
-                  payloads, ok, sig = download_copies(kind, url, params_builder, is_geojson=is_geojson, copies=4)
-                  if not ok:
-                      log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
-                      continue
-
-                  ts = int(time.time())
-                  if is_geojson:
-                      final = payloads[0]
-                      # Fill in any missing attributes so output matches current structure + added fields
-                      if all_field_names:
-                          final = pad_geojson_properties_with_all_fields(final, all_field_names)
-                      final = add_timestamp_to_geojson(final, ts)
-                  else:
-                      final = add_timestamp_to_table(payloads[0], ts)
-
-                  with open(outfile, "w", encoding="utf-8") as f:
-                      json.dump(final, f, ensure_ascii=False, indent=2)
-                  feat_count = sig[0] if isinstance(sig, tuple) else ""
-                  log(f"{kind}: wrote {outfile} (features={feat_count})")
-                  return True
-
-              log(f"{kind}: FAILED after {max_attempts} attempts")
-              return False
-
-          # Orchestrate all three datasets
-          success_all = True
-          success_all &= attempt_fetch(
-              kind="active_fires (layer 0)",
-              url=os.environ["ACTIVE_FIRES_URL"],
-              is_geojson=True,
-              outfile=os.environ["ACTIVE_FIRES_FILE"]
-          )
-          success_all &= attempt_fetch(
-              kind="out_fires (layer 1)",
-              url=os.environ["OUT_FIRES_URL"],
-              is_geojson=True,
-              outfile=os.environ["OUT_FIRES_FILE"]
-          )
-          success_all &= attempt_fetch(
-              kind="sums_table (layer 2)",
-              url=os.environ["SUMS_TABLE_URL"],
-              is_geojson=False,
-              outfile=os.environ["SUMS_TABLE_FILE"]
-          )
-
-          if not success_all:
-              log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
-          else:
-              log("All datasets fetched and validated successfully.")
-
-          PYCODE
-
-      - name: Commit and push (if changed)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git status --porcelain
-          CHANGED="$(git status --porcelain)"
-          if [ -n "$CHANGED" ]; then
-            echo "Changes detected; committing…"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" || true
-            git commit -m "Update ERD fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            git push
-            echo "Pushed updates."
-          else
-            echo "No changes to commit."
-          fi
+          def get_oid_field(meta):
+              # Prefer 'objectIdField', else find the field with type esriFieldTypeOID, else common fallbacks
+              if isinstance(meta.get("objectIdField"), str):
+                  return meta["objectIdField"]
+              for f in meta.get("fields", []):
+                  if f.get("type") == "esriFieldTypeOID":
+                      return f.get("name")
+              for cand in ("OBJECTID","ObjectID","objectid"):
+                  if any(cand == f.get("name") for f in meta.get("fields", [])):
+                      return cand
+              # last resort
