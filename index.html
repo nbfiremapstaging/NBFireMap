@@ -75,7 +75,7 @@
       .city-label{font-size:15px;font-weight:800;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.7),0 0 8px rgba(0,0,0,.6),1px 1px 0 rgba(0,0,0,.9)}
       .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:rgba(239,68,68,.12);backdrop-filter:blur(2px)}
 
-      /* Summary modal (make whole panel scrollable on small screens) */
+      /* Summary modal (whole panel scrolls on mobile) */
       .fire-summary-btn{position:fixed;left:12px;bottom:86px;z-index:2001}
       .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
       .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(680px,calc(100% - 24px));color:var(--text);
@@ -92,6 +92,7 @@
       .summary-list a{color:var(--link);text-decoration:none;font-weight:700}
       .summary-list a:hover{text-decoration:underline}
       .fs-scroll{margin-top:8px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--panel)}
+
       .fs-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
       .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;box-shadow:var(--shadow-soft)}
       .stat .h{font:800 13px/1.2 Inter,system-ui,Arial;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
@@ -115,23 +116,6 @@
       .ws-svg text{fill:#fff;stroke:rgba(0,0,0,.45);stroke-width:.9px;paint-order:stroke;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
       .ws-speed{font-weight:800;font-size:14px}
       .ws-small{font-weight:700;font-size:10px;opacity:.95}
-
-      /* Soft “data may be unavailable” modal */
-      .service-alert-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:4000;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
-      .service-alert{background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(560px,calc(100% - 24px));color:var(--text)}
-      .service-alert header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
-      .service-alert h2{font-size:var(--fs-18);font-weight:800;margin:0}
-      .service-alert .body{padding:14px 16px;line-height:1.55}
-      .service-alert .footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
-      .service-btn{background:var(--btn-bg);border:1px solid var(--btn-border);color:var(--text);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800;box-shadow:var(--shadow-soft)}
-      .service-btn:hover{background:var(--btn-hover)}
-
-      /* Fire status filter */
-      .fire-filter-block{ margin:8px 0 6px; padding:6px 0 2px 0; }
-      .fire-filter-title{ margin:0 0 4px; font:800 12px/1.1 Inter,system-ui,Arial; color:var(--muted); letter-spacing:.02em; text-transform:uppercase; }
-      .fire-filter-row{ display:grid; grid-template-columns:18px 26px auto; align-items:center; column-gap:8px; margin:4px 0; }
-      .fire-filter-row .legend-badge{ width:18px; height:18px; }
-      .fire-filter-row .legend-badge i{ font-size:11px; }
     </style>
   </head>
   <body>
@@ -186,7 +170,6 @@
     <script defer src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
     <script defer src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
     <script defer src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <!-- needed for clustered Esri feature layers (weather) -->
     <script defer src="https://unpkg.com/esri-leaflet-cluster/dist/esri-leaflet-cluster.js"></script>
 
     <script>
@@ -195,8 +178,11 @@
 
         /* ====================== Config ====================== */
         const LS_KEY = 'nbMapView';
+        const NB_BOUNDS = [[44.0, -69.5], [48.5, -62.0]];
         const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 };
         const ATLANTIC_TZ = 'America/Moncton';
+        const OPEN_SKY_URL = 'https://opensky-network.org/api/states/all';
+        const OPEN_SKY_INTERVAL_MS = 250_000;
         const LIGHTNING_REFRESH_MS = 120_000;
 
         /* ====================== Utilities ====================== */
@@ -225,7 +211,7 @@
           extinguished: -1
         }[norm(s)] ?? -1);
 
-        // date helpers (today/yesterday in Atlantic)
+        // Atlantic day bucketing
         const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
           const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
           const parts = fmt.formatToParts(new Date(ms));
@@ -249,8 +235,8 @@
         });
 
         // Panes
-        [['alwaysOnTopPopup',9999],['sentinelPane',400],['nbBoundaryPane',405],['perimetersPane',412],['radarPane',413],['lightningPane',413],['viirsPane',414],['weatherPane',415],['aqiPane',416],['firesPane',420]]
-          .forEach(([name, z]) => { const p = map.createPane(name); p.style.zIndex = z; });
+        [['alwaysOnTopPopup',9999],['sentinelPane',400],['nbBoundaryPane',405],['perimetersPane',412],['radarPane',413],['lightningPane',413],['viirsPane',414],['weatherPane',415],['aqiPane',416],['firesPane',420],['planesPane',1000,true]]
+          .forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
 
         L.esri.basemapLayer('Imagery').addTo(map);
 
@@ -261,8 +247,8 @@
           }).addTo(map);
         }
 
-        /* ====================== Fires: GeoJSON-only + clustering + status checkboxes ====================== */
-        const fireStore = new Map(); // id -> { id, props, latlng, layer, statusKey }
+        /* ====================== Fires: GeoJSON + markercluster (no overlay toggles) ====================== */
+        const fireStore = new Map();
         const fireClusters = L.markerClusterGroup({
           disableClusteringAtZoom: 11,
           spiderfyOnMaxZoom: true,
@@ -294,10 +280,10 @@
           pane: 'firesPane'
         }).addTo(map);
 
-        const activeMarkers = [];
-        const outMarkers = [];
+        const activeMarkersAll = []; // all non-extinguished markers (kept for filtering)
+        const outMarkersAll = [];    // extinguished markers
 
-        function bindFireFeature(props, layer, explicitStatus) {
+        function bindFirePopup(props, layer, explicitStatus) {
           const status = explicitStatus || props.FIRE_STAT_DESC_E || '—';
           const html = `
             <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
@@ -317,7 +303,7 @@
 
           const rawId = props.GlobalID || props.OBJECTID || props.FIRE_ID || Math.random().toString(36).slice(2)+Date.now().toString(36);
           const id = String(rawId);
-          fireStore.set(id,{ id, props, latlng: layer.getLatLng(), layer, statusKey: norm(status) });
+          fireStore.set(id,{ id, props, latlng: layer.getLatLng(), layer, statusKey: layer.options._statusKey });
 
           // hover/click UX
           let clicked=false, openT=null, closeT=null;
@@ -344,7 +330,7 @@
           });
           marker.options._statusKey = statusKey;
           marker.options._severity  = severityRank(statusKey);
-          bindFireFeature(props, marker, explicitStatus);
+          bindFirePopup(props, marker, explicitStatus);
           return marker;
         }
 
@@ -362,28 +348,33 @@
         }
 
         async function loadLocalFires(){
-          const [activeData, outData] = await Promise.all([
-            fetchLocalAny('active_fires'),
-            fetchLocalAny('out_fires')
-          ]);
+          try {
+            const [activeData, outData] = await Promise.all([
+              fetchLocalAny('active_fires'),
+              fetchLocalAny('out_fires')
+            ]);
 
-          (activeData.features||[]).forEach((f)=>{
-            if (!f || f.geometry?.type !== 'Point') return;
-            const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, f.properties?.FIRE_STAT_DESC_E);
-            activeMarkers.push(m);
-            fireClusters.addLayer(m); // active visible on load
-          });
+            (activeData.features||[]).forEach((f)=>{
+              if (!f || f.geometry?.type !== 'Point') return;
+              const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, f.properties?.FIRE_STAT_DESC_E);
+              activeMarkersAll.push(m);
+              fireClusters.addLayer(m); // ACTIVE visible by default
+            });
 
-          (outData.features||[]).forEach((f)=>{
-            if (!f || f.geometry?.type !== 'Point') return;
-            const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, 'Extinguished');
-            outMarkers.push(m);
-            // not added yet; controlled by status checkbox (default OFF)
-          });
+            (outData.features||[]).forEach((f)=>{
+              if (!f || f.geometry?.type !== 'Point') return;
+              const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, 'Extinguished');
+              outMarkersAll.push(m);
+              // Extinguished OFF by default — not added
+            });
 
-          refreshSummary();
+            applyFireFilter();   // enforce initial checkbox state (Extinguished off)
+            refreshSummary();    // summary uses fireStore
+          } catch (e) {
+            console.error('Loading local fires failed:', e);
+          }
         }
-        loadLocalFires().catch(err => console.warn(err));
+        loadLocalFires();
 
         /* ====================== MODIS, Perimeters, NB boundary ====================== */
         const modis48 = L.esri.featureLayer({
@@ -428,6 +419,20 @@
           pane:'nbBoundaryPane',
           style:()=>({color:cssVar('--boundary'),weight:5,fill:false}), interactive:false
         }).addTo(map);
+
+        /* ====================== Sentinel-2 imagery (public service) ====================== */
+        const sentinel2 = L.esri.imageMapLayer({
+          url:'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer',
+          opacity:0.75, pane:'sentinelPane'
+        });
+
+        sentinel2.on('load', ()=> sentinel2.bringToFront());
+
+        /* ====================== Burn Bans (NB) ====================== */
+        const nbBurnBans = L.esri.dynamicMapLayer({
+          url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
+          opacity:.7, pane:'perimetersPane'
+        });
 
         /* ====================== Weather (clustered), Radar, Lightning, AQHI ====================== */
         function stationPopupHTML(p) {
@@ -506,11 +511,9 @@
           zoomToBoundsOnClick: false,
           showCoverageOnHover: false,
           pointToLayer: makeStationMarker,
-          // Make cluster icon show the nearest station symbol + count (like fires)
           iconCreateFunction: (cluster) => {
             const center = cluster.getLatLng();
             const markers = cluster.getAllChildMarkers();
-            // pick the child whose marker is closest to cluster center
             let best = null, bestDist = Infinity;
             for (const m of markers) {
               const d = map.distance(center, m.getLatLng());
@@ -542,7 +545,7 @@
         let lightningTimer=null;
         const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
         const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
-        map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); });
+        map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
         map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
 
         const fireRiskGroup = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
@@ -553,6 +556,7 @@
           url:'https://enterpriseim.esriservices.ca/server/rest/services/Hosted/Aug12/ImageServer',
           opacity:.5, pane:'sentinelPane'
         });
+
         const aqhiLayer = L.esri.featureLayer({
           url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1',
           pane:'aqiPane',
@@ -577,93 +581,151 @@
           }
         });
 
-        /* ====================== Overlays + control (no fire toggles here) ====================== */
-        const overlaysFull = {
+        /* ====================== Aircraft tracking (OpenSky) ====================== */
+        const planesLayer = L.layerGroup(); const planeMarkers=new Map();
+        const makePlaneIcon=(heading)=>{ const ICON_OFFSET=-45;
+          const rotate=Number.isFinite(heading)?heading:0;
+          return L.divIcon({className:'plane-div-icon',html:`<div style="transform:rotate(${ICON_OFFSET}deg);transform-origin:center;display:inline-block;">
+              <div style="transform:rotate(${rotate}deg);font-size:26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))">✈️</div></div>`,
+            iconSize:[30,46],iconAnchor:[15,23]}); };
+        const upsertPlane=(id,lat,lon,hdg,callsign,vel)=> {
+          const html = `<b>${callsign||'Unknown'}</b><br>Heading: ${Number.isFinite(hdg)?Math.round(hdg):'—'}°<br>Speed: ${vel!=null?Math.round(vel*1.94384):'—'} kt`;
+          let m=planeMarkers.get(id);
+          if(!m){
+            m=L.marker([lat,lon],{icon:makePlaneIcon(hdg),pane:'planesPane',keyboard:false,zIndexOffset:10000}).bindPopup(html,{pane:'alwaysOnTopPopup'});
+            let clicked=false;
+            m.on('mouseover',function(){ if(!clicked) this.openPopup(); });
+            m.on('mouseout',function(){ if(!clicked) this.closePopup(); });
+            m.on('click',function(){ clicked=!clicked; clicked?this.openPopup():this.closePopup(); });
+            m.addTo(planesLayer); planeMarkers.set(id,m);
+          } else {
+            m.setLatLng([lat,lon]); m.setIcon(makePlaneIcon(hdg)); m.setPopupContent(html);
+          }
+        };
+        const pruneMissing=(seen)=>{ for(const [k,m] of planeMarkers.entries()){ if(!seen.has(k)){ planesLayer.removeLayer(m); planeMarkers.delete(k); } } };
+        async function fetchOpenSky(){ try{
+          const [[lamin,lomin],[lamax,lomax]] = NB_BOUNDS;
+          const r=await fetch(`${OPEN_SKY_URL}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`, { cache:'no-store' });
+          if(!r.ok) throw new Error(r.statusText);
+          const data=await r.json(); const states=Array.isArray(data.states)?data.states:[]; const seen=new Set();
+          for(const s of states){ const icao24=s[0], callsign=(s[1]||'').trim().toUpperCase(), lon=s[5], lat=s[6], vel=s[9], hdg=s[10];
+            if(!icao24||lat==null||lon==null) continue; seen.add(icao24); upsertPlane(icao24,lat,lon,hdg,callsign,vel); }
+          pruneMissing(seen);
+        } catch(e){ console.warn('OpenSky fetch failed:', e); } }
+        let planesTimer=null;
+        planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,OPEN_SKY_INTERVAL_MS); });
+        planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
+
+        /* ====================== Cities ====================== */
+        const cityMarkers=L.layerGroup(
+          [
+            ['Fredericton',45.9636,-66.6431],['Saint John',45.2733,-66.0633],['Moncton',46.0878,-64.7782],
+            ['Bathurst',47.6186,-65.6517],['Miramichi',47.0281,-65.5019],['Edmundston',47.3730,-68.3251],
+            ['Campbellton',48.0075,-66.6731],['Dieppe',46.0842,-64.6877],['Riverview',46.0617,-64.8052],
+            ['Quispamsis',45.4319,-65.9469],['Oromocto',45.8491,-66.4828],['Woodstock',46.1527,-67.6016],
+            ['Grand Falls',47.0469,-67.7394],['Shediac',46.2197,-64.5403],['Tracadie',47.5081,-64.9117],
+            ['St. Stephen',45.1942,-67.2756],['Shippagan',47.7400,-64.7078],['Caraquet',47.7943,-64.9386],
+            ['Bouctouche',46.4711,-64.7400],['Sussex',45.7221,-65.5060]
+          ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
+            .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
+        );
+
+        /* ====================== Overlays + control (no separate fire toggles) ====================== */
+        const overlays = {
           'MODIS Hotspots — Last 48 hours': modis48,
           'MODIS Hotspots — Last 7 days': modis7d,
           'Weather Stations': weatherStations,
           'Fire Perimeters': activefires,
-          //'NB Boundary': nbBoundary,
+          'Sentinel-2 Imagery': sentinel2,
+          'NB Burn Bans': nbBurnBans,
           'AQHI Risk': aqhiLayer,
           'Weather Radar': noaaRadar,
           'Lightning Density': lightningLayer,
-          'Fire Danger (CWFIS)': fireRiskGroup,
-          Smoke: smokeLayer
+          Smoke: smokeLayer,
+          'Fire Risk': fireRiskGroup,
+          Aircraft: planesLayer,
+          'Major Cities & Towns': cityMarkers
         };
-        L.control.layers(null, overlaysFull, { collapsed: false }).addTo(map);
+        const layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
-        // decorate legend (no Active/Extinguished entries anymore)
-        (function decorateLayersControl(){
+        const decorateLayersControl = () => {
           const list=document.querySelector('.leaflet-control-layers-overlays'); if(!list) return;
+          list.querySelectorAll('.icons-pack').forEach(el=>el.remove());
           const packs={
             'MODIS Hotspots — Last 48 hours':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
             'MODIS Hotspots — Last 7 days':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
             'Weather Stations':'<span class="icons-pack"><i class="fa-solid fa-location-arrow legend-icon" style="transform:rotate(45deg)"></i></span>',
             'Fire Perimeters':'<span class="icons-pack"><i class="fa-regular fa-square legend-icon"></i></span>',
-            //'NB Boundary':'<span class="icons-pack"><i class="fa-regular fa-square legend-icon"></i></span>',
+            'Sentinel-2 Imagery':'<span class="icons-pack"><i class="fa-regular fa-image legend-icon"></i></span>',
+            'NB Burn Bans':'<span class="icons-pack"><i class="fa-solid fa-ban legend-icon"></i></span>',
             'AQHI Risk':'<span class="icons-pack"><i class="fa-solid fa-wind legend-icon"></i></span>',
             'Weather Radar':'<span class="icons-pack"><i class="fa-solid fa-broadcast-tower legend-icon"></i></span>',
             'Lightning Density':'<span class="icons-pack"><i class="fa-solid fa-bolt legend-icon"></i></span>',
-            'Fire Danger (CWFIS)':'<span class="icons-pack"><i class="fa-solid fa-fire legend-icon"></i></span>',
-            Smoke:'<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>'
+            Smoke:'<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>',
+            'Fire Risk':'<span class="icons-pack"><i class="fa-solid fa-fire-extinguisher legend-icon"></i></span>',
+            Aircraft:'<span class="icons-pack"><span style="font-size:14px;display:inline-block;transform:rotate(-45deg)">✈️</span></span>',
+            'Major Cities & Towns':'<span class="icons-pack"><i class="fa-solid fa-city legend-icon"></i></span>'
           };
           list.querySelectorAll('label').forEach((label)=>{
             const textSpan=Array.from(label.querySelectorAll('span')).find(s=>s.textContent.trim());
-            if(!textSpan) return; const name=textSpan.textContent.trim();
+            if(!textSpan) return;
+            const name=textSpan.textContent.trim();
             label.insertAdjacentHTML('afterbegin',packs[name]||`<span class="icons-pack"><i class="fa-solid fa-layer-group legend-icon"></i></span>`);
             textSpan.classList.add('text');
           });
-        })();
+        };
+        decorateLayersControl();
 
-        // replace the whole FIRE_STATUS + injectFireStatusPanel block header
-const FIRE_STATUS = [
-  ['Out of Control', cssVar('--oc'), true],
-  ['Contained',      cssVar('--cont'), true],
-  ['Under Control',  cssVar('--uc'), true],
-  ['Being Patrolled',cssVar('--pat'), true],
-  ['Being Monitored',cssVar('--mon'), true],
-  ['Extinguished',   '#9aa0a6', false] // default OFF
-];
+        /* ======== Fire Status panel (Extinguished OFF by default) ======== */
+        const FIRE_STATUS = [
+          ['Out of Control', cssVar('--oc'), true],
+          ['Contained',      cssVar('--cont'), true],
+          ['Under Control',  cssVar('--uc'), true],
+          ['Being Patrolled',cssVar('--pat'), true],
+          ['Being Monitored',cssVar('--mon'), true],
+          ['Extinguished',   '#9aa0a6', false]
+        ];
+        function injectFireStatusPanel(){
+          const overlaysList = document.querySelector('.leaflet-control-layers-overlays');
+          if(!overlaysList || overlaysList.querySelector('.fire-filter-block')) return;
 
-(function injectFireStatusPanel(){
-  const overlaysList = document.querySelector('.leaflet-control-layers-overlays'); if(!overlaysList) return;
-  if (overlaysList.querySelector('.fire-filter-block')) return;
-  const block = document.createElement('div');
-  block.className = 'fire-filter-block';
-  block.innerHTML = `
-    <div class="fire-filter-title">Fire Status</div>
-    ${FIRE_STATUS.map(([label, ring, checked]) => `
-      <label class="fire-filter-row">
-        <input type="checkbox" data-status="${label}" ${checked ? 'checked' : ''}>
-        <span class="legend-badge" style="--ring:${ring}">
-          <i class="fa-solid fa-fire"></i>
-        </span>
-        <span class="text">${label}</span>
-      </label>
-    `).join('')}
-  `;
-  overlaysList.prepend(block);
-  block.addEventListener('change', applyFireFilter);
-  applyFireFilter();
-})();
-
-
+          const block = document.createElement('div');
+          block.className = 'fire-filter-block';
+          block.innerHTML = `
+            <div class="fire-filter-title">Fire Status</div>
+            ${FIRE_STATUS.map(([label, ring, checked]) => `
+              <label class="fire-filter-row">
+                <input type="checkbox" data-status="${label}" ${checked ? 'checked' : ''}>
+                <span class="legend-badge" style="--ring:${ring}">
+                  <i class="fa-solid fa-fire"></i>
+                </span>
+                <span class="text">${label}</span>
+              </label>
+            `).join('')}
+          `;
+          overlaysList.prepend(block);
+          block.addEventListener('change', applyFireFilter);
+        }
         function applyFireFilter(){
           const cbs = document.querySelectorAll('.fire-filter-block input[type="checkbox"]');
           const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
 
-          // Remove all markers first…
-          activeMarkers.forEach(m => fireClusters.removeLayer(m));
-          outMarkers.forEach(m => fireClusters.removeLayer(m));
-
-          // …then add back the ones whose status is enabled
-          activeMarkers.forEach(m => { if (enabled.has(m.options._statusKey)) fireClusters.addLayer(m); });
-          if (enabled.has('extinguished')) { outMarkers.forEach(m => fireClusters.addLayer(m)); }
-
-          // If everything is off, you’ll see no fire points (as requested).
+          // ACTIVE markers: show if their status is enabled
+          for (const m of activeMarkersAll) {
+            const show = enabled.has(m.options._statusKey);
+            if (show && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
+            if (!show && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
+          }
+          // EXTINGUISHED markers: controlled by 'extinguished' toggle
+          const showOut = enabled.has('extinguished');
+          for (const m of outMarkersAll) {
+            if (showOut && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
+            if (!showOut && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
+          }
         }
+        injectFireStatusPanel();
 
-        /* ====================== Summary ====================== */
+        /* ====================== Summary (scrollable body) ====================== */
         const fsOverlay=document.getElementById('fireSummaryOverlay');
         const fsBody=document.getElementById('fs-body');
         const chip=(label,n)=>`<span class="chip"><span class="dot" style="background:${statusColor(label)}"></span>${label} <span style="font-weight:800;margin-left:6px">${n}</span></span>`;
@@ -672,6 +734,7 @@ const FIRE_STATUS = [
         function buildSummaryHTML(){
           const items=[...fireStore.values()];
           const year = new Date().getFullYear();
+
           let totalArea=0, counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,extinguished:0,other:0};
           let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
@@ -700,13 +763,16 @@ const FIRE_STATUS = [
             ['Extinguished',counts['extinguished']]
           ].map(([l,n])=>chip(l,n)).join('');
 
+          // group & sort by status (largest → smallest)
           const byStatus = new Map();
           for (const it of items) {
             const st = norm(it.statusKey || it.props?.FIRE_STAT_DESC_E || 'other');
             if (!byStatus.has(st)) byStatus.set(st, []);
             byStatus.get(st).push(it);
           }
-          for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
+          for (const arr of byStatus.values()) {
+            arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
+          }
           const statusOrder = ['out of control','contained','under control','being patrolled','being monitored','extinguished','other'];
 
           const detailSections = statusOrder
@@ -714,8 +780,10 @@ const FIRE_STATUS = [
             .map(k => {
               const label = k==='other' ? 'Other' : k.replace(/\b\w/g, c=>c.toUpperCase());
               const list = byStatus.get(k).map((it) => {
-                const p=it.props||{}; const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
-                const size = toNum(sizeOf(p),0); const det  = fmtDateTZ(getDetectedMs(p));
+                const p=it.props||{};
+                const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
+                const size = toNum(sizeOf(p),0);
+                const det  = fmtDateTZ(getDetectedMs(p));
                 const extra = (k==='extinguished') ? ` • Out: ${fmtDateTZ(getExtinguishedMs(p))}` : '';
                 return `<li style="margin:4px 0;"><a href="#" data-fireid="${it.id}"><span style="font-weight:700">${name}</span>&nbsp;—&nbsp;${size} ha <span style="opacity:.8">• ${label}</span> <span style="opacity:.8">• Detected: ${det}${extra}</span></a></li>`;
               }).join('') || '<li>None</li>';
@@ -760,11 +828,11 @@ const FIRE_STATUS = [
           });
         }
 
-        /* ====================== Buttons ====================== */
         document.getElementById('fireSummaryBtn').addEventListener('click',()=>{ refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; });
         document.getElementById('fs-close').addEventListener('click',()=>{ fsOverlay.style.display='none'; fsOverlay.hidden=true; });
         fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay){ fsOverlay.style.display='none'; fsOverlay.hidden=true; } });
 
+        /* ====================== Show/Hide Layers + Reset view ====================== */
         const mapToggleBtn = document.getElementById('mapToggleBtn');
         const mtbText = document.getElementById('mtb-text');
         mapToggleBtn.addEventListener('click', () => {
@@ -777,27 +845,6 @@ const FIRE_STATUS = [
           map.flyTo(INITIAL_VIEW.center, INITIAL_VIEW.zoom, { duration: 0.6 });
         });
 
-        /* ====================== Mobile layers panel width ====================== */
-        function sizeLayersPanel() {
-          const panel = document.querySelector('.leaflet-control-layers');
-          if (!panel) return;
-          if (window.innerWidth > 640) { panel.style.removeProperty('--layers-w'); panel.style.overflowX = 'visible'; return; }
-          const measureText = 'MODIS Hotspots — Last 48 hours';
-          const measurer = document.createElement('span');
-          measurer.style.visibility = 'hidden'; measurer.style.position = 'absolute'; measurer.style.whiteSpace = 'nowrap';
-          measurer.style.font = getComputedStyle(panel).font; measurer.textContent = measureText;
-          document.body.appendChild(measurer);
-          const labelWidth = Math.ceil(measurer.getBoundingClientRect().width);
-          document.body.removeChild(measurer);
-          const extra = 18 + 26 + 8 + 14 + 40;
-          const desired = labelWidth + extra;
-          const max = Math.max(240, Math.min(desired, window.innerWidth - 24));
-          panel.style.setProperty('--layers-w', max + 'px');
-          panel.style.overflowX = desired > max ? 'auto' : 'visible';
-        }
-        sizeLayersPanel();
-        window.addEventListener('resize', sizeLayersPanel);
-        document.querySelector('.leaflet-control-layers')?.addEventListener('click', () => queueMicrotask(sizeLayersPanel));
       });
     </script>
   </body>
