@@ -21,7 +21,7 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      - name: Fetch and verify feeds (with cleanup)
+      - name: Fetch and verify feeds (all-or-nothing, up to 5 passes)
         id: fetch
         env:
           BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
@@ -30,15 +30,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          cleanup_snapshots() {
-            # remove any 10× snapshot sets that might exist
-            rm -f active_fires0*.json out_fires0*.json v_fire_dashboard_sum0*.json || true
+          cleanup_prefix() {
+            rm -f "$1"0*.json || true
           }
-          trap cleanup_snapshots EXIT
 
           download_ten() {
             local url="$1" prefix="$2"
-            rm -f "${prefix}"*.json || true
+            cleanup_prefix "$prefix"
             for i in $(seq -w 01 10); do
               tmpfile="$(mktemp)"
               if ! curl -sS --fail --retry 3 --retry-delay 2 --retry-connrefused --max-time 60 "$url" -o "$tmpfile"; then
@@ -58,7 +56,6 @@ jobs:
 
           all_match() {
             local prefix="$1"
-            # if any file missing, not a match
             ls ${prefix}*.json >/dev/null 2>&1 || return 1
             local uniq_count
             uniq_count=$(sha256sum ${prefix}*.json | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
@@ -66,23 +63,31 @@ jobs:
           }
 
           get_table_id() {
-            # read service metadata to find the table id by name
             local meta
             if ! meta="$(curl -sS --fail "$BASE?f=pjson")"; then
               echo "Failed to read service metadata"; return 1
             fi
-            echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '
-              .tables[] | select(.name==$NAME) | .id
-            ' 2>/dev/null | tr -d '\r\n'
+            echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '.tables[] | select(.name==$NAME) | .id' 2>/dev/null | tr -d '\r\n'
           }
 
-          attempt_fetch_all() {
-            local ok=true
+          # Resolve table ID once
+          TID="$(get_table_id || true)"
+          if [ -z "${TID:-}" ]; then
+            echo "Could not find table id for $TABLE_NAME in service metadata."
+            echo "stable=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-            echo "::group::Attempt: active fires (layer 0)"
+          STABLE=false
+          for pass in 1 2 3 4 5; do
+            echo "::group::Pass $pass"
+
+            ok=true
+
+            echo "Attempt: active fires (layer 0)"
             if download_ten "$BASE/0/query$QUERY" "active_fires"; then
               if all_match "active_fires"; then
-                cp active_fires01.json active_fires.json
+                cp -f active_fires01.json active_fires.json
                 echo "Active fires stable."
               else
                 echo "Active fires NOT stable."
@@ -92,13 +97,12 @@ jobs:
               echo "Active fires download failed."
               ok=false
             fi
-            rm -f active_fires0*.json || true
-            echo "::endgroup::"
+            cleanup_prefix "active_fires"
 
-            echo "::group::Attempt: out fires (layer 1)"
+            echo "Attempt: out fires (layer 1)"
             if download_ten "$BASE/1/query$QUERY" "out_fires"; then
               if all_match "out_fires"; then
-                cp out_fires01.json out_fires.json
+                cp -f out_fires01.json out_fires.json
                 echo "Out fires stable."
               else
                 echo "Out fires NOT stable."
@@ -108,51 +112,34 @@ jobs:
               echo "Out fires download failed."
               ok=false
             fi
-            rm -f out_fires0*.json || true
-            echo "::endgroup::"
+            cleanup_prefix "out_fires"
 
-            echo "::group::Attempt: table $TABLE_NAME"
-            local tid
-            tid="$(get_table_id || true)"
-            if [ -z "${tid:-}" ]; then
-              echo "Could not find table id for $TABLE_NAME in service metadata."
-              ok=false
-            else
-              if download_ten "$BASE/$tid/query$QUERY" "v_fire_dashboard_sum"; then
-                if all_match "v_fire_dashboard_sum"; then
-                  cp v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
-                  echo "Table $TABLE_NAME stable."
-                else
-                  echo "Table $TABLE_NAME NOT stable."
-                  ok=false
-                fi
+            echo "Attempt: table $TABLE_NAME (id=$TID)"
+            if download_ten "$BASE/$TID/query$QUERY" "v_fire_dashboard_sum"; then
+              if all_match "v_fire_dashboard_sum"; then
+                cp -f v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
+                echo "Table $TABLE_NAME stable."
               else
-                echo "Table $TABLE_NAME download failed."
+                echo "Table $TABLE_NAME NOT stable."
                 ok=false
               fi
+            else
+              echo "Table $TABLE_NAME download failed."
+              ok=false
             fi
-            rm -f v_fire_dashboard_sum0*.json || true
+            cleanup_prefix "v_fire_dashboard_sum"
+
             echo "::endgroup::"
 
-            $ok
-          }
-
-          # First attempt
-          if attempt_fetch_all; then
-            echo "stable=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Not all datasets stable. Waiting 10 minutes, then retrying…"
-            sleep 600
-            if attempt_fetch_all; then
-              echo "stable=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "stable=false" >> "$GITHUB_OUTPUT"
-              echo "Datasets were not stable after two attempts; leaving previous JSONs unchanged."
-              exit 0
+            if [ "$ok" = true ]; then
+              STABLE=true
+              break
             fi
-          fi
+          done
 
-      - name: Commit updated JSON (if changed)
+          echo "stable=$STABLE" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated JSON (if all stable)
         if: steps.fetch.outputs.stable == 'true'
         run: |
           set -euo pipefail
