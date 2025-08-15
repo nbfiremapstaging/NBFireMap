@@ -22,8 +22,10 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v4
 
-        # If you commit with a personal token or use a protected branch,
-        # you may need to set 'persist-credentials: false' and push with a PAT.
+      - name: Setup Node (for npx/mapshaper)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Fetch, verify, and save layers (with retries)
         shell: bash
@@ -70,9 +72,15 @@ jobs:
             # Promote first copy to canonical file in repo root
             cp "${base}01.json" "${base}.json"
 
+            # === Add/Update FIRE_SIZE in hectares from geometry area ===
+            # Uses mapshaper's area(); points/lines will yield 0 -> set to null.
+            npx -y mapshaper "${base}.json" \
+              -each 'FIRE_SIZE = (area() > 0 ? round(area()/10000, 4) : null)' \
+              -o force format=geojson "${base}.json"
+
             # Clean up temp copies
             rm -f "${base}"??.json
-            echo "Saved ${base}.json"
+            echo "Saved ${base}.json (FIRE_SIZE in ha)"
           }
 
           attempt=1
@@ -110,7 +118,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add active_fires.json out_fires.json
-            git commit -m "chore(data): update fire layers (hourly)"
+            git commit -m "chore(data): update fire layers (hourly, add FIRE_SIZE ha)"
             git push
           else
             echo "No changes to commit."
