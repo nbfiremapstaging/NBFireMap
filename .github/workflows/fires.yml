@@ -139,4 +139,47 @@ jobs:
             if [ "$TABLE_NEEDED" = true ]; then
               echo "Attempt: table $TABLE_NAME (id=${TID:-unknown}) -> JSON (non-spatial)"
               if [ -n "${TID:-}" ]; then
-                if download_n "$BASE/$TID/query$QUERY_JSON" "v_fire_dashboard_sum.json" "$COPIES";_
+                if download_n "$BASE/$TID/query$QUERY_JSON" "v_fire_dashboard_sum.json" "$COPIES"; then
+                  if all_match "v_fire_dashboard_sum.json"; then
+                    write_with_timestamp v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
+                    echo "Table $TABLE_NAME stabilized on pass $pass"
+                    TABLE_NEEDED=false
+                    ANY_CHANGED=true
+                  else
+                    echo "Table $TABLE_NAME NOT stable on pass $pass."
+                  fi
+                else
+                  echo "Table $TABLE_NAME download failed on pass $pass."
+                fi
+                cleanup_prefix "v_fire_dashboard_sum.json"
+              else
+                echo "Skipping table; no table id."
+              fi
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$ACTIVE_NEEDED" = false ] && [ "$OUT_NEEDED" = false ] && [ "$TABLE_NEEDED" = false ]; then
+              break
+            else
+              echo "Some datasets still unstable; waiting 30s before next pass..."
+              sleep 30
+            fi
+          done
+
+          echo "any_changed=$ANY_CHANGED" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated data (only what changed)
+        if: steps.fetch.outputs.any_changed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add active_fires.geojson out_fires.geojson v_fire_dashboard_sum.json || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git commit -m "Update fire feeds (${ts})"
+            git push
+          fi
