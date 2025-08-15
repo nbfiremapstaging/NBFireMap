@@ -39,43 +39,61 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (verbose)
+      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (verbose, attrs-only, retry failed)
         id: fetch
         shell: python
         env:
           PYTHONUNBUFFERED: "1"
         run: |
           import os, json, time, hashlib, sys, datetime, requests, copy
+          from pathlib import Path
 
+          # ---------- config ----------
           targets = {
               "active_fires.json": os.environ["ACTIVE_URL"],
               "out_fires.json":    os.environ["OUT_URL"],
               "sums_table.json":   os.environ["SUMS_URL"],
           }
 
-          COPIES = int(os.environ["COPIES_PER_PASS"])
-          SLEEP_COPIES = int(os.environ["SLEEP_BETWEEN_COPIES_SEC"])
-          SLEEP_PASSES = int(os.environ["SLEEP_BETWEEN_PASSES_SEC"])
-          MAX_PASSES = int(os.environ["MAX_PASSES"])
+          COPIES       = int(os.environ.get("COPIES_PER_PASS", "10"))
+          SLEEP_COPIES = int(os.environ.get("SLEEP_BETWEEN_COPIES_SEC", "8"))
+          SLEEP_PASSES = int(os.environ.get("SLEEP_BETWEEN_PASSES_SEC", "60"))
+          MAX_PASSES   = int(os.environ.get("MAX_PASSES", "5"))
 
           session = requests.Session()
           session.headers.update({"User-Agent": "github-actions-fetch-erd/1.0"})
-
-          def normalize(obj):
-              return json.dumps(obj, sort_keys=True, separators=(",", ":"))
 
           def fetch_once(url):
               r = session.get(url, timeout=60)
               r.raise_for_status()
               return r.json()
 
+          def extract_attrs(esri_json):
+              """
+              Return a normalized representation of ONLY the attributes:
+              - list of attributes dicts
+              - with sorted keys inside each dict
+              - sorted by their JSON string so order of features doesn't matter
+              """
+              feats = esri_json.get("features", []) or []
+              attrs_list = []
+              for f in feats:
+                  attrs = (f or {}).get("attributes", {}) or {}
+                  # Ensure JSON-serializable & normalized key order
+                  attrs_list.append(json.loads(json.dumps(attrs, sort_keys=True)))
+              # Sort feature records deterministically by their JSON form
+              attrs_list_sorted = sorted((json.dumps(a, sort_keys=True) for a in attrs_list))
+              # Return both the comparable structure and a short digest (for logging only)
+              digest_src = "[" + ",".join(attrs_list_sorted) + "]"
+              digest = hashlib.sha256(digest_src.encode("utf-8")).hexdigest()
+              return attrs_list_sorted, digest
+
           def adorn_fetch_time(esri_json, timestamp_iso):
-              # include ERD_FETCH_TIME in ESRI 'fields' metadata and attribute values
               esri_json = copy.deepcopy(esri_json)
               fields = esri_json.get("fields", [])
               if not isinstance(fields, list):
                   fields = []
-              if not any(f.get("name") == "ERD_FETCH_TIME" for f in fields):
+              if not any((f or {}).get("name") == "ERD_FETCH_TIME" for f in fields):
                   fields.append({
                       "name": "ERD_FETCH_TIME",
                       "type": "esriFieldTypeString",
@@ -88,51 +106,90 @@ jobs:
                       "defaultValue": None
                   })
               esri_json["fields"] = fields
-              for feat in esri_json.get("features", []):
+              for feat in esri_json.get("features", []) or []:
                   attrs = feat.setdefault("attributes", {})
                   attrs["ERD_FETCH_TIME"] = timestamp_iso
               return esri_json
 
-          def verify_and_write(fname, url):
-              print(f"\n=== Processing {fname} ===")
-              for attempt in range(1, MAX_PASSES+1):
-                  print(f" Pass {attempt} (fetching {COPIES} copies)…")
-                  copies, hashes = [], []
+          # Pass-oriented runner: try all, then only retry failed
+          remaining = dict(targets)   # fname -> url
+          results   = {fn: None for fn in targets}  # True/False as we finish
+
+          print(f"\n=== Starting fetch (attributes-only verification) ===", flush=True)
+          for attempt in range(1, MAX_PASSES + 1):
+              if not remaining:
+                  break
+
+              print(f"\n== Pass {attempt}/{MAX_PASSES} – processing {len(remaining)} target(s) ==", flush=True)
+              failed_this_pass = {}
+
+              for fname, url in list(remaining.items()):
+                  print(f"::group::Processing {fname}")
+                  print(f"Fetching {COPIES} copies…", flush=True)
+
+                  copies = []
+                  digests = []
+                  attrs_norms = []
+
                   for i in range(COPIES):
                       data = fetch_once(url)
-                      h = hashlib.sha256(normalize(data).encode("utf-8")).hexdigest()
+                      attrs_norm, digest = extract_attrs(data)
                       copies.append(data)
-                      hashes.append(h)
-                      print(f"   Copy {i+1}/{COPIES} hash: {h[:12]}…")
+                      attrs_norms.append(attrs_norm)
+                      digests.append(digest)
+                      print(f"  Copy {i+1}/{COPIES}: attrs-digest {digest[:12]}…", flush=True)
                       if i < COPIES - 1:
                           time.sleep(SLEEP_COPIES)
 
-                  unique_hashes = set(hashes)
-                  if len(unique_hashes) == 1:
-                      print(f" ✅ All {COPIES} copies match for {fname}.")
+                  # Verify equality of ONLY attributes (ignore geometry/fields/etc for stability)
+                  first = attrs_norms[0]
+                  all_match = all(an == first for an in attrs_norms[1:])
+
+                  if all_match:
+                      print(f"✅ Attributes match across {COPIES} copies.")
                       ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
                       final = adorn_fetch_time(copies[0], ts)
                       with open(fname, "w", encoding="utf-8") as f:
                           json.dump(final, f, ensure_ascii=False, indent=2)
-                      print(f" → Wrote {fname} with ERD_FETCH_TIME={ts}")
-                      return True
+                      print(f"→ Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
+                      results[fname] = True
+                      remaining.pop(fname, None)
                   else:
-                      print(f" ❌ Mismatch detected in {fname} (hashes: {len(unique_hashes)} unique).")
-                      if attempt < MAX_PASSES:
-                          print(f"   Retrying after {SLEEP_PASSES}s…")
-                          time.sleep(SLEEP_PASSES)
-                      else:
-                          print(f"   FAILED after {MAX_PASSES} passes, no stable copy.")
-                          return False
+                      uniq = len(set(digests))
+                      print(f"❌ Attribute mismatch detected ({uniq} unique attrs digests).", flush=True)
+                      results[fname] = False
+                      failed_this_pass[fname] = url
+                  print("::endgroup::")
 
-          results = {fn: verify_and_write(fn, url) for fn, url in targets.items()}
+              if failed_this_pass and attempt < MAX_PASSES:
+                  print(f"\nSome targets were unstable; retrying them after {SLEEP_PASSES}s…", flush=True)
+                  time.sleep(SLEEP_PASSES)
+              # Narrow remaining to only failed ones from this pass
+              remaining = failed_this_pass
 
-          print("\n=== SUMMARY ===")
-          for fn, ok in results.items():
-              status = "OK" if ok else "FAILED"
-              print(f" {fn}: {status}")
+          # Summary
+          print("\n=== SUMMARY ===", flush=True)
+          ok_all = True
+          lines = []
+          for fn in targets:
+              status = results.get(fn)
+              if status is True:
+                  msg = f"{fn}: OK"
+              elif status is False:
+                  msg = f"{fn}: FAILED"
+                  ok_all = False
+              else:
+                  msg = f"{fn}: SKIPPED?"
+                  ok_all = False
+              print(" " + msg, flush=True)
+              lines.append(f"- {msg}")
 
-          if not all(results.values()):
+          # Write run summary (appears atop the job UI)
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              Path(summary_path).write_text("### ERD Fetch (attributes-only)\n" + "\n".join(lines) + "\n")
+
+          if not ok_all:
               sys.exit(1)
 
       - name: Commit updated JSONs
