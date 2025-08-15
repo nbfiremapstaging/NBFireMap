@@ -25,15 +25,15 @@ jobs:
         id: fetch
         env:
           BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
-          QUERY: '?where=1%3D1&outFields=*&f=json'
+          # IMPORTANT: ask for GeoJSON in WGS84 (CRS84 lon/lat) so GitHub can render it.
+          QUERY_GEO: '?where=1%3D1&outFields=*&outSR=4326&f=geojson'
+          QUERY_JSON: '?where=1%3D1&outFields=*&f=json'
           TABLE_NAME: SDEOWNER.V_FIRE_DASHBOARD_SUM
           COPIES: "10"
         run: |
           set -euo pipefail
 
-          cleanup_prefix() {
-            rm -f "${1}"[0-9][0-9].json || true
-          }
+          cleanup_prefix() { rm -f "${1}"[0-9][0-9].json "${1}"[0-9][0-9].geojson || true; }
 
           download_n() {
             local url="$1" prefix="$2" n="${3:-10}"
@@ -50,16 +50,18 @@ jobs:
                 rm -f "$tmpfile"
                 return 1
               fi
-              mv "$tmpfile" "${prefix}${i}.json"
-              sleep 2   # <-- 2 seconds between copies
+              ext="${prefix##*.}" # keep extension in prefix if provided
+              [ "$ext" = "geojson" ] || ext="json"
+              mv "$tmpfile" "${prefix%.*}${i}.${ext}"
+              sleep 2
             done
           }
 
           all_match() {
             local prefix="$1"
-            ls ${prefix}[0-9][0-9].json >/dev/null 2>&1 || return 1
+            ls ${prefix%.*}[0-9][0-9].* >/dev/null 2>&1 || return 1
             local uniq_count
-            uniq_count=$(sha256sum ${prefix}[0-9][0-9].json | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
+            uniq_count=$(sha256sum ${prefix%.*}[0-9][0-9].* | awk '{print $1}' | sort | uniq | wc -l | tr -d ' ')
             test "$uniq_count" -eq 1
           }
 
@@ -71,18 +73,16 @@ jobs:
             echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '.tables[] | select(.name==$NAME) | .id' 2>/dev/null | tr -d '\r\n'
           }
 
+          # Add timestamp to either GeoJSON (properties) or Esri JSON (attributes)
           write_with_timestamp() {
             local src="$1" dest="$2"
-            local ts
-            ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            local ts; ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             jq --arg ts "$ts" '
-              if (.features | type) == "array" then
-                .features |= map(
-                  .attributes |= ((. // {}) + {"UPDATED_FROM_ERD": $ts})
-                )
-              else
-                .
-              end
+              if .type=="FeatureCollection" and (.features|type)=="array" then
+                .features |= map(.properties |= ((. // {}) + {"UPDATED_FROM_ERD": $ts}))
+              elif (.features|type)=="array" then
+                .features |= map(.attributes |= ((. // {}) + {"UPDATED_FROM_ERD": $ts}))
+              else . end
             ' "$src" > "${dest}.tmp"
             mv "${dest}.tmp" "$dest"
           }
@@ -103,10 +103,10 @@ jobs:
             echo "::group::Pass $pass"
 
             if [ "$ACTIVE_NEEDED" = true ]; then
-              echo "Attempt: active fires (layer 0)"
-              if download_n "$BASE/0/query$QUERY" "active_fires" "$COPIES"; then
-                if all_match "active_fires"; then
-                  write_with_timestamp active_fires01.json active_fires.json
+              echo "Attempt: active fires (layer 0) -> GeoJSON"
+              if download_n "$BASE/0/query$QUERY_GEO" "active_fires.geojson" "$COPIES"; then
+                if all_match "active_fires.geojson"; then
+                  write_with_timestamp active_fires01.geojson active_fires.geojson
                   echo "Active fires stabilized on pass $pass"
                   ACTIVE_NEEDED=false
                   ANY_CHANGED=true
@@ -116,14 +116,14 @@ jobs:
               else
                 echo "Active fires download failed on pass $pass."
               fi
-              cleanup_prefix "active_fires"
+              cleanup_prefix "active_fires.geojson"
             fi
 
             if [ "$OUT_NEEDED" = true ]; then
-              echo "Attempt: out fires (layer 1)"
-              if download_n "$BASE/1/query$QUERY" "out_fires" "$COPIES"; then
-                if all_match "out_fires"; then
-                  write_with_timestamp out_fires01.json out_fires.json
+              echo "Attempt: out fires (layer 1) -> GeoJSON"
+              if download_n "$BASE/1/query$QUERY_GEO" "out_fires.geojson" "$COPIES"; then
+                if all_match "out_fires.geojson"; then
+                  write_with_timestamp out_fires01.geojson out_fires.geojson
                   echo "Out fires stabilized on pass $pass"
                   OUT_NEEDED=false
                   ANY_CHANGED=true
@@ -133,53 +133,10 @@ jobs:
               else
                 echo "Out fires download failed on pass $pass."
               fi
-              cleanup_prefix "out_fires"
+              cleanup_prefix "out_fires.geojson"
             fi
 
             if [ "$TABLE_NEEDED" = true ]; then
-              echo "Attempt: table $TABLE_NAME (id=${TID:-unknown})"
+              echo "Attempt: table $TABLE_NAME (id=${TID:-unknown}) -> JSON (non-spatial)"
               if [ -n "${TID:-}" ]; then
-                if download_n "$BASE/$TID/query$QUERY" "v_fire_dashboard_sum" "$COPIES"; then
-                  if all_match "v_fire_dashboard_sum"; then
-                    write_with_timestamp v_fire_dashboard_sum01.json v_fire_dashboard_sum.json
-                    echo "Table $TABLE_NAME stabilized on pass $pass"
-                    TABLE_NEEDED=false
-                    ANY_CHANGED=true
-                  else
-                    echo "Table $TABLE_NAME NOT stable on pass $pass."
-                  fi
-                else
-                  echo "Table $TABLE_NAME download failed on pass $pass."
-                fi
-                cleanup_prefix "v_fire_dashboard_sum"
-              else
-                echo "Skipping table; no table id."
-              fi
-            fi
-
-            echo "::endgroup::"
-
-            if [ "$ACTIVE_NEEDED" = false ] && [ "$OUT_NEEDED" = false ] && [ "$TABLE_NEEDED" = false ]; then
-              break
-            else
-              echo "Some datasets still unstable; waiting 30s before next pass..."
-              sleep 30
-            fi
-          done
-
-          echo "any_changed=$ANY_CHANGED" >> "$GITHUB_OUTPUT"
-
-      - name: Commit updated JSON (only what changed)
-        if: steps.fetch.outputs.any_changed == 'true'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add active_fires.json out_fires.json v_fire_dashboard_sum.json || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            git commit -m "Update fire feeds (${ts})"
-            git push
-          fi
+                if download_n "$BASE/$TID/query$QUERY_JSON" "v_fire_dashboard_sum.json" "$COPIES";_
