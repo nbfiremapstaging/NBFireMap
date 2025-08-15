@@ -25,7 +25,7 @@ jobs:
       SLEEP_BETWEEN_COPIES_SEC: "8"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
-      CHUNK_SIZE: "1000"
+      CHUNK_SIZE: "800"   # a bit smaller than 1000 just to keep chunk sizes tame
 
     steps:
       - name: Checkout
@@ -41,7 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers (GeoJSON; compare string attrs only; retry failed)
+      - name: Fetch ERD layers (GeoJSON; string-attrs only; POST; retry failed)
         id: fetch
         shell: python
         env:
@@ -62,90 +62,112 @@ jobs:
           SLEEP_COPIES = int(os.environ.get("SLEEP_BETWEEN_COPIES_SEC", "8"))
           SLEEP_PASSES = int(os.environ.get("SLEEP_BETWEEN_PASSES_SEC", "60"))
           MAX_PASSES   = int(os.environ.get("MAX_PASSES", "5"))
-          CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "1000"))
+          CHUNK_SIZE   = int(os.environ.get("CHUNK_SIZE", "800"))
 
           session = requests.Session()
           session.headers.update({
-              "User-Agent": "github-actions-fetch-erd/geojson-strings-only/1.0",
+              "User-Agent": "github-actions-fetch-erd/geojson-strings-only/1.1",
               "Cache-Control": "no-cache",
               "Pragma": "no-cache",
           })
 
           # ---------- helpers ----------
-          def _layer_url(url):
-              # "<...>/MapServer/<layer>" without "/query"
+          def _layer_root(url):
+              # "<...>/MapServer/<layer>" (no trailing /query)
               return url.split("/query")[0].rstrip("?&")
 
           def _base_query(url):
-              # deterministic base query for IDs/Count
-              if "/query" in url:
-                  pre = url.split("/query")[0]
+              # deterministic base for IDs/Count (no params that jitter)
+              root = _layer_root(url)
+              return root + "/query?where=1%3D1&outFields=*"
+
+          def _ts_param():
+              return {"_ts": str(int(time.time() * 1000))}
+
+          def get_json(method, url, params=None):
+              params = params or {}
+              params.update(_ts_param())
+              if method == "GET":
+                  r = session.get(url, params=params, timeout=120)
               else:
-                  pre = url.rstrip("/")
-              return pre + "/query?where=1%3D1&outFields=*"
-
-          def _ts():
-              return str(int(time.time() * 1000))
-
-          def req_json(url, timeout=60):
-              r = session.get(url + ("&_ts=" + _ts() if "?" in url else "?_ts=" + _ts()), timeout=timeout)
+                  # POST as form to avoid URL length limits
+                  r = session.post(url, data=params, timeout=120)
               r.raise_for_status()
               return r.json()
 
           def layer_info(url):
-              # read layer/table metadata (fields, geometryType, objectIdField)
-              info = req_json(_layer_url(url) + "?f=json")
+              info = get_json("GET", _layer_root(url), {"f":"json"})
               fields = info.get("fields") or []
               gtype  = info.get("geometryType")
               oidf   = info.get("objectIdField") or info.get("objectIdFieldName") or "OBJECTID"
               return fields, gtype, oidf
 
           def get_all_ids(base):
-              j = req_json(base + "&returnIdsOnly=true&f=json")
+              j = get_json("GET", base, {"returnIdsOnly":"true","f":"json"})
               ids = j.get("objectIds") or []
               try:
                   ids = [int(x) for x in ids]
               except Exception:
                   ids = list(ids)
               ids.sort()
-              cnt = req_json(base + "&returnCountOnly=true&f=json").get("count", 0)
+              cnt = get_json("GET", base, {"returnCountOnly":"true","f":"json"}).get("count", 0)
               return ids, int(cnt)
 
-          def fetch_chunk_geojson(base, id_chunk):
-              # Ask ArcGIS for GeoJSON directly; returns WGS84, geometry null for tables
-              qs = "&" + urlencode({
+          def fetch_chunk_esri_json(base, id_chunk):
+              # POST with f=json, outSR=4326; ArcGIS returns ESRI JSON
+              params = {
                   "objectIds": ",".join(str(i) for i in id_chunk),
                   "orderByFields": "OBJECTID",
                   "returnGeometry": "true",
-                  "f": "geojson",
-              })
-              return req_json(base + qs)
+                  "outFields": "*",
+                  "outSR": "4326",
+                  "f": "json",
+              }
+              return get_json("POST", base, params)
+
+          # ---- ESRI JSON -> GeoJSON (points supported; others fall back to null geometry) ----
+          def esri_feature_to_geojson(f, geometry_type):
+              props = (f or {}).get("attributes") or {}
+              geom  = (f or {}).get("geometry")
+              gj_geom = None
+
+              if geometry_type == "esriGeometryPoint" and geom:
+                  x, y = geom.get("x"), geom.get("y")
+                  if x is not None and y is not None:
+                      gj_geom = {"type":"Point", "coordinates":[float(x), float(y)]}
+              # You can extend here for lines/polygons if needed
+
+              return {"type":"Feature","geometry":gj_geom,"properties":props}
+
+          def esri_to_geojson(esri_json, geometry_type):
+              feats = esri_json.get("features") or []
+              gj_feats = [esri_feature_to_geojson(f, geometry_type) for f in feats]
+              return {"type":"FeatureCollection","features":gj_feats}
 
           def fetch_full_geojson(url):
               """
-              Deterministic all-rows fetch:
-                - read schema (f=json)
+              Deterministic all-rows fetch via IDs-first + POST:
+                - read schema (fields/gtype/oid)
                 - get IDs (returnIdsOnly)
-                - chunk features as GeoJSON (f=geojson)
-              Returns (feature_collection, meta, schema)
+                - chunk features as f=json (POST, outSR=4326), then convert locally to GeoJSON
               """
               fields, gtype, oidf = layer_info(url)
               base = _base_query(url)
               ids, expected_count = get_all_ids(base)
 
-              features = []
+              all_gj_features = []
               for start in range(0, len(ids), CHUNK_SIZE):
                   chunk = ids[start:start+CHUNK_SIZE]
-                  gj = fetch_chunk_geojson(base, chunk)
-                  feats = gj.get("features") or []
-                  features.extend(feats)
+                  esri_chunk = fetch_chunk_esri_json(base, chunk)
+                  gj_chunk   = esri_to_geojson(esri_chunk, gtype)
+                  all_gj_features.extend(gj_chunk.get("features", []))
 
-              fc = { "type": "FeatureCollection", "features": features }
+              fc = { "type":"FeatureCollection", "features": all_gj_features }
               meta = {
                   "ids_len": len(ids),
                   "expected_count": expected_count,
-                  "fetched_len": len(features),
-                  "ok_len": (len(ids) == expected_count == len(features)),
+                  "fetched_len": len(all_gj_features),
+                  "ok_len": (len(ids) == expected_count == len(all_gj_features)),
               }
               schema = { "fields": fields, "geometryType": gtype, "oid_field": oidf }
               return fc, meta, schema
@@ -157,7 +179,7 @@ jobs:
                   props["ERD_FETCH_TIME"] = ts_iso
               return out
 
-          # ---- comparison helpers (string properties only) ----
+          # ---- compare string attributes only ----
           def string_field_names(fields):
               names = []
               for f in (fields or []):
@@ -209,7 +231,7 @@ jobs:
           remaining = dict(targets)
           results   = {fn: None for fn in targets}
 
-          print(f"\n=== Starting fetch (GeoJSON; verify string attributes only) ===", flush=True)
+          print(f"\n=== Starting fetch (GeoJSON; string-attrs only; POST + local conversion) ===", flush=True)
           for attempt in range(1, MAX_PASSES + 1):
               if not remaining:
                   break
@@ -231,7 +253,6 @@ jobs:
                       if i < COPIES - 1:
                           time.sleep(SLEEP_COPIES)
 
-                  # all copies must have full counts
                   counts_ok = all(m.get("ok_len") for m in metas)
                   if not counts_ok:
                       print("  ✖ Count mismatch across copies — will retry.", flush=True)
@@ -243,7 +264,7 @@ jobs:
                   match, report = copies_match_string_props_only(copies, schema)
                   if match:
                       print("  ✅ String attributes match across copies.", flush=True)
-                      ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+                      ts = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat().replace("+00:00","Z")
                       final = stamp_fetch_time(copies[0], ts)
                       with open(fname, "w", encoding="utf-8") as f:
                           json.dump(final, f, ensure_ascii=False, indent=2)
@@ -282,7 +303,7 @@ jobs:
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
               Path(summary_path).write_text(
-                  "### ERD Fetch (GeoJSON; string-attrs only)\n"
+                  "### ERD Fetch (GeoJSON; string-attrs only; POST + local conversion)\n"
                   + "\n".join(lines) + "\n"
               )
 
@@ -292,7 +313,7 @@ jobs:
       - name: Commit updated GeoJSONs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update ERD fires GeoJSONs (string attributes verified across copies)"
+          commit_message: "chore(data): update ERD fires GeoJSONs (string attrs only; POST + local conversion)"
           file_pattern: |
             active_fires.geojson
             out_fires.geojson
