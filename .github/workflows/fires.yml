@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Original endpoints kept for clarity, but the code will rebuild clean base query URLs.
       ACTIVE_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
       OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
       SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true&f=json"
@@ -26,8 +25,6 @@ jobs:
       SLEEP_BETWEEN_COPIES_SEC: "8"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
-
-      # IDs-first chunk size (ArcGIS is fine with ~1000)
       CHUNK_SIZE: "1000"
 
     steps:
@@ -50,9 +47,7 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          import os, json, time, hashlib, sys, datetime, requests, copy, math
-          from pathlib import Path
-          from urllib.parse import urlparse
+          import os, json, time, hashlib, sys, datetime, requests, copy
 
           # ---------- config ----------
           targets = {
@@ -99,12 +94,11 @@ jobs:
               ids = j.get("objectIds") or []
               ids = [int(x) for x in ids]
               ids.sort()
-              # For verification:
               cnt = req(base + "&returnCountOnly=true&f=json").get("count", 0)
               return ids, int(cnt)
 
           def fetch_chunk(base, id_chunk):
-              ids_str = ","".join(str(i) for i in id_chunk)
+              ids_str = ",".join(str(i) for i in id_chunk)  # <-- fixed here
               url = (base
                      + f"&objectIds={ids_str}"
                      + "&orderByFields=OBJECTID"
@@ -115,8 +109,7 @@ jobs:
           def fetch_full_ids_first(url):
               """
               Deterministically fetch ALL features for a layer/table using IDs-first.
-              Returns the full ESRI JSON (features + fields + geometryType + spatialReference, if available)
-              along with a couple of metadata bits.
+              Returns the full ESRI JSON (features + metadata) and a meta dict.
               """
               base = _layer_base(url)
 
@@ -132,7 +125,6 @@ jobs:
                   j = fetch_chunk(base, chunk)
                   feats = j.get("features") or []
                   features.extend(feats)
-                  # Grab metadata the first time we see it
                   if fields is None: fields = j.get("fields")
                   if geometryType is None: geometryType = j.get("geometryType")
                   if spatialReference is None: spatialReference = j.get("spatialReference")
@@ -146,9 +138,7 @@ jobs:
                   "ok_len": ok_len,
               }
 
-              esri = {
-                  "features": features,
-              }
+              esri = {"features": features}
               if fields is not None: esri["fields"] = fields
               if geometryType is not None: esri["geometryType"] = geometryType
               if spatialReference is not None: esri["spatialReference"] = spatialReference
@@ -157,21 +147,12 @@ jobs:
               return esri, meta
 
           def extract_attrs(esri_json):
-              """
-              Return a normalized representation of ONLY the attributes:
-              - list of attributes dicts
-              - with sorted keys inside each dict
-              - sorted by their JSON string so order of features doesn't matter
-              """
               feats = esri_json.get("features", []) or []
               attrs_list = []
               for f in feats:
                   attrs = (f or {}).get("attributes", {}) or {}
-                  # Ensure JSON-serializable & normalized key order
                   attrs_list.append(json.loads(json.dumps(attrs, sort_keys=True)))
-              # Sort feature records deterministically by their JSON form
               attrs_list_sorted = sorted((json.dumps(a, sort_keys=True) for a in attrs_list))
-              # Return both the comparable structure and a short digest (for logging only)
               digest_src = "[" + ",".join(attrs_list_sorted) + "]"
               digest = hashlib.sha256(digest_src.encode("utf-8")).hexdigest()
               return attrs_list_sorted, digest
@@ -200,8 +181,8 @@ jobs:
               return esri_json
 
           # Pass-oriented runner: try all, then only retry failed
-          remaining = dict(targets)   # fname -> url
-          results   = {fn: None for fn in targets}  # True/False as we finish
+          remaining = dict(targets)
+          results   = {fn: None for fn in targets}
 
           print(f"\n=== Starting fetch (IDs-first, attributes-only verification across copies) ===", flush=True)
           for attempt in range(1, MAX_PASSES + 1):
@@ -224,7 +205,6 @@ jobs:
                       esri, meta = fetch_full_ids_first(url)
                       metas.append(meta)
 
-                      # Basic sanity on counts
                       if not meta["ok_len"]:
                           print(f"  Copy {i+1}/{COPIES}: count mismatch "
                                 f"(ids={meta['ids_len']}, expected={meta['expected_count']}, fetched={meta['fetched_len']})", flush=True)
@@ -240,7 +220,6 @@ jobs:
                       if i < COPIES - 1:
                           time.sleep(SLEEP_COPIES)
 
-                  # Verify equality of ONLY attributes (ignore geometry/fields/etc for stability)
                   first = attrs_norms[0]
                   all_match = all(an == first for an in attrs_norms[1:])
                   counts_all_ok = all(m.get("ok_len") for m in metas)
@@ -265,7 +244,6 @@ jobs:
               if failed_this_pass and attempt < MAX_PASSES:
                   print(f"\nSome targets were unstable; retrying them after {SLEEP_PASSES}s…", flush=True)
                   time.sleep(SLEEP_PASSES)
-              # Narrow remaining to only failed ones from this pass
               remaining = failed_this_pass
 
           # Summary
@@ -285,9 +263,9 @@ jobs:
               print(" " + msg, flush=True)
               lines.append(f"- {msg}")
 
-          # Write run summary (appears atop the job UI)
           summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
           if summary_path:
+              from pathlib import Path
               Path(summary_path).write_text("### ERD Fetch (IDs-first, attributes-only)\n" + "\n".join(lines) + "\n")
 
           if not ok_all:
@@ -301,4 +279,3 @@ jobs:
             active_fires.json
             out_fires.json
             sums_table.json
-
