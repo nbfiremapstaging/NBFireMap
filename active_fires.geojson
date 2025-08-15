@@ -33,7 +33,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -62,7 +62,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -91,7 +91,36 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68529,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.11489901540172,
+          47.29720967591014
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68529,
+        "FIRE_NAME": "Chief's",
+        "DEGREES_LAT": 47.297200000000004,
+        "DEGREES_LONG": 66.1149,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755108480000,
+        "FIRE_STAT_DATE": 1755290040000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 20,
+        "FIRE_SIZE": 50.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -120,7 +149,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -149,7 +178,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -178,7 +207,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -207,7 +236,7 @@
         "PERCENT_CONTAINED": 60,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -236,7 +265,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -265,7 +294,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -294,36 +323,36 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
       "type": "Feature",
-      "id": 68529,
+      "id": 68586,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -66.11489901540172,
-          47.29720967591014
+          -65.52649880294629,
+          47.18245966931053
         ]
       },
       "properties": {
-        "OBJECTID": 68529,
-        "FIRE_NAME": "Chief's",
-        "DEGREES_LAT": 47.297200000000004,
-        "DEGREES_LONG": 66.1149,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755108480000,
-        "FIRE_STAT_DATE": 1755270060000,
+        "OBJECTID": 68586,
+        "FIRE_NAME": "Green Brook",
+        "DEGREES_LAT": 47.182449999999996,
+        "DEGREES_LONG": 65.5265,
+        "FIRE_STAT_ID": 3,
+        "FIRE_STAT_DESC_E": "Under Control",
+        "FIRE_STAT_DESC_F": "Maîtrisé ",
+        "TIME_DETECTED": 1755170940000,
+        "FIRE_STAT_DATE": 1755287460000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 20,
-        "FIRE_SIZE": 25.0,
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -352,7 +381,36 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68643,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.10332903746092,
+          47.80806976121515
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68643,
+        "FIRE_NAME": "Jacquet River PNA",
+        "DEGREES_LAT": 47.80806,
+        "DEGREES_LONG": 66.10333,
+        "FIRE_STAT_ID": 6,
+        "FIRE_STAT_DESC_E": "Being Monitored",
+        "FIRE_STAT_DESC_F": "Sous surveillance",
+        "TIME_DETECTED": 1755176400000,
+        "FIRE_STAT_DATE": 1755289980000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 0.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -381,7 +439,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -410,36 +468,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68583,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.78932889525713,
-          47.186679664440135
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68583,
-        "FIRE_NAME": "Pats Brook",
-        "DEGREES_LAT": 47.18667,
-        "DEGREES_LONG": 65.78932999999999,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1755164700000,
-        "FIRE_STAT_DATE": 1755273060000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -468,7 +497,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -497,7 +526,65 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68583,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.78932889525713,
+          47.186679664440135
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68583,
+        "FIRE_NAME": "Pats Brook",
+        "DEGREES_LAT": 47.18667,
+        "DEGREES_LONG": 65.78932999999999,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755164700000,
+        "FIRE_STAT_DATE": 1755287280000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755301446
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68662,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.33629873763141,
+          47.21130967857177
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68662,
+        "FIRE_NAME": "271",
+        "DEGREES_LAT": 47.2113,
+        "DEGREES_LONG": 65.33630000000001,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1755276840000,
+        "FIRE_STAT_DATE": 1755290100000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 8.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -526,7 +613,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -555,36 +642,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68603,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.73226887866821,
-          47.24325967496597
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68603,
-        "FIRE_NAME": "Smoker Brook",
-        "DEGREES_LAT": 47.243249999999996,
-        "DEGREES_LONG": 65.73227,
-        "FIRE_STAT_ID": 3,
-        "FIRE_STAT_DESC_E": "Under Control",
-        "FIRE_STAT_DESC_F": "Maîtrisé ",
-        "TIME_DETECTED": 1755174900000,
-        "FIRE_STAT_DATE": 1755264900000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -613,7 +671,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -642,7 +700,36 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68603,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.73226887866821,
+          47.24325967496597
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68603,
+        "FIRE_NAME": "Smoker Brook",
+        "DEGREES_LAT": 47.243249999999996,
+        "DEGREES_LONG": 65.73227,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755174900000,
+        "FIRE_STAT_DATE": 1755287340000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -671,36 +758,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68643,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.10332903746092,
-          47.80806976121515
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68643,
-        "FIRE_NAME": "Jacquet River PNA",
-        "DEGREES_LAT": 47.80806,
-        "DEGREES_LONG": 66.10333,
-        "FIRE_STAT_ID": 6,
-        "FIRE_STAT_DESC_E": "Being Monitored",
-        "FIRE_STAT_DESC_F": "Sous surveillance",
-        "TIME_DETECTED": 1755176400000,
-        "FIRE_STAT_DATE": 1755267960000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -729,7 +787,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -758,65 +816,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68662,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.33629873763141,
-          47.21130967857177
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68662,
-        "FIRE_NAME": "271",
-        "DEGREES_LAT": 47.2113,
-        "DEGREES_LONG": 65.33630000000001,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755276840000,
-        "FIRE_STAT_DATE": 1755277260000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68586,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.52649880294629,
-          47.18245966931053
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68586,
-        "FIRE_NAME": "Green Brook",
-        "DEGREES_LAT": 47.182449999999996,
-        "DEGREES_LONG": 65.5265,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755170940000,
-        "FIRE_STAT_DATE": 1755173520000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -845,7 +845,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     },
     {
@@ -867,14 +867,14 @@
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
         "TIME_DETECTED": 1755195600000,
-        "FIRE_STAT_DATE": 1755287261000,
+        "FIRE_STAT_DATE": 1755290641000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": null,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755298066
+        "FETCHED_FROM_ERD": 1755301446
       }
     }
   ]
