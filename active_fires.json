@@ -117,7 +117,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2542348.7124999985,
@@ -140,7 +140,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2529125.1330999993,
@@ -163,7 +163,7 @@
         "FIRE_NOTE_ENG": "Yes",
         "FIRE_NOTE_FR": "Oui",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2635074.9045999981,
@@ -186,7 +186,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2500819.2593999989,
@@ -209,11 +209,34 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2415407.8643999994,
         "y": 7432077.7851000018
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 68307,
+        "FIRE_NAME": "Old Field Road",
+        "DEGREES_LAT": 47.15278,
+        "DEGREES_LONG": 65.43248,
+        "FIRE_STAT_ID": 1.0,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "FIRE_SIZE": 1402.0,
+        "TIME_DETECTED": 1754492640000,
+        "FIRE_STAT_DATE": 1755256620000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 60.0,
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
+      },
+      "geometry": {
+        "x": 2580953.6717000008,
+        "y": 7573112.3042000011
       }
     },
     {
@@ -232,7 +255,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2472768.5045000017,
@@ -241,25 +264,25 @@
     },
     {
       "attributes": {
-        "OBJECTID": 68307,
-        "FIRE_NAME": "Old Field Road",
-        "DEGREES_LAT": 47.15278,
-        "DEGREES_LONG": 65.43248,
-        "FIRE_STAT_ID": 1.0,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "FIRE_SIZE": 1402.0,
-        "TIME_DETECTED": 1754492640000,
-        "FIRE_STAT_DATE": 1755253320000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 20.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "OBJECTID": 68608,
+        "FIRE_NAME": "Moose Brook",
+        "DEGREES_LAT": 47.3419,
+        "DEGREES_LONG": 65.29452,
+        "FIRE_STAT_ID": 2.0,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "FIRE_SIZE": 2.7,
+        "TIME_DETECTED": 1755196440000,
+        "FIRE_STAT_DATE": 1755258600000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100.0,
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
-        "x": 2580953.6717000008,
-        "y": 7573112.3042000011
+        "x": 2591092.3511000015,
+        "y": 7594286.8539000005
       }
     },
     {
@@ -278,7 +301,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2569951.6519000009,
@@ -301,7 +324,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2570106.501600001,
@@ -324,11 +347,34 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2467746.8713999987,
         "y": 7644293.5229000002
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 68603,
+        "FIRE_NAME": "Smoker Brook",
+        "DEGREES_LAT": 47.24325,
+        "DEGREES_LONG": 65.73227,
+        "FIRE_STAT_ID": 2.0,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "FIRE_SIZE": 0.2,
+        "TIME_DETECTED": 1755174900000,
+        "FIRE_STAT_DATE": 1755257940000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100.0,
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
+      },
+      "geometry": {
+        "x": 2558121.7388999984,
+        "y": 7582903.9525000006
       }
     },
     {
@@ -347,7 +393,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2557323.3200000003,
@@ -370,7 +416,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2591528.2395000011,
@@ -393,7 +439,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2599953.3332999982,
@@ -416,7 +462,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2551459.0227999985,
@@ -439,7 +485,7 @@
         "FIRE_NOTE_ENG": "Yes",
         "FIRE_NOTE_FR": "Oui",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2554863.6906999983,
@@ -462,34 +508,11 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2553858.9532999992,
         "y": 7576573.4466999993
-      }
-    },
-    {
-      "attributes": {
-        "OBJECTID": 68608,
-        "FIRE_NAME": "Moose Brook",
-        "DEGREES_LAT": 47.3419,
-        "DEGREES_LONG": 65.29452,
-        "FIRE_STAT_ID": 2.0,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "FIRE_SIZE": 2.7,
-        "TIME_DETECTED": 1755196440000,
-        "FIRE_STAT_DATE": 1755248460000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
-      },
-      "geometry": {
-        "x": 2591092.3511000015,
-        "y": 7594286.8539000005
       }
     },
     {
@@ -508,34 +531,11 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2543043.059799999,
         "y": 7656152.0465999991
-      }
-    },
-    {
-      "attributes": {
-        "OBJECTID": 68603,
-        "FIRE_NAME": "Smoker Brook",
-        "DEGREES_LAT": 47.24325,
-        "DEGREES_LONG": 65.73227,
-        "FIRE_STAT_ID": 1.0,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "FIRE_SIZE": 0.1,
-        "TIME_DETECTED": 1755174900000,
-        "FIRE_STAT_DATE": 1755183720000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
-      },
-      "geometry": {
-        "x": 2558121.7388999984,
-        "y": 7582903.9525000006
       }
     },
     {
@@ -554,7 +554,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2570703.0784000009,
@@ -577,7 +577,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2543249.5769000016,
@@ -600,7 +600,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2573783.1523000002,
@@ -623,7 +623,7 @@
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100.0,
-        "UPDATED_FROM_ERD": "2025-08-15T13:53:52Z"
+        "UPDATED_FROM_ERD": "2025-08-15T14:53:44Z"
       },
       "geometry": {
         "x": 2547542.7397000007,
