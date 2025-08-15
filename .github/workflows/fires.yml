@@ -42,6 +42,8 @@ jobs:
       - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (verbose)
         id: fetch
         shell: python
+        env:
+          PYTHONUNBUFFERED: "1"
         run: |
           import os, json, time, hashlib, sys, datetime, requests, copy
 
