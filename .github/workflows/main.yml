@@ -1,0 +1,13 @@
+name: Schedule Test
+
+on:
+  schedule:
+    - cron: "43 * * * *"   # runs at 43 minutes past every hour (UTC)
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "Hello! It is $(date -u) UTC and this was triggered by cron."
