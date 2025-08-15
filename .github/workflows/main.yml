@@ -2,7 +2,7 @@ name: Schedule Test
 
 on:
   schedule:
-    - cron: "43 * * * *"   # runs at 43 minutes past every hour (UTC)
+    - cron: "48 * * * *"   # runs at 43 minutes past every hour (UTC)
   workflow_dispatch:
 
 jobs:
