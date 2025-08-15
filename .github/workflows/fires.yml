@@ -2,7 +2,7 @@ name: Fetch NB Fire Feeds
 
 on:
   schedule:
-    - cron: "58 * * * *"   # run ~2 and ~32 past the hour (UTC)
+    - cron: "11 * * * *"   # run ~2 and ~32 past the hour (UTC)
   workflow_dispatch:
 permissions:
   contents: write
