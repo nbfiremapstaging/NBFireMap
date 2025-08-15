@@ -39,17 +39,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME
+      - name: Fetch ERD layers with verification and add ERD_FETCH_TIME (verbose)
         id: fetch
         shell: python
         run: |
           import os, json, time, hashlib, sys, datetime, requests, copy
 
-          # Targets with proper layer URLs
           targets = {
-            "active_fires.json": os.environ["ACTIVE_URL"],
-            "out_fires.json":    os.environ["OUT_URL"],
-            "sums_table.json":   os.environ["SUMS_URL"],
+              "active_fires.json": os.environ["ACTIVE_URL"],
+              "out_fires.json":    os.environ["OUT_URL"],
+              "sums_table.json":   os.environ["SUMS_URL"],
           }
 
           COPIES = int(os.environ["COPIES_PER_PASS"])
@@ -58,71 +57,86 @@ jobs:
           MAX_PASSES = int(os.environ["MAX_PASSES"])
 
           session = requests.Session()
-          session.headers.update({"User-Agent":"github-actions-fetch-erd/1.0"})
+          session.headers.update({"User-Agent": "github-actions-fetch-erd/1.0"})
 
           def normalize(obj):
-            return json.dumps(obj, sort_keys=True, separators=(",",":"))
+              return json.dumps(obj, sort_keys=True, separators=(",", ":"))
 
           def fetch_once(url):
-            r = session.get(url, timeout=60)
-            r.raise_for_status()
-            return r.json()
+              r = session.get(url, timeout=60)
+              r.raise_for_status()
+              return r.json()
 
           def adorn_fetch_time(esri_json, timestamp_iso):
-            esri_json = copy.deepcopy(esri_json)
-            fields = esri_json.get("fields", [])
-            if not any(f.get("name") == "ERD_FETCH_TIME" for f in fields):
-              fields.append({
-                "name": "ERD_FETCH_TIME",
-                "type": "esriFieldTypeString",
-                "alias": "ERD_FETCH_TIME",
-                "sqlType": "sqlTypeOther",
-                "length": 32,
-                "nullable": True,
-                "editable": False,
-                "domain": None,
-                "defaultValue": None
-              })
-            esri_json["fields"] = fields
-            for feat in esri_json.get("features", []):
-              attrs = feat.setdefault("attributes", {})
-              attrs["ERD_FETCH_TIME"] = timestamp_iso
-            return esri_json
+              # include ERD_FETCH_TIME in ESRI 'fields' metadata and attribute values
+              esri_json = copy.deepcopy(esri_json)
+              fields = esri_json.get("fields", [])
+              if not isinstance(fields, list):
+                  fields = []
+              if not any(f.get("name") == "ERD_FETCH_TIME" for f in fields):
+                  fields.append({
+                      "name": "ERD_FETCH_TIME",
+                      "type": "esriFieldTypeString",
+                      "alias": "ERD_FETCH_TIME",
+                      "sqlType": "sqlTypeOther",
+                      "length": 32,
+                      "nullable": True,
+                      "editable": False,
+                      "domain": None,
+                      "defaultValue": None
+                  })
+              esri_json["fields"] = fields
+              for feat in esri_json.get("features", []):
+                  attrs = feat.setdefault("attributes", {})
+                  attrs["ERD_FETCH_TIME"] = timestamp_iso
+              return esri_json
 
           def verify_and_write(fname, url):
-            for attempt in range(1, MAX_PASSES+1):
-              copies = []
-              hashes = []
-              for i in range(COPIES):
-                data = fetch_once(url)
-                copies.append(data)
-                hashes.append(hashlib.sha256(normalize(data).encode('utf-8')).hexdigest())
-                if i < COPIES - 1:
-                  time.sleep(SLEEP_COPIES)
-              if len(set(hashes)) == 1:
-                ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-                final = adorn_fetch_time(copies[0], ts)
-                with open(fname, "w", encoding="utf-8") as f:
-                  json.dump(final, f, ensure_ascii=False, indent=2)
-                print(f"{fname}: stabilized in pass {attempt}")
-                return True
-              else:
-                print(f"{fname}: mismatch on pass {attempt}, retrying after {SLEEP_PASSES}s" if attempt < MAX_PASSES else f"{fname}: FAILED after {MAX_PASSES} passes")
-                if attempt < MAX_PASSES:
-                  time.sleep(SLEEP_PASSES)
-            return False
+              print(f"\n=== Processing {fname} ===")
+              for attempt in range(1, MAX_PASSES+1):
+                  print(f" Pass {attempt} (fetching {COPIES} copies)…")
+                  copies, hashes = [], []
+                  for i in range(COPIES):
+                      data = fetch_once(url)
+                      h = hashlib.sha256(normalize(data).encode("utf-8")).hexdigest()
+                      copies.append(data)
+                      hashes.append(h)
+                      print(f"   Copy {i+1}/{COPIES} hash: {h[:12]}…")
+                      if i < COPIES - 1:
+                          time.sleep(SLEEP_COPIES)
 
-          summary = {fn: verify_and_write(fn, url) for fn, url in targets.items()}
-          print("Summary:", summary)
-          failed = [fn for fn, ok in summary.items() if not ok]
-          if failed:
-            print("Failed layers:", failed)
-            sys.exit(1)
+                  unique_hashes = set(hashes)
+                  if len(unique_hashes) == 1:
+                      print(f" ✅ All {COPIES} copies match for {fname}.")
+                      ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+                      final = adorn_fetch_time(copies[0], ts)
+                      with open(fname, "w", encoding="utf-8") as f:
+                          json.dump(final, f, ensure_ascii=False, indent=2)
+                      print(f" → Wrote {fname} with ERD_FETCH_TIME={ts}")
+                      return True
+                  else:
+                      print(f" ❌ Mismatch detected in {fname} (hashes: {len(unique_hashes)} unique).")
+                      if attempt < MAX_PASSES:
+                          print(f"   Retrying after {SLEEP_PASSES}s…")
+                          time.sleep(SLEEP_PASSES)
+                      else:
+                          print(f"   FAILED after {MAX_PASSES} passes, no stable copy.")
+                          return False
+
+          results = {fn: verify_and_write(fn, url) for fn, url in targets.items()}
+
+          print("\n=== SUMMARY ===")
+          for fn, ok in results.items():
+              status = "OK" if ok else "FAILED"
+              print(f" {fn}: {status}")
+
+          if not all(results.values()):
+              sys.exit(1)
 
       - name: Commit updated JSONs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update fires JSONs with verified fetch and timestamp"
+          commit_message: "chore(data): update ERD fires JSONs (verified copies + ERD_FETCH_TIME)"
           file_pattern: |
             active_fires.json
             out_fires.json
