@@ -21,7 +21,7 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      - name: Fetch and verify feeds (10-in-a-row, up to 5 passes, 2s per copy, 30s between passes)
+      - name: Fetch and verify feeds (5-in-a-row, up to 5 passes, 8s per copy, 60s between passes)
         id: fetch
         env:
           BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
@@ -30,7 +30,7 @@ jobs:
           # Esri Feature JSON (for consumers that need aliases/fields)
           QUERY_JSON: '?where=1%3D1&outFields=*&f=json'
           TABLE_NAME: SDEOWNER.V_FIRE_DASHBOARD_SUM
-          COPIES: "10"
+          COPIES: "5"
         run: |
           set -euo pipefail
 
@@ -39,7 +39,7 @@ jobs:
           }
 
           download_n() {
-            local url="$1" prefix="$2" n="${3:-10}"
+            local url="$1" prefix="$2" n="${3:-5}"
             cleanup_prefix "$prefix"
             for i in $(seq -w 01 "$n"); do
               tmpfile="$(mktemp)"
@@ -57,7 +57,7 @@ jobs:
               local base="${prefix%.*}"
               local ext="${prefix##*.}"
               mv "$tmpfile" "${base}${i}.${ext}"
-              sleep 2
+              sleep 8   # <-- 8 seconds between copies
             done
           }
 
@@ -227,8 +227,8 @@ jobs:
             if [ "$ACTIVE_NEEDED" = false ] && [ "$OUT_NEEDED" = false ] && [ "$TABLE_NEEDED" = false ]; then
               break
             else
-              echo "Some datasets still unstable; waiting 30s before next pass..."
-              sleep 30
+              echo "Some datasets still unstable; waiting 60s before next pass..."
+              sleep 60   # <-- 60 seconds between passes
             fi
           done
 
