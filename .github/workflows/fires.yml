@@ -21,11 +21,11 @@ jobs:
       OUT_URL:    "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query?where=1%3D1&outFields=*&returnGeometry=true"
       SUMS_URL:   "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query?where=1%3D1&outFields=*&returnGeometry=true"
 
-      COPIES_PER_PASS: "4"
-      SLEEP_BETWEEN_COPIES_SEC: "1"
+      COPIES_PER_PASS: "10"
+      SLEEP_BETWEEN_COPIES_SEC: "8"
       SLEEP_BETWEEN_PASSES_SEC: "60"
       MAX_PASSES: "5"
-      CHUNK_SIZE: "800"   # a bit smaller than 1000 just to keep chunk sizes tame
+      CHUNK_SIZE: "800"
 
     steps:
       - name: Checkout
@@ -41,7 +41,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Fetch ERD layers (GeoJSON; string-attrs only; POST; retry failed)
+      # Clean up any previously-committed files in wrong locations or with wrong names
+      - name: Clean old/misplaced outputs
+        shell: bash
+        run: |
+          set -euxo pipefail
+          # Remove any duplicates not in repo root
+          find . -type f -name 'active_fires.geojson' ! -path './active_fires.geojson' -delete || true
+          find . -type f -name 'out_fires.geojson'    ! -path './out_fires.geojson'    -delete || true
+          find . -type f -name 'sums_table.json'      ! -path './sums_table.json'      -delete || true
+          # Remove old/mistyped filenames anywhere
+          find . -type f -name 'sums_table.geojson' -delete || true
+          find . -type f -name 'out_fires_geojson'  -delete || true
+
+      - name: Fetch ERD layers (strict verify; write only on success)
         id: fetch
         shell: python
         env:
@@ -49,13 +62,12 @@ jobs:
         run: |
           import os, json, time, sys, datetime, requests, copy
           from pathlib import Path
-          from urllib.parse import urlencode
 
           # ---------- config ----------
           targets = {
               "active_fires.geojson": os.environ["ACTIVE_URL"],
               "out_fires.geojson":    os.environ["OUT_URL"],
-              "sums_table.json":      os.environ["SUMS_URL"],   # <-- changed to .json
+              "sums_table.json":      os.environ["SUMS_URL"],   # table saved as JSON (attrs only)
           }
 
           COPIES       = int(os.environ.get("COPIES_PER_PASS", "10"))
@@ -66,31 +78,27 @@ jobs:
 
           session = requests.Session()
           session.headers.update({
-              "User-Agent": "github-actions-fetch-erd/geojson-strings-only/1.1",
+              "User-Agent": "github-actions-fetch-erd/geojson-strings-only/1.2",
               "Cache-Control": "no-cache",
               "Pragma": "no-cache",
           })
 
           # ---------- helpers ----------
           def _layer_root(url):
-              # "<...>/MapServer/<layer>" (no trailing /query)
               return url.split("/query")[0].rstrip("?&")
 
           def _base_query(url):
-              # deterministic base for IDs/Count (no params that jitter)
-              root = _layer_root(url)
-              return root + "/query?where=1%3D1&outFields=*"
+              return _layer_root(url) + "/query?where=1%3D1&outFields=*"
 
           def _ts_param():
               return {"_ts": str(int(time.time() * 1000))}
 
           def get_json(method, url, params=None):
-              params = params or {}
+              params = (params or {}).copy()
               params.update(_ts_param())
               if method == "GET":
                   r = session.get(url, params=params, timeout=120)
               else:
-                  # POST as form to avoid URL length limits
                   r = session.post(url, data=params, timeout=120)
               r.raise_for_status()
               return r.json()
@@ -105,16 +113,13 @@ jobs:
           def get_all_ids(base):
               j = get_json("GET", base, {"returnIdsOnly":"true","f":"json"})
               ids = j.get("objectIds") or []
-              try:
-                  ids = [int(x) for x in ids]
-              except Exception:
-                  ids = list(ids)
+              try: ids = [int(x) for x in ids]
+              except Exception: ids = list(ids)
               ids.sort()
               cnt = get_json("GET", base, {"returnCountOnly":"true","f":"json"}).get("count", 0)
               return ids, int(cnt)
 
           def fetch_chunk_esri_json(base, id_chunk):
-              # POST with f=json, outSR=4326; ArcGIS returns ESRI JSON
               params = {
                   "objectIds": ",".join(str(i) for i in id_chunk),
                   "orderByFields": "OBJECTID",
@@ -125,59 +130,55 @@ jobs:
               }
               return get_json("POST", base, params)
 
-          # ---- ESRI JSON -> GeoJSON (points supported; others fall back to null geometry) ----
+          # ---- ESRI JSON -> GeoJSON (points supported; others -> null geom) ----
           def esri_feature_to_geojson(f, geometry_type):
               props = (f or {}).get("attributes") or {}
               geom  = (f or {}).get("geometry")
               gj_geom = None
-
               if geometry_type == "esriGeometryPoint" and geom:
                   x, y = geom.get("x"), geom.get("y")
                   if x is not None and y is not None:
-                      gj_geom = {"type":"Point", "coordinates":[float(x), float(y)]}
-              # You can extend here for lines/polygons if needed
-
+                      gj_geom = {"type":"Point","coordinates":[float(x), float(y)]}
               return {"type":"Feature","geometry":gj_geom,"properties":props}
 
           def esri_to_geojson(esri_json, geometry_type):
               feats = esri_json.get("features") or []
-              gj_feats = [esri_feature_to_geojson(f, geometry_type) for f in feats]
-              return {"type":"FeatureCollection","features":gj_feats}
+              return {"type":"FeatureCollection","features":[esri_feature_to_geojson(f, geometry_type) for f in feats]}
 
           def fetch_full_geojson(url):
-              """
-              Deterministic all-rows fetch via IDs-first + POST:
-                - read schema (fields/gtype/oid)
-                - get IDs (returnIdsOnly)
-                - chunk features as f=json (POST, outSR=4326), then convert locally to GeoJSON
-              """
               fields, gtype, oidf = layer_info(url)
               base = _base_query(url)
               ids, expected_count = get_all_ids(base)
-
               all_gj_features = []
               for start in range(0, len(ids), CHUNK_SIZE):
                   chunk = ids[start:start+CHUNK_SIZE]
                   esri_chunk = fetch_chunk_esri_json(base, chunk)
                   gj_chunk   = esri_to_geojson(esri_chunk, gtype)
                   all_gj_features.extend(gj_chunk.get("features", []))
-
-              fc = { "type":"FeatureCollection", "features": all_gj_features }
+              fc = {"type":"FeatureCollection","features": all_gj_features}
               meta = {
                   "ids_len": len(ids),
                   "expected_count": expected_count,
                   "fetched_len": len(all_gj_features),
                   "ok_len": (len(ids) == expected_count == len(all_gj_features)),
               }
-              schema = { "fields": fields, "geometryType": gtype, "oid_field": oidf }
+              schema = {"fields": fields, "geometryType": gtype, "oid_field": oidf}
               return fc, meta, schema
 
-          def stamp_fetch_time(fc, ts_iso):
+          def stamp_fetch_time_on_fc(fc, ts_iso):
               out = copy.deepcopy(fc)
               for feat in out.get("features", []):
                   props = feat.setdefault("properties", {})
                   props["ERD_FETCH_TIME"] = ts_iso
               return out
+
+          def fc_to_rows_with_stamp(fc, ts_iso):
+              rows = []
+              for feat in (fc.get("features") or []):
+                  props = dict((feat or {}).get("properties") or {})
+                  props["ERD_FETCH_TIME"] = ts_iso
+                  rows.append(props)
+              return rows
 
           # ---- compare string attributes only ----
           def string_field_names(fields):
@@ -195,29 +196,20 @@ jobs:
                   props = (feat or {}).get("properties") or {}
                   oid = props.get(oid_field)
                   if oid is not None:
-                      try:
-                          m[int(oid)] = feat
-                      except Exception:
-                          m[str(oid)] = feat
+                      try: m[int(oid)] = feat
+                      except Exception: m[str(oid)] = feat
               return m
 
           def copies_match_string_props_only(copies, schema):
-              if not copies:
-                  return False, {"reason": "no copies"}
-
+              if not copies: return False, {"reason": "no copies"}
               fields = schema.get("fields") or []
               oidf   = schema.get("oid_field") or "OBJECTID"
               sfields = string_field_names(fields)
-
               maps = [features_by_oid_geojson(c, oidf) for c in copies]
-
-              # same OID sets
               base_oids = set(maps[0].keys())
               for i, m in enumerate(maps[1:], start=2):
                   if set(m.keys()) != base_oids:
                       return False, {"reason": f"OID set mismatch at copy {i}"}
-
-              # per-oid string property equality
               for oid in sorted(base_oids):
                   base_props = (maps[0][oid].get("properties") or {})
                   for i, m in enumerate(maps[1:], start=2):
@@ -226,15 +218,6 @@ jobs:
                           if str(base_props.get(fn)) != str(props.get(fn)):
                               return False, {"reason": "string attr mismatch", "oid": oid, "field": fn, "copy": i}
               return True, {"reason": "all good"}
-
-          # Convert a FeatureCollection to attribute rows (for sums_table.json)
-          def fc_to_rows_with_stamp(fc, ts_iso):
-              rows = []
-              for feat in (fc.get("features") or []):
-                  props = dict((feat or {}).get("properties") or {})
-                  props["ERD_FETCH_TIME"] = ts_iso
-                  rows.append(props)
-              return rows
 
           # ---------- main driver ----------
           remaining = dict(targets)
@@ -276,14 +259,13 @@ jobs:
                       ts = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat().replace("+00:00","Z")
 
                       if fname == "sums_table.json":
-                          # Write plain JSON (attributes-only rows) for the sums table
+                          # Write plain JSON (attribute rows) for the table
                           rows = fc_to_rows_with_stamp(copies[0], ts)
                           with open(fname, "w", encoding="utf-8") as f:
                               json.dump({"rows": rows}, f, ensure_ascii=False, indent=2)
                           print(f"  → Wrote {fname} (rows JSON) with ERD_FETCH_TIME={ts}", flush=True)
                       else:
-                          # Write GeoJSON for map layers
-                          final = stamp_fetch_time(copies[0], ts)
+                          final = stamp_fetch_time_on_fc(copies[0], ts)
                           with open(fname, "w", encoding="utf-8") as f:
                               json.dump(final, f, ensure_ascii=False, indent=2)
                           print(f"  → Wrote {fname} with ERD_FETCH_TIME={ts}", flush=True)
@@ -329,11 +311,13 @@ jobs:
           if not ok_all:
               sys.exit(1)
 
-      - name: Commit updated GeoJSONs
+      - name: Commit updated data
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(data): update ERD fires GeoJSONs (string attrs only; POST + local conversion)"
+          commit_message: "chore(data): update ERD fires (active/out geojson; sums json)"
           file_pattern: |
             active_fires.geojson
             out_fires.geojson
             sums_table.json
+          # Stage deletions from the cleanup step, too
+          commit_options: '--all'
