@@ -21,23 +21,22 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      - name: Fetch and verify feeds with partial overwrites (up to 5 passes, 5-in-a-row, 30s pause)
+      - name: Fetch and verify feeds (10-in-a-row, up to 5 passes, 2s per copy, 30s between passes)
         id: fetch
         env:
           BASE: https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer
           QUERY: '?where=1%3D1&outFields=*&f=json'
           TABLE_NAME: SDEOWNER.V_FIRE_DASHBOARD_SUM
-          COPIES: "5"
+          COPIES: "10"
         run: |
           set -euo pipefail
 
-          # Only delete numbered temp copies like foo01.json .. foo99.json (keep foo.json!)
           cleanup_prefix() {
             rm -f "${1}"[0-9][0-9].json || true
           }
 
           download_n() {
-            local url="$1" prefix="$2" n="${3:-5}"
+            local url="$1" prefix="$2" n="${3:-10}"
             cleanup_prefix "$prefix"
             for i in $(seq -w 01 "$n"); do
               tmpfile="$(mktemp)"
@@ -52,7 +51,7 @@ jobs:
                 return 1
               fi
               mv "$tmpfile" "${prefix}${i}.json"
-              sleep 1
+              sleep 2   # <-- 2 seconds between copies
             done
           }
 
@@ -72,16 +71,15 @@ jobs:
             echo "$meta" | jq -e --arg NAME "$TABLE_NAME" '.tables[] | select(.name==$NAME) | .id' 2>/dev/null | tr -d '\r\n'
           }
 
-          # Add UPDATED_FROM_ERD to every feature.attributes and write to target file
           write_with_timestamp() {
             local src="$1" dest="$2"
             local ts
             ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            # If it has .features (array), add/merge UPDATED_FROM_ERD inside each .attributes
-            # Otherwise, leave structure unchanged.
             jq --arg ts "$ts" '
               if (.features | type) == "array" then
-                .features = (.features | map(.attributes = ((.attributes // {}) + {"UPDATED_FROM_ERD": $ts})))
+                .features |= map(
+                  .attributes |= ((. // {}) + {"UPDATED_FROM_ERD": $ts})
+                )
               else
                 .
               end
@@ -108,7 +106,6 @@ jobs:
               echo "Attempt: active fires (layer 0)"
               if download_n "$BASE/0/query$QUERY" "active_fires" "$COPIES"; then
                 if all_match "active_fires"; then
-                  # write final file with timestamp
                   write_with_timestamp active_fires01.json active_fires.json
                   echo "Active fires stabilized on pass $pass"
                   ACTIVE_NEEDED=false
