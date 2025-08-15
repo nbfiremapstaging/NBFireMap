@@ -27,8 +27,7 @@
         --shadow:0 10px 30px rgba(2,8,20,.08); --shadow-soft:0 6px 16px rgba(2,8,20,.06);
         --btn-bg:#fff; --btn-border:#d9dee6; --btn-hover:#f2f4f7;
         --link:#2563eb; --focus:0 0 0 3px rgba(37,99,235,.28);
-        --oc:#ef4444; --cont:#fb923c; --uc:#facc15; --pat:#22c55e;
-        --mon:#3b82f6; /* NEW: Being Monitored (blue) */
+        --oc:#ef4444; --cont:#fb923c; --uc:#facc15; --pat:#22c55e; --mon:#3b82f6;
         --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
         --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
       }
@@ -52,15 +51,8 @@
       .leaflet-control-layers-overlays input{margin:0;width:max-content;height:18px}
       .leaflet-control-layers-overlays .text{min-width:max-content;white-space:nowrap;overflow:visible;text-overflow:clip}
 
-      /* Mobile: panel width is set by JS to longest label */
       @media (max-width: 640px) {
-        .leaflet-control-layers {
-          width: var(--layers-w, auto);
-          max-width: calc(100vw - 24px);
-          min-width: 0 !important; /* override base min width on mobile */
-          white-space: nowrap;
-          overflow-x: auto;
-        }
+        .leaflet-control-layers { width: var(--layers-w, auto); max-width: calc(100vw - 24px); min-width: 0 !important; white-space: nowrap; overflow-x: auto; }
         .leaflet-control-layers-overlays label { grid-template-columns: 18px 26px auto; }
         .leaflet-control-layers-overlays .text { white-space: nowrap; min-width: max-content; }
       }
@@ -81,15 +73,16 @@
       /* Labels */
       .city-label-tooltip,.perimeter-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
       .city-label{font-size:15px;font-weight:800;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.7),0 0 8px rgba(0,0,0,.6),1px 1px 0 rgba(0,0,0,.9)}
-      .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:color-mix(in oklab,var(--perimeter) 12%,transparent);backdrop-filter:blur(2px)}
+      .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:rgba(239,68,68,.12);backdrop-filter:blur(2px)}
 
-      /* Summary modal */
+      /* Summary modal (make whole panel scrollable on small screens) */
       .fire-summary-btn{position:fixed;left:12px;bottom:86px;z-index:2001}
       .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
-      .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(560px,calc(100% - 24px));color:var(--text)}
-      .fire-summary header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+      .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(680px,calc(100% - 24px));color:var(--text);
+        max-height:90vh; display:flex; flex-direction:column; overflow:hidden;}
+      .fire-summary header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px; flex:0 0 auto;}
       .fire-summary h2{font-size:var(--fs-18);font-weight:800;margin:0}
-      .fire-summary .body{padding:0 16px 16px;line-height:1.5}
+      .fire-summary .body{padding:0 16px 16px;line-height:1.5; overflow:auto; flex:1 1 auto; min-height:0;}
       .close-summary{background:var(--btn-bg);border:1px solid var(--btn-border);color:var(--text);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;font-weight:700;box-shadow:var(--shadow-soft)}
       .close-summary:hover{background:var(--btn-hover)}
       .close-summary:focus-visible{outline:none;box-shadow:var(--focus)}
@@ -98,8 +91,12 @@
       .summary-list{margin:8px 0 0;padding-left:12px;list-style:decimal;list-style-position:inside}
       .summary-list a{color:var(--link);text-decoration:none;font-weight:700}
       .summary-list a:hover{text-decoration:underline}
-      .fs-scroll{max-height:260px;overflow-y:auto;margin-top:6px}
-      .fs-meta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px;font-weight:800}
+      .fs-scroll{margin-top:8px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--panel)}
+      .fs-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+      .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;box-shadow:var(--shadow-soft)}
+      .stat .h{font:800 13px/1.2 Inter,system-ui,Arial;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
+      .stat .v{font:800 18px/1.15 Inter,system-ui,Arial}
+      @media (max-width: 520px){ .fs-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 
       /* Legend icons */
       .marker-badge{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;background:var(--panel-strong);border:2.5px solid var(--ring,#9aa0a6);box-shadow:0 2px 10px rgba(0,0,0,.18)}
@@ -129,15 +126,10 @@
       .service-btn{background:var(--btn-bg);border:1px solid var(--btn-border);color:var(--text);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800;box-shadow:var(--shadow-soft)}
       .service-btn:hover{background:var(--btn-hover)}
 
-      /* Fire status filter (in-panel, blends in) */
+      /* Fire status filter */
       .fire-filter-block{ margin:8px 0 6px; padding:6px 0 2px 0; }
-      .fire-filter-title{
-        margin:0 0 4px; font:800 12px/1.1 Inter,system-ui,Arial;
-        color:var(--muted); letter-spacing:.02em; text-transform:uppercase;
-      }
-      .fire-filter-row{
-        display:grid; grid-template-columns:18px 26px auto; align-items:center; column-gap:8px; margin:4px 0;
-      }
+      .fire-filter-title{ margin:0 0 4px; font:800 12px/1.1 Inter,system-ui,Arial; color:var(--muted); letter-spacing:.02em; text-transform:uppercase; }
+      .fire-filter-row{ display:grid; grid-template-columns:18px 26px auto; align-items:center; column-gap:8px; margin:4px 0; }
       .fire-filter-row .legend-badge{ width:18px; height:18px; }
       .fire-filter-row .legend-badge i{ font-size:11px; }
     </style>
@@ -173,9 +165,8 @@
           <h2 id="svc-title">Data May Be Unavailable</h2>
         </header>
         <div id="svc-body" class="body">
-          <p>We couldn’t load the <b>Active Fires</b> layer within 20 seconds.</p>
-          <p>Natural Resources and Energy Development’s ArcGIS services may be temporarily unavailable. This can also affect the <b>Burn Bans</b> layer.</p>
-          <p>If it still doesn’t load, please try refreshing the page later.</p>
+          <p>We couldn’t load one of the layers.</p>
+          <p>Please try refreshing the page later.</p>
         </div>
         <div class="footer">
           <button id="svc-ack" class="service-btn" type="button">OK</button>
@@ -194,89 +185,59 @@
     <script defer src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
     <script defer src="https://unpkg.com/esri-leaflet-image/dist/esri-leaflet-image.js"></script>
     <script defer src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
-
-    <!-- Leaflet markercluster + Esri Leaflet Cluster -->
     <script defer src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <!-- needed for clustered Esri feature layers (weather) -->
     <script defer src="https://unpkg.com/esri-leaflet-cluster/dist/esri-leaflet-cluster.js"></script>
 
     <script>
       window.addEventListener('DOMContentLoaded', () => {
         'use strict';
 
-        /* ====================== Constants / Config ====================== */
+        /* ====================== Config ====================== */
         const LS_KEY = 'nbMapView';
-        const NB_BOUNDS = [[44.0, -69.5], [48.5, -62.0]];
         const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 };
         const ATLANTIC_TZ = 'America/Moncton';
-
-        const OPEN_SKY_URL = 'https://opensky-network.org/api/states/all';
-        const OPEN_SKY_INTERVAL_MS = 250_000;
         const LIGHTNING_REFRESH_MS = 120_000;
-        const SERVICE_ALERT_MS = 20_000;
-        const MANUAL_REFRESH_MIN = 30;
 
         /* ====================== Utilities ====================== */
         const isMobile = () => innerWidth < 768;
-        const rootStyle = getComputedStyle(document.documentElement);
-        const cssVar = (name) => rootStyle.getPropertyValue(name).trim();
-
-        const toNum = (v, d = 1) =>
-          v == null || Number.isNaN(Number(v))
-            ? '—'
-            : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
-
-        const fmtDateTime = (ms) =>
-          ms == null
-            ? '—'
-            : new Date(+ms).toLocaleString(undefined, {
-                year: 'numeric', month: 'short', day: '2-digit',
-                hour: '2-digit', minute: '2-digit'
-              });
-
-        const fmtDateTZ = (ms, tz = ATLANTIC_TZ) =>
-          ms == null
-            ? '—'
-            : new Date(+ms).toLocaleDateString(undefined, {
-                year: 'numeric', month: 'short', day: '2-digit', timeZone: tz
-              });
-
+        const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         const norm = (s) => (s || '').toString().trim().toLowerCase();
-        const statusColor = (s) =>
-          ({
-            'out of control': cssVar('--oc'),
-            contained: cssVar('--cont'),
-            'under control': cssVar('--uc'),
-            'being patrolled': cssVar('--pat'),
-            'being monitored': cssVar('--mon')          // NEW
-          }[norm(s)] || '#9aa0a6');
+        const toNum = (v, d = 1) => (v == null || Number.isNaN(Number(v))) ? '—' : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
+        const fmtDateTime = (ms) => ms == null ? '—' : new Date(+ms).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const fmtDateTZ = (ms, tz = ATLANTIC_TZ) => ms == null ? '—' : new Date(+ms).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: tz });
 
-        const severityRank = (s) =>
-          ({
-            'out of control': 3,
-            contained: 2,
-            'under control': 1,
-            'being patrolled': 0,
-            'being monitored': 0                         // NEW
-          }[norm(s)] ?? -1);
+        const statusColor = (s) => ({
+          'out of control': cssVar('--oc'),
+          contained: cssVar('--cont'),
+          'under control': cssVar('--uc'),
+          'being patrolled': cssVar('--pat'),
+          'being monitored': cssVar('--mon'),
+          extinguished: '#9aa0a6'
+        }[norm(s)] || '#9aa0a6');
 
-        // Atlantic-time day bucketing
+        const severityRank = (s) => ({
+          'out of control': 3,
+          contained: 2,
+          'under control': 1,
+          'being patrolled': 0,
+          'being monitored': 0,
+          extinguished: -1
+        }[norm(s)] ?? -1);
+
+        // date helpers (today/yesterday in Atlantic)
         const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
           const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
           const parts = fmt.formatToParts(new Date(ms));
           const grab = (k) => +parts.find((p) => p.type === k)?.value;
           return { y: grab('year'), m: grab('month'), d: grab('day') };
         };
-        const sameYMD = (a, b, tz) => {
-          if (a == null || b == null) return false;
-          const A = ymdInTz(a, tz); const B = ymdInTz(b, tz);
-          return A.y === B.y && A.m === B.m && A.d === B.d;
-        };
-        const yesterdayUTCms = (tz = ATLANTIC_TZ) => {
-          const t = ymdInTz(Date.now(), tz);
-          return Date.UTC(t.y, t.m - 1, t.d) - 86_400_000;
-        };
+        const sameYMD = (a, b, tz) => { if (a == null || b == null) return false; const A = ymdInTz(a, tz); const B = ymdInTz(b, tz); return A.y===B.y && A.m===B.m && A.d===B.d; };
+        const yesterdayUTCms = (tz = ATLANTIC_TZ) => { const t = ymdInTz(Date.now(), tz); return Date.UTC(t.y, t.m - 1, t.d) - 86_400_000; };
         const isToday = (ms) => sameYMD(ms, Date.now(), ATLANTIC_TZ);
         const isYesterday = (ms) => sameYMD(ms, yesterdayUTCms(ATLANTIC_TZ), ATLANTIC_TZ);
+        const getExtinguishedMs = (p) => { for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) { const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t; } return null; };
+        const getDetectedMs = (p) => { for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) { const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t; } return null; };
 
         /* ====================== Map init ====================== */
         const restored = (() => { try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; } })();
@@ -288,15 +249,10 @@
         });
 
         // Panes
-        [
-          ['alwaysOnTopPopup', 9999],
-          ['sentinelPane', 400], ['nbBoundaryPane', 405], ['perimetersPane', 412],
-          ['radarPane', 413], ['lightningPane', 413], ['viirsPane', 414],
-          ['weatherPane', 415], ['aqiPane', 416], ['firesPane', 420], ['planesPane', 1000, true]
-        ].forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
+        [['alwaysOnTopPopup',9999],['sentinelPane',400],['nbBoundaryPane',405],['perimetersPane',412],['radarPane',413],['lightningPane',413],['viirsPane',414],['weatherPane',415],['aqiPane',416],['firesPane',420]]
+          .forEach(([name, z]) => { const p = map.createPane(name); p.style.zIndex = z; });
 
         L.esri.basemapLayer('Imagery').addTo(map);
-        const sentinel2c = L.esri.imageMapLayer({ url: 'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer', opacity: 0.7, pane: 'sentinelPane' });
 
         if (isMobile()) {
           L.control.locate({
@@ -305,69 +261,20 @@
           }).addTo(map);
         }
 
-        /* ====================== Fires (CLUSTERED by highest urgency) ====================== */
-        const fireStore = new Map();
-
-        const fireBadgeIcon = (status) => L.divIcon({
-          className:'fire-badge-icon',
-          html:`<div class="marker-badge" style="--ring:${statusColor(status)}"><i class="fa-solid fa-fire"></i></div>`,
-          iconSize:[38,38],iconAnchor:[19,26],popupAnchor:[0,-22]
-        });
-
-        const bindFireFeature = (feature, layer) => {
-          const p = feature.properties || {};
-          const html = `
-            <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
-              <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">${p.FIRE_NAME || 'Unnamed Fire'}</div>
-              <div style="margin:6px 0 10px">
-                <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.12)">
-                  <span class="dot" style="background:${statusColor(p.FIRE_STAT_DESC_E)}"></span>${p.FIRE_STAT_DESC_E || '—'}
-                </span>
-              </div>
-              <div><b>Area:</b> ${toNum(p.FIRE_SIZE,1)} ha</div>
-              <div><b>Detected:</b> ${fmtDateTime(p.TIME_DETECTED)}</div>
-              <div><b>Status updated:</b> ${fmtDateTime(p.FIRE_STAT_DATE)}</div>
-            </div>`;
-          layer.bindPopup(html,{maxWidth:340,pane:'alwaysOnTopPopup'});
-
-          const rawId = feature.id ?? p.OBJECTID ?? p.GlobalID ?? p.FIRE_ID ?? Math.random();
-          const id = String(rawId);
-          fireStore.set(id,{id,props:p,latlng:layer.getLatLng(),layer});
-
-          let clicked=false, openT=null, closeT=null;
-          const OPEN_MS=150, CLOSE_MS=60;
-          const clearTimers=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
-
-          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
-            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup(); },OPEN_MS); }});
-          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
-            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup(); },CLOSE_MS); }});
-          layer.on('click',function(){ clicked=!clicked; clearTimers(); clicked?this.openPopup():this.closePopup(); });
-          layer.on('remove', clearTimers);
-        };
-
-        // Single clustered Esri layer for Active Fires (always on; not in layers panel)
-        const clusteredFires = L.esri.Cluster.featureLayer({
-          url:'https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0',
-          pane:'firesPane',
+        /* ====================== Fires: GeoJSON-only + clustering + status checkboxes ====================== */
+        const fireStore = new Map(); // id -> { id, props, latlng, layer, statusKey }
+        const fireClusters = L.markerClusterGroup({
           disableClusteringAtZoom: 11,
           spiderfyOnMaxZoom: true,
           zoomToBoundsOnClick: true,
           showCoverageOnHover: false,
-          pointToLayer:(feature,latlng)=>{
-            const status = feature?.properties?.FIRE_STAT_DESC_E;
-            const marker = L.marker(latlng,{icon:fireBadgeIcon(status)});
-            marker.options._statusKey = norm(status);
-            marker.options._severity  = severityRank(status);
-            return marker;
-          },
-          onEachFeature: bindFireFeature,
           iconCreateFunction:(cluster)=>{
             const markers = cluster.getAllChildMarkers();
-            let worst = { sev:-1, key:null };
+            let worst = { sev:-2, key:'extinguished' };
             for(const m of markers){
-              const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(m.options._statusKey);
-              if(sev > worst.sev){ worst = { sev, key: m.options._statusKey }; }
+              const k = m.options._statusKey || 'extinguished';
+              const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
+              if(sev > worst.sev){ worst = { sev, key: k }; }
             }
             const ring = statusColor(worst.key);
             const count = cluster.getChildCount();
@@ -381,20 +288,104 @@
                   <div style="position:absolute;bottom:-6px;right:-6px;background:var(--panel-strong);border:2px solid ${ring};border-radius:999px;
                               font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${count}</div>
                 </div>`,
-              iconSize:[42,42],
-              iconAnchor:[21,28],
-              popupAnchor:[0,-24]
+              iconSize:[42,42], iconAnchor:[21,28], popupAnchor:[0,-24]
             });
-          }
+          },
+          pane: 'firesPane'
         }).addTo(map);
 
-        clusteredFires.on('removefeature',(e)=> {
-          const p = (e.feature && e.feature.properties) || {};
-          const id = String(e.feature && (e.feature.id ?? p.OBJECTID ?? p.GlobalID ?? p.FIRE_ID));
-          fireStore.delete(id);
-        });
+        const activeMarkers = [];
+        const outMarkers = [];
 
-        /* ====================== MODIS ====================== */
+        function bindFireFeature(props, layer, explicitStatus) {
+          const status = explicitStatus || props.FIRE_STAT_DESC_E || '—';
+          const html = `
+            <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
+              <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">${props.FIRE_NAME || props.FIRE_ID || 'Unnamed Fire'}</div>
+              <div style="margin:6px 0 10px">
+                <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+                  <span class="dot" style="background:${statusColor(status)}"></span>${status}
+                </span>
+              </div>
+              <div><b>Area:</b> ${toNum(props.FIRE_SIZE ?? props.SIZE_HA ?? props.AREA,1)} ha</div>
+              <div><b>Detected:</b> ${fmtDateTime(getDetectedMs(props))}</div>
+              ${norm(status)==='extinguished'
+                ? `<div><b>Extinguished:</b> ${fmtDateTime(getExtinguishedMs(props))}</div>`
+                : `<div><b>Status updated:</b> ${fmtDateTime(props.FIRE_STAT_DATE)}</div>`}
+            </div>`;
+          layer.bindPopup(html,{maxWidth:340,pane:'alwaysOnTopPopup'});
+
+          const rawId = props.GlobalID || props.OBJECTID || props.FIRE_ID || Math.random().toString(36).slice(2)+Date.now().toString(36);
+          const id = String(rawId);
+          fireStore.set(id,{ id, props, latlng: layer.getLatLng(), layer, statusKey: norm(status) });
+
+          // hover/click UX
+          let clicked=false, openT=null, closeT=null;
+          const OPEN_MS=150, CLOSE_MS=60;
+          const clearTimers=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
+          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
+            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup(); },OPEN_MS); }});
+          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
+            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup(); },CLOSE_MS); }});
+          layer.on('click',function(){ clicked=!clicked; clearTimers(); clicked?this.openPopup():this.closePopup(); });
+          layer.on('remove', clearTimers);
+        }
+
+        function makeFireMarker(props, coords, explicitStatus){
+          const [lng, lat] = coords; // GeoJSON order
+          const statusKey = norm(explicitStatus || props.FIRE_STAT_DESC_E || '—');
+          const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className:'fire-badge-icon',
+              html:`<div class="marker-badge" style="--ring:${statusColor(statusKey)}"><i class="fa-solid fa-fire"></i></div>`,
+              iconSize:[38,38],iconAnchor:[19,26],popupAnchor:[0,-22]
+            }),
+            keyboard:false
+          });
+          marker.options._statusKey = statusKey;
+          marker.options._severity  = severityRank(statusKey);
+          bindFireFeature(props, marker, explicitStatus);
+          return marker;
+        }
+
+        async function fetchLocalAny(base){
+          const attempts = [
+            `${base}.json`, `${base}.geojson`,
+            `./${base}.json`, `./${base}.geojson`,
+            `data/${base}.json`, `data/${base}.geojson`,
+            `./data/${base}.json`, `./data/${base}.geojson`,
+          ];
+          for (const url of attempts) {
+            try { const r = await fetch(url, { cache:'no-store' }); if (r.ok) return await r.json(); } catch {}
+          }
+          throw new Error(`Could not load ${base} from any known path`);
+        }
+
+        async function loadLocalFires(){
+          const [activeData, outData] = await Promise.all([
+            fetchLocalAny('active_fires'),
+            fetchLocalAny('out_fires')
+          ]);
+
+          (activeData.features||[]).forEach((f)=>{
+            if (!f || f.geometry?.type !== 'Point') return;
+            const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, f.properties?.FIRE_STAT_DESC_E);
+            activeMarkers.push(m);
+            fireClusters.addLayer(m); // active visible on load
+          });
+
+          (outData.features||[]).forEach((f)=>{
+            if (!f || f.geometry?.type !== 'Point') return;
+            const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, 'Extinguished');
+            outMarkers.push(m);
+            // not added yet; controlled by status checkbox (default OFF)
+          });
+
+          refreshSummary();
+        }
+        loadLocalFires().catch(err => console.warn(err));
+
+        /* ====================== MODIS, Perimeters, NB boundary ====================== */
         const modis48 = L.esri.featureLayer({
           url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
           pane:'viirsPane',
@@ -407,7 +398,6 @@
           pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:4,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.65})
         });
 
-        /* ====================== Perimeters & misc ====================== */
         const PERIMETER_COLOR = cssVar('--perimeter');
         const perimeterLabelLayers = new Set();
 
@@ -432,34 +422,24 @@
         activefires.on('load', setPerimeterLabels);
         map.on('zoomend', setPerimeterLabels);
 
-        const nbCrownLands = L.esri.featureLayer({
-          url:'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/Crown_Lands/FeatureServer/0',
-          pane:'perimetersPane',
-          style:()=>({color:'#a855f7',weight:1,fillOpacity:.18})
-        });
-        map.on('zoomend',()=>{ if(map.getZoom()<10 && map.hasLayer(nbCrownLands)) map.removeLayer(nbCrownLands); });
+        const nbBoundary = L.esri.featureLayer({
+          url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0',
+          where:"Name_EN = 'New Brunswick'",
+          pane:'nbBoundaryPane',
+          style:()=>({color:cssVar('--boundary'),weight:5,fill:false}), interactive:false
+        }).addTo(map);
 
-        const nbBurnBans = L.esri.dynamicMapLayer({
-          url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
-          opacity:.7, pane:'perimetersPane'
-        });
-
-        /* ====================== Weather stations (with % humidity; unchanged look) ====================== */
+        /* ====================== Weather (clustered), Radar, Lightning, AQHI ====================== */
         function stationPopupHTML(p) {
           const fromDeg = Number(p.WindDirection);
           const dirTxt = Number.isFinite(fromDeg)
-            ? (() => {
-                const d = ((fromDeg % 360) + 360) % 360;
-                const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
-                return dirs[Math.round(d / 22.5)];
-              })()
+            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
             : '—';
           const kmh = Number(p.WindSpeed_kmh);
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
           const hum  = p.Humidity_Percent !== '' && p.Humidity_Percent != null ? Math.round(Number(p.Humidity_Percent)) : null;
           const name = p.StationName || p.location_name_en || 'Weather station';
           const when = p.observation_datetime_text_en || '';
-
           return `
             <div style="min-width:240px">
               <div style="font-weight:800;margin-bottom:4px">${name}</div>
@@ -468,26 +448,20 @@
               ${when ? `<div style="opacity:.8">${when}</div>` : ''}
             </div>`;
         }
-
         function stationSVG(p, size=84){
           const fromDeg = Number(p.WindDirection);
           const toDeg = Number.isFinite(fromDeg) ? (fromDeg + 180) % 360 : 0;
           const kmh = Number(p.WindSpeed_kmh);
           const dirTxt = Number.isFinite(fromDeg)
-            ? (() => {
-                const d = ((fromDeg % 360) + 360) % 360;
-                const dirs = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
-                return dirs[Math.round(d / 22.5)];
-              })()
+            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
             : '—';
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
           const hum  = p.Humidity_Percent !== '' && p.Humidity_Percent != null ? Math.round(Number(p.Humidity_Percent)) : null;
-
           const arrowPathD = "M42 14 Q52 30 58 58 Q42 48 42 48 Q42 48 26 58 Q32 30 42 14 Z";
           const scale = size/84;
           return `
             <svg class="ws-svg" width="${84*scale}" height="${92*scale}" viewBox="0 0 84 92" aria-hidden="true" role="img"
-                 style="position:relative; z-index:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))">
+                 style="position:relative; z-index:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))">
               <circle cx="42" cy="42" r="34" fill="#0b0f19" stroke="#ffffff" stroke-width="2.5"/>
               <g transform="rotate(${toDeg} 42 42)">
                 <path d="${arrowPathD}" fill="#999999" stroke="#999999" stroke-width="1.8" stroke-linejoin="round"></path>
@@ -501,25 +475,15 @@
               </g>
             </svg>`;
         }
-
         function makeStationMarker(feature, latlng) {
           const p = feature.properties || {};
-          const icon = L.divIcon({
-            className: 'ws-div',
-            html: stationSVG(p, 84),
-            iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44]
-          });
-
+          const icon = L.divIcon({ className: 'ws-div', html: stationSVG(p, 84), iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44] });
           const m = L.marker(latlng, { icon, pane: 'weatherPane' });
           m.options._stationProps = p;
 
           const fromDeg = Number(p.WindDirection);
           const dirTxt = Number.isFinite(fromDeg)
-            ? (() => {
-                const d = ((fromDeg % 360) + 360) % 360;
-                const dirs = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
-                return dirs[Math.round(d / 22.5)];
-              })()
+            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
             : '—';
           const kmh = Number(p.WindSpeed_kmh);
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
@@ -534,8 +498,6 @@
           m.bindPopup(stationPopupHTML(p), { pane: 'alwaysOnTopPopup' });
           return m;
         }
-
-        // Clustered stations: same icon; count badge overlaps with +8px and is on top
         const weatherStations = L.esri.Cluster.featureLayer({
           url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
           pane: 'weatherPane',
@@ -544,52 +506,32 @@
           zoomToBoundsOnClick: false,
           showCoverageOnHover: false,
           pointToLayer: makeStationMarker,
+          // Make cluster icon show the nearest station symbol + count (like fires)
           iconCreateFunction: (cluster) => {
             const center = cluster.getLatLng();
             const markers = cluster.getAllChildMarkers();
+            // pick the child whose marker is closest to cluster center
             let best = null, bestDist = Infinity;
-            for(const m of markers){
+            for (const m of markers) {
               const d = map.distance(center, m.getLatLng());
-              if(d < bestDist){ bestDist = d; best = m; }
+              if (d < bestDist) { bestDist = d; best = m; }
             }
             const p = best?.options?._stationProps || {};
-            const count = cluster.getChildCount();
             return L.divIcon({
               className: 'ws-cluster-icon',
               html: `
                 <div style="position:relative;display:inline-grid;place-items:center">
                   ${stationSVG(p, 84)}
                   <div style="position:absolute;bottom:8px;right:8px;z-index:2;background:var(--panel-strong);border:2px solid #111827;border-radius:999px;
-                              font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18);pointer-events:none">${count}</div>
+                              font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18);pointer-events:none">
+                    ${cluster.getChildCount()}
+                  </div>
                 </div>`,
-              iconSize: [84, 92],
-              iconAnchor: [42, 54],
-              popupAnchor: [0, -44]
+              iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44]
             });
           }
         }).addTo(map);
 
-        // Cluster click -> popup with nearest station to click point
-        weatherStations.on('clusterclick', (e) => {
-          const clickLL = e.latlng;
-          const markers = e.layer.getAllChildMarkers();
-          let best = null, bestDist = Infinity;
-          for (const m of markers) {
-            const d = map.distance(clickLL, m.getLatLng());
-            if (d < bestDist) { bestDist = d; best = m; }
-          }
-          if (!best) return;
-          const count = markers.length;
-          const content = `
-            ${stationPopupHTML(best.options._stationProps || {})}
-            <div style="margin-top:6px;font-size:12px;color:var(--muted)">${count - 1} other station${count > 1 ? 's' : ''} in this cluster</div>`;
-          L.popup({ maxWidth: 340, pane: 'alwaysOnTopPopup' })
-            .setLatLng(e.layer.getLatLng())
-            .setContent(content)
-            .openOn(map);
-        });
-
-        /* ====================== Radar & Lightning ====================== */
         const noaaRadar = L.esri.imageMapLayer({
           url:'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
           opacity:.8, pane:'radarPane'
@@ -603,41 +545,6 @@
         map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); });
         map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
 
-        /* ====================== Planes (OpenSky) ====================== */
-        const planesLayer=L.layerGroup(); const planeMarkers=new Map();
-        const makePlaneIcon=(heading,callsign)=>{ const ICON_OFFSET=-45; const wl=(window.WHITELIST_CALLSIGNS||new Set()).has(callsign);
-          const base='drop-shadow(0 2px 2px rgba(0,0,0,.25))'; const filter=wl?`hue-rotate(-90deg) saturate(5) ${base}`:base;
-          const rotate=Number.isFinite(heading)?heading:0;
-          return L.divIcon({className:'plane-div-icon',html:`<div style="transform:rotate(${ICON_OFFSET}deg);transform-origin:center;display:inline-block;"><div style="transform:rotate(${rotate}deg);font-size:26px;filter:${filter}">✈️</div></div>`,iconSize:[30,46],iconAnchor:[15,23]}); };
-        const upsertPlane=(id,lat,lon,hdg,callsign,vel)=> {
-          const html = `<b>${callsign||'Unknown'}</b><br>Heading: ${Number.isFinite(hdg)?Math.round(hdg):'—'}°<br>Speed: ${vel!=null?Math.round(vel*1.94384):'—'} kt`;
-          let m=planeMarkers.get(id);
-          if(!m){
-            m=L.marker([lat,lon],{icon:makePlaneIcon(hdg,callsign),pane:'planesPane',keyboard:false,zIndexOffset:10000}).bindPopup(html,{pane:'alwaysOnTopPopup'});
-            let clicked=false;
-            m.on('mouseover',function(){ if(!clicked) this.openPopup(); });
-            m.on('mouseout',function(){ if(!clicked) this.closePopup(); });
-            m.on('click',function(){ clicked=!clicked; clicked?this.openPopup():this.closePopup(); });
-            m.addTo(planesLayer); planeMarkers.set(id,m);
-          } else {
-            m.setLatLng([lat,lon]); m.setIcon(makePlaneIcon(hdg,callsign)); m.setPopupContent(html);
-          }
-        };
-        const pruneMissing=(seen)=>{ for(const [k,m] of planeMarkers.entries()){ if(!seen.has(k)){ planesLayer.removeLayer(m); planeMarkers.delete(k); } } };
-        async function fetchOpenSky(){ try{
-          const [[lamin,lomin],[lamax,lomax]] = NB_BOUNDS;
-          const r=await fetch(`${OPEN_SKY_URL}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`, { cache:'no-store' });
-          if(!r.ok) throw new Error(r.statusText);
-          const data=await r.json(); const states=Array.isArray(data.states)?data.states:[]; const seen=new Set();
-          for(const s of states){ const icao24=s[0], callsign=(s[1]||'').trim().toUpperCase(), lon=s[5], lat=s[6], vel=s[9], hdg=s[10];
-            if(!icao24||lat==null||lon==null) continue; seen.add(icao24); upsertPlane(icao24,lat,lon,hdg,callsign,vel); }
-          pruneMissing(seen);
-        } catch(e){ console.warn('OpenSky fetch failed:', e); } }
-        let planesTimer=null;
-        planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,OPEN_SKY_INTERVAL_MS); });
-        planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
-
-        /* ====================== WMS + Smoke + AQHI ====================== */
         const fireRiskGroup = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
           layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
           opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
@@ -652,7 +559,7 @@
           pointToLayer:(feature,latlng)=> {
             const p=feature.properties||{};
             const raw=p.aqhi??p.aqhi_round; const val=(raw==null||Number.isNaN(Number(raw)))?null:Number(raw);
-            const label=val==null?'—':val>=10?'Very High':val>=7?'High':val>=4?'Moderate':'Low';
+            const label=val==null?'—':val>=10?'Very High Risk':val>=7?'High Risk':val>=4?'Moderate Risk':'Low Risk';
             const color=val==null?'#6b7280':val>=10?'#8b5cf6':val>=7?'#ef4444':val>=4?'#eab308':'#22c55e';
             const icon=L.divIcon({className:'aqi-badge-icon',html:`
               <div style="display:flex;flex-direction:column;align-items:center;">
@@ -670,233 +577,194 @@
           }
         });
 
-        /* ====================== Cities ====================== */
-        const cityMarkers=L.layerGroup(
-          [
-            ['Fredericton',45.9636,-66.6431],['Saint John',45.2733,-66.0633],['Moncton',46.0878,-64.7782],
-            ['Bathurst',47.6186,-65.6517],['Miramichi',47.0281,-65.5019],['Edmundston',47.3730,-68.3251],
-            ['Campbellton',48.0075,-66.6731],['Dieppe',46.0842,-64.6877],['Riverview',46.0617,-64.8052],
-            ['Quispamsis',45.4319,-65.9469],['Oromocto',45.8491,-66.4828],['Woodstock',46.1527,-67.6016],
-            ['Grand Falls',47.0469,-67.7394],['Shediac',46.2197,-64.5403],['Tracadie',47.5081,-64.9117],
-            ['St. Stephen',45.1942,-67.2756],['Shippagan',47.7400,-64.7078],['Caraquet',47.7943,-64.9386],
-            ['Bouctouche',46.4711,-64.7400],['Sussex',45.7221,-65.5060]
-          ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
-            .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
-        );
-
-        /* NB boundary */
-        L.esri.featureLayer({
-          url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0',
-          where:"Name_EN = 'New Brunswick'", pane:'nbBoundaryPane',
-          style:()=>({color:cssVar('--boundary'),weight:5,fill:false}), interactive:false
-        }).addTo(map);
-
-        /* ====================== Overlays + control ====================== */
-        const overlays = {
-          // Fires clustered layer intentionally NOT in panel (always on)
+        /* ====================== Overlays + control (no fire toggles here) ====================== */
+        const overlaysFull = {
           'MODIS Hotspots — Last 48 hours': modis48,
           'MODIS Hotspots — Last 7 days': modis7d,
           'Weather Stations': weatherStations,
           'Fire Perimeters': activefires,
-          Aircraft: planesLayer,
-          'Major Cities & Towns': cityMarkers,
-          'NB Burn Bans': nbBurnBans,
+          //'NB Boundary': nbBoundary,
           'AQHI Risk': aqhiLayer,
           'Weather Radar': noaaRadar,
           'Lightning Density': lightningLayer,
-          Smoke: smokeLayer,
-          'Fire Risk': fireRiskGroup,
-          'Sentinel-2C Imagery': sentinel2c
+          'Fire Danger (CWFIS)': fireRiskGroup,
+          Smoke: smokeLayer
         };
-        const layersControl = L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+        L.control.layers(null, overlaysFull, { collapsed: false }).addTo(map);
 
-        const decorateLayersControl = () => {
+        // decorate legend (no Active/Extinguished entries anymore)
+        (function decorateLayersControl(){
           const list=document.querySelector('.leaflet-control-layers-overlays'); if(!list) return;
-          list.querySelectorAll('.icons-pack').forEach(el=>el.remove());
           const packs={
             'MODIS Hotspots — Last 48 hours':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
             'MODIS Hotspots — Last 7 days':'<span class="icons-pack"><span class="legend-modis-dot"></span></span>',
             'Weather Stations':'<span class="icons-pack"><i class="fa-solid fa-location-arrow legend-icon" style="transform:rotate(45deg)"></i></span>',
             'Fire Perimeters':'<span class="icons-pack"><i class="fa-regular fa-square legend-icon"></i></span>',
-            Aircraft:'<span class="icons-pack"><span style="font-size:14px;display:inline-block;transform:rotate(-45deg)">✈️</span></span>',
-            'Major Cities & Towns':'<span class="icons-pack"><i class="fa-solid fa-city legend-icon"></i></span>',
-            'NB Crown Lands':'<span class="icons-pack"><i class="fa-solid fa-tree legend-icon"></i></span>',
-            'NB Burn Bans':'<span class="icons-pack"><i class="fa-solid fa-ban legend-icon"></i></span>',
+            //'NB Boundary':'<span class="icons-pack"><i class="fa-regular fa-square legend-icon"></i></span>',
             'AQHI Risk':'<span class="icons-pack"><i class="fa-solid fa-wind legend-icon"></i></span>',
             'Weather Radar':'<span class="icons-pack"><i class="fa-solid fa-broadcast-tower legend-icon"></i></span>',
             'Lightning Density':'<span class="icons-pack"><i class="fa-solid fa-bolt legend-icon"></i></span>',
-            Smoke:'<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>',
-            'Fire Risk':'<span class="icons-pack"><i class="fa-solid fa-fire-extinguisher legend-icon"></i></span>',
-            'Sentinel-2C Imagery':'<span class="icons-pack"><i class="fa-regular fa-image legend-icon"></i></span>'
+            'Fire Danger (CWFIS)':'<span class="icons-pack"><i class="fa-solid fa-fire legend-icon"></i></span>',
+            Smoke:'<span class="icons-pack"><i class="fa-solid fa-smog legend-icon"></i></span>'
           };
           list.querySelectorAll('label').forEach((label)=>{
             const textSpan=Array.from(label.querySelectorAll('span')).find(s=>s.textContent.trim());
-            if(!textSpan) return;
-            const name=textSpan.textContent.trim();
+            if(!textSpan) return; const name=textSpan.textContent.trim();
             label.insertAdjacentHTML('afterbegin',packs[name]||`<span class="icons-pack"><i class="fa-solid fa-layer-group legend-icon"></i></span>`);
             textSpan.classList.add('text');
           });
-        };
-        decorateLayersControl();
+        })();
 
-        /* ======== Inject Fire Status toggles (uses fire badge icons) ======== */
-        const FIRE_STATUS = [
-          ['Out of Control','--oc',"FIRE_STAT_DESC_E = 'Out of Control'"],
-          ['Contained','--cont',"FIRE_STAT_DESC_E = 'Contained'"],
-          ['Under Control','--uc',"FIRE_STAT_DESC_E = 'Under Control'"],
-          ['Being Patrolled','--pat',"FIRE_STAT_DESC_E = 'Being Patrolled'"],
-          ['Being Monitored','--mon',"FIRE_STAT_DESC_E = 'Being Monitored'"] // NEW
-        ];
+        // replace the whole FIRE_STATUS + injectFireStatusPanel block header
+const FIRE_STATUS = [
+  ['Out of Control', cssVar('--oc'), true],
+  ['Contained',      cssVar('--cont'), true],
+  ['Under Control',  cssVar('--uc'), true],
+  ['Being Patrolled',cssVar('--pat'), true],
+  ['Being Monitored',cssVar('--mon'), true],
+  ['Extinguished',   '#9aa0a6', false] // default OFF
+];
 
-        function injectFireStatusPanel(){
-          const overlaysList = document.querySelector('.leaflet-control-layers-overlays');
-          if(!overlaysList) return;
-          if(overlaysList.querySelector('.fire-filter-block')) return;
+(function injectFireStatusPanel(){
+  const overlaysList = document.querySelector('.leaflet-control-layers-overlays'); if(!overlaysList) return;
+  if (overlaysList.querySelector('.fire-filter-block')) return;
+  const block = document.createElement('div');
+  block.className = 'fire-filter-block';
+  block.innerHTML = `
+    <div class="fire-filter-title">Fire Status</div>
+    ${FIRE_STATUS.map(([label, ring, checked]) => `
+      <label class="fire-filter-row">
+        <input type="checkbox" data-status="${label}" ${checked ? 'checked' : ''}>
+        <span class="legend-badge" style="--ring:${ring}">
+          <i class="fa-solid fa-fire"></i>
+        </span>
+        <span class="text">${label}</span>
+      </label>
+    `).join('')}
+  `;
+  overlaysList.prepend(block);
+  block.addEventListener('change', applyFireFilter);
+  applyFireFilter();
+})();
 
-          const block = document.createElement('div');
-          block.className = 'fire-filter-block';
-          block.innerHTML = `
-            <div class="fire-filter-title">Fire Status</div>
-            ${FIRE_STATUS.map(([label, varName]) => `
-              <label class="fire-filter-row">
-                <input type="checkbox" data-status="${label}" checked>
-                <span class="legend-badge" style="--ring:${getComputedStyle(document.documentElement).getPropertyValue(varName)}">
-                  <i class="fa-solid fa-fire"></i>
-                </span>
-                <span class="text">${label}</span>
-              </label>
-            `).join('')}
-          `;
-          overlaysList.prepend(block);
-
-          block.addEventListener('change', (e) => {
-            if (e.target && e.target.matches('input[type="checkbox"]')) applyFireFilter();
-          });
-        }
 
         function applyFireFilter(){
           const cbs = document.querySelectorAll('.fire-filter-block input[type="checkbox"]');
-          const enabled = [];
-          const whereParts = [];
-          cbs.forEach(cb => {
-            const lbl = cb.getAttribute('data-status');
-            if(cb.checked){ enabled.push(lbl); whereParts.push(FIRE_STATUS.find(f=>f[0]===lbl)[2]); }
-          });
-          clusteredFires.setWhere(enabled.length===0 || enabled.length===FIRE_STATUS.length ? '1=1' : '('+whereParts.join(' OR ')+')');
+          const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
+
+          // Remove all markers first…
+          activeMarkers.forEach(m => fireClusters.removeLayer(m));
+          outMarkers.forEach(m => fireClusters.removeLayer(m));
+
+          // …then add back the ones whose status is enabled
+          activeMarkers.forEach(m => { if (enabled.has(m.options._statusKey)) fireClusters.addLayer(m); });
+          if (enabled.has('extinguished')) { outMarkers.forEach(m => fireClusters.addLayer(m)); }
+
+          // If everything is off, you’ll see no fire points (as requested).
         }
 
-        injectFireStatusPanel();
-
-        /* ======== Mobile layers panel width: cap to the longest label text ======== */
-        function sizeLayersPanel() {
-          const panel = document.querySelector('.leaflet-control-layers');
-          if (!panel) return;
-
-          if (window.innerWidth > 640) {
-            panel.style.removeProperty('--layers-w');
-            panel.style.overflowX = 'visible';
-            return;
-          }
-
-          // measure the text of your longest label
-          const measureText = 'MODIS Hotspots — Last 48 hours';
-          const measurer = document.createElement('span');
-          measurer.style.visibility = 'hidden';
-          measurer.style.position = 'absolute';
-          measurer.style.whiteSpace = 'nowrap';
-          measurer.style.font = getComputedStyle(panel).font;
-          measurer.textContent = measureText;
-          document.body.appendChild(measurer);
-          const labelWidth = Math.ceil(measurer.getBoundingClientRect().width);
-          document.body.removeChild(measurer);
-
-          const extra = 18 + 26 + 8 + 14 + 40; // checkbox + icon + gap + paddings
-          const desired = labelWidth + extra;
-
-          const max = Math.max(240, Math.min(desired, window.innerWidth - 24));
-          panel.style.setProperty('--layers-w', max + 'px');
-          panel.style.overflowX = desired > max ? 'auto' : 'visible';
-        }
-        sizeLayersPanel();
-        window.addEventListener('resize', sizeLayersPanel);
-        document.querySelector('.leaflet-control-layers')?.addEventListener('click', () => queueMicrotask(sizeLayersPanel));
-
-        /* ====================== Fire Summary modal ====================== */
+        /* ====================== Summary ====================== */
         const fsOverlay=document.getElementById('fireSummaryOverlay');
         const fsBody=document.getElementById('fs-body');
         const chip=(label,n)=>`<span class="chip"><span class="dot" style="background:${statusColor(label)}"></span>${label} <span style="font-weight:800;margin-left:6px">${n}</span></span>`;
+        const sizeOf=(p)=> Number((p?.FIRE_SIZE ?? p?.SIZE_HA ?? p?.AREA) ?? 0) || 0;
 
-        const buildSummaryHTML=()=>{
+        function buildSummaryHTML(){
           const items=[...fireStore.values()];
-          let totalArea=0; const counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,other:0};
-          let newToday=0, newYesterday=0;
+          const year = new Date().getFullYear();
+          let totalArea=0, counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,extinguished:0,other:0};
+          let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
           for(const it of items){
-            const p=it.props||{}; const sz=+p.FIRE_SIZE; if(Number.isFinite(sz)) totalArea+=sz;
-            const key=norm(p.FIRE_STAT_DESC_E); Object.prototype.hasOwnProperty.call(counts,key) ? counts[key]++ : counts.other++;
-            const det=p.TIME_DETECTED!=null?+p.TIME_DETECTED:null;
+            const p=it.props||{};
+            totalArea += sizeOf(p);
+            const key=norm(it.statusKey || p.FIRE_STAT_DESC_E);
+            if (Object.prototype.hasOwnProperty.call(counts,key)) counts[key]++; else counts.other++;
+            if (key === 'extinguished') totalExt++; else totalActive++;
+
+            const det = getDetectedMs(p);
             if(det!=null){ if(isToday(det)) newToday++; else if(isYesterday(det)) newYesterday++; }
+
+            if (key === 'extinguished') {
+              const outMs = getExtinguishedMs(p);
+              if (outMs!=null){ if (isToday(outMs)) extToday++; else if (isYesterday(outMs)) extYesterday++; }
+            }
           }
 
-          const chips=[
+          const chipsHTML=[
             ['Out of Control',counts['out of control']],
             ['Contained',counts['contained']],
             ['Under Control',counts['under control']],
             ['Being Patrolled',counts['being patrolled']],
-            ['Being Monitored',counts['being monitored']]
+            ['Being Monitored',counts['being monitored']],
+            ['Extinguished',counts['extinguished']]
           ].map(([l,n])=>chip(l,n)).join('');
 
-          const sorted=items.slice().sort((a,b)=>(+b.props.FIRE_SIZE||0)-(+a.props.FIRE_SIZE||0));
-          const list=sorted.map((it)=>{
-            const p=it.props||{};
-            return `<li style="margin:4px 0;"><a href="#" data-fireid="${it.id}"><span style="font-weight:700">${p.FIRE_NAME||'Unnamed Fire'}</span>&nbsp;—&nbsp;${toNum(p.FIRE_SIZE,0)} ha <span style="opacity:.8">• ${p.FIRE_STAT_DESC_E||'—'}</span> <span style="opacity:.8">• Detected: ${fmtDateTZ(p.TIME_DETECTED)}</span></a></li>`;
-          }).join('') || '<li>No active fires</li>';
+          const byStatus = new Map();
+          for (const it of items) {
+            const st = norm(it.statusKey || it.props?.FIRE_STAT_DESC_E || 'other');
+            if (!byStatus.has(st)) byStatus.set(st, []);
+            byStatus.get(st).push(it);
+          }
+          for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
+          const statusOrder = ['out of control','contained','under control','being patrolled','being monitored','extinguished','other'];
+
+          const detailSections = statusOrder
+            .filter(k => byStatus.has(k))
+            .map(k => {
+              const label = k==='other' ? 'Other' : k.replace(/\b\w/g, c=>c.toUpperCase());
+              const list = byStatus.get(k).map((it) => {
+                const p=it.props||{}; const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
+                const size = toNum(sizeOf(p),0); const det  = fmtDateTZ(getDetectedMs(p));
+                const extra = (k==='extinguished') ? ` • Out: ${fmtDateTZ(getExtinguishedMs(p))}` : '';
+                return `<li style="margin:4px 0;"><a href="#" data-fireid="${it.id}"><span style="font-weight:700">${name}</span>&nbsp;—&nbsp;${size} ha <span style="opacity:.8">• ${label}</span> <span style="opacity:.8">• Detected: ${det}${extra}</span></a></li>`;
+              }).join('') || '<li>None</li>';
+              return `<div style="margin:10px 0"><b>${label}</b><ol class="summary-list">${list}</ol></div>`;
+            }).join('');
+
+          const totalFiresYear = totalActive + totalExt;
 
           return `
-            <div class="fs-meta-row"><div>New fires today: ${toNum(newToday,0)}</div><div>New fires yesterday: ${toNum(newYesterday,0)}</div><div>Total area burned: ${toNum(totalArea,0)} ha</div></div>
-            <div style="margin:8px 0 6px"><b>Fires by status</b></div><div>${chips}</div>
-            <div style="margin-top:10px"><b>All active fires <span style="font-weight:600;color:var(--muted)">(largest → smallest)</span></b><ol class="summary-list fs-scroll" id="fs-all">${list}</ol></div>
-            <div style="margin-top:10px;font-size:12px;color:var(--muted)">“Today / yesterday” uses Atlantic Time (TIME_DETECTED). Source: NB Active Fires (Public_Fires/MapServer/0).</div>`;
-        };
+            <div class="fs-meta-grid">
+              <div class="stat"><div class="h">Total Fires (${year})</div><div class="v">${toNum(totalFiresYear,0)}</div></div>
+              <div class="stat"><div class="h">Active</div><div class="v">${toNum(totalActive,0)}</div></div>
+              <div class="stat"><div class="h">Extinguished</div><div class="v">${toNum(totalExt,0)}</div></div>
+              <div class="stat"><div class="h">New Fires Today</div><div class="v">${toNum(newToday,0)}</div></div>
+              <div class="stat"><div class="h">New Fires Yesterday</div><div class="v">${toNum(newYesterday,0)}</div></div>
+              <div class="stat"><div class="h">Total Area Burned</div><div class="v">${toNum(totalArea,0)} ha</div></div>
+              <div class="stat"><div class="h">Extinguished Today</div><div class="v">${toNum(extToday,0)}</div></div>
+              <div class="stat"><div class="h">Extinguished Yesterday</div><div class="v">${toNum(extYesterday,0)}</div></div>
+            </div>
 
-        const openSummary=()=>{
-          fsBody.innerHTML=buildSummaryHTML();
-          fsOverlay.hidden=false; fsOverlay.style.display='flex';
-          document.getElementById('fs-all')?.addEventListener('click',(e)=>{
-            const a=e.target.closest('a[data-fireid]'); if(!a) return; e.preventDefault();
+            <div style="margin:8px 0 6px"><b>Fires by status</b></div>
+            <div>${chipsHTML}</div>
+
+            <div style="margin-top:12px"><b>Fires (largest → smallest)</b></div>
+            <div class="fs-scroll" id="fs-scroll">
+              ${detailSections}
+            </div>
+
+            <div style="margin-top:10px;font-size:12px;color:var(--muted)">“Today / yesterday” uses Atlantic Time. Sources: local <b>active_fires</b> &amp; <b>out_fires</b>.</div>`;
+        }
+
+        function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); }
+        function wireSummaryClicks(){
+          const cont = document.getElementById('fs-scroll'); if(!cont) return;
+          cont.addEventListener('click', (e)=>{
+            const a = e.target.closest('a[data-fireid]'); if(!a) return;
+            e.preventDefault();
             const rec=fireStore.get(a.getAttribute('data-fireid')); if(!rec) return;
             fsOverlay.style.display='none'; fsOverlay.hidden=true;
             map.flyTo(rec.latlng,Math.max(map.getZoom(),12),{duration:.6});
             map.once('moveend',()=>rec.layer?.openPopup&&rec.layer.openPopup());
-          },{once:true});
-        };
+          });
+        }
 
-        document.getElementById('fireSummaryBtn').addEventListener('click',openSummary);
+        /* ====================== Buttons ====================== */
+        document.getElementById('fireSummaryBtn').addEventListener('click',()=>{ refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; });
         document.getElementById('fs-close').addEventListener('click',()=>{ fsOverlay.style.display='none'; fsOverlay.hidden=true; });
         fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay){ fsOverlay.style.display='none'; fsOverlay.hidden=true; } });
 
-        /* ====================== Soft service alert + refresh ====================== */
-        const svcOverlay=document.getElementById('serviceAlertOverlay');
-        const svcAckBtn=document.getElementById('svc-ack');
-        const showSvcModal=()=>{ svcOverlay.hidden=false; svcOverlay.style.display='flex'; };
-        const hideSvcModal=()=>{ svcOverlay.style.display='none'; svcOverlay.hidden=true; };
-        svcOverlay.addEventListener('click',(e)=>{ if(e.target===svcOverlay) hideSvcModal(); });
-        svcAckBtn.addEventListener('click', hideSvcModal);
-
-        function startManualRefresh(layer, minutes){
-          const fn = typeof layer.refresh==='function' ? layer.refresh : (typeof layer.redraw==='function' ? layer.redraw : null);
-          if(!fn) return;
-          const ms = minutes*60*1000;
-          if(layer._nbRefreshTimer) clearInterval(layer._nbRefreshTimer);
-          layer._nbRefreshTimer = setInterval(()=>{ if(map.hasLayer(layer)) { try{ fn.call(layer); }catch{} } }, ms);
-        }
-
-        let firesAnyLoaded=false;
-        clusteredFires.once('load', ()=>{ firesAnyLoaded=true; startManualRefresh(clusteredFires, MANUAL_REFRESH_MIN); });
-        nbBurnBans.once('load', ()=>{ startManualRefresh(nbBurnBans, MANUAL_REFRESH_MIN); });
-        setTimeout(()=>{ if(!firesAnyLoaded){ showSvcModal(); } }, SERVICE_ALERT_MS);
-
-        /* ====================== Show/Hide Layers + Reset view ====================== */
         const mapToggleBtn = document.getElementById('mapToggleBtn');
         const mtbText = document.getElementById('mtb-text');
         mapToggleBtn.addEventListener('click', () => {
@@ -904,12 +772,32 @@
           mapToggleBtn.setAttribute('aria-pressed', String(!hidden));
           mtbText.textContent = hidden ? 'Show Layers' : 'Hide Layers';
         });
-
         document.getElementById('resetViewBtn').addEventListener('click', () => {
           localStorage.removeItem(LS_KEY);
           map.flyTo(INITIAL_VIEW.center, INITIAL_VIEW.zoom, { duration: 0.6 });
         });
 
+        /* ====================== Mobile layers panel width ====================== */
+        function sizeLayersPanel() {
+          const panel = document.querySelector('.leaflet-control-layers');
+          if (!panel) return;
+          if (window.innerWidth > 640) { panel.style.removeProperty('--layers-w'); panel.style.overflowX = 'visible'; return; }
+          const measureText = 'MODIS Hotspots — Last 48 hours';
+          const measurer = document.createElement('span');
+          measurer.style.visibility = 'hidden'; measurer.style.position = 'absolute'; measurer.style.whiteSpace = 'nowrap';
+          measurer.style.font = getComputedStyle(panel).font; measurer.textContent = measureText;
+          document.body.appendChild(measurer);
+          const labelWidth = Math.ceil(measurer.getBoundingClientRect().width);
+          document.body.removeChild(measurer);
+          const extra = 18 + 26 + 8 + 14 + 40;
+          const desired = labelWidth + extra;
+          const max = Math.max(240, Math.min(desired, window.innerWidth - 24));
+          panel.style.setProperty('--layers-w', max + 'px');
+          panel.style.overflowX = desired > max ? 'auto' : 'visible';
+        }
+        sizeLayersPanel();
+        window.addEventListener('resize', sizeLayersPanel);
+        document.querySelector('.leaflet-control-layers')?.addEventListener('click', () => queueMicrotask(sizeLayersPanel));
       });
     </script>
   </body>
