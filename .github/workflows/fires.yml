@@ -1,0 +1,117 @@
+name: Fetch NB Fire Layers (Hourly)
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # every hour
+  workflow_dispatch:       # enables the manual "Run workflow" button
+
+# Prevent overlapping runs (new ones will queue)
+concurrency:
+  group: fires-fetch
+  cancel-in-progress: false
+
+permissions:
+  contents: write  # needed to commit changes
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+        # If you commit with a personal token or use a protected branch,
+        # you may need to set 'persist-credentials: false' and push with a PAT.
+
+      - name: Fetch, verify, and save layers (with retries)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BASE_URL="https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer"
+
+          # Build deterministic query URLs (GeoJSON, ordered by OBJECTID)
+          make_url () {
+            local layer_id="$1"
+            echo "${BASE_URL}/${layer_id}/query?where=1%3D1&outFields=*&orderByFields=OBJECTID&returnGeometry=true&f=geojson"
+          }
+
+          # fetch_and_check <layer_id> <basename-in-root>
+          fetch_and_check () {
+            local layer_id="$1"
+            local base="$2"
+
+            echo "=== Layer ${layer_id} (${base}) ==="
+            rm -f "${base}"??.json || true
+
+            local url
+            url="$(make_url "${layer_id}")"
+            echo "Query URL: ${url}"
+
+            # Download 10 copies
+            for i in $(seq -w 01 10); do
+              curl -sS --fail --retry 5 --retry-delay 2 "${url}" -o "${base}${i}.json"
+            done
+
+            # Compare hashes against the first copy
+            local ref_hash
+            ref_hash="$(sha256sum "${base}01.json" | awk '{print $1}')"
+            local i hash
+            for i in $(seq -w 02 10); do
+              hash="$(sha256sum "${base}${i}.json" | awk '{print $1}')"
+              if [[ "${hash}" != "${ref_hash}" ]]; then
+                echo "Mismatch: ${base}${i}.json differs from ${base}01.json"
+                return 1
+              fi
+            done
+
+            # Promote first copy to canonical file in repo root
+            cp "${base}01.json" "${base}.json"
+
+            # Clean up temp copies
+            rm -f "${base}"??.json
+            echo "Saved ${base}.json"
+          }
+
+          attempt=1
+          max_attempts=3
+          success=0
+
+          while (( attempt <= max_attempts )); do
+            echo "===== Attempt ${attempt}/${max_attempts} ====="
+            if fetch_and_check 0 "active_fires" && fetch_and_check 1 "out_fires"; then
+              success=1
+              break
+            fi
+
+            # Clean up temps between attempts
+            rm -f active_fires??.json out_fires??.json || true
+
+            if (( attempt < max_attempts )); then
+              echo "Attempt ${attempt} failed. Sleeping 10 minutes before retry…"
+              sleep 600
+            fi
+            ((attempt++))
+          done
+
+          if (( success != 1 )); then
+            echo "All attempts failed."
+            exit 1
+          fi
+
+      - name: Commit and push if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Stage only if changed
+          if [[ -n "$(git status --porcelain -- active_fires.json out_fires.json || true)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add active_fires.json out_fires.json
+            git commit -m "chore(data): update fire layers (hourly)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
