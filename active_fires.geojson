@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -314,7 +314,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -345,7 +345,38 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68687,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.28782909653758,
+          47.7023397388585
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68687,
+        "FIRE_NUMBER": "2025281",
+        "FIRE_NUMBER_SHORT": "281",
+        "FIRE_NAME": "281",
+        "DEGREES_LAT": 47.702329999999996,
+        "DEGREES_LONG": 66.28783,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755359340000,
+        "FIRE_STAT_DATE": 1755374100000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 50.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -376,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -407,7 +438,38 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 100.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68703,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.74541888104815,
+          47.20845966902111
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68703,
+        "FIRE_NUMBER": "2025287",
+        "FIRE_NUMBER_SHORT": "287",
+        "FIRE_NAME": "287",
+        "DEGREES_LAT": 47.20845,
+        "DEGREES_LONG": 65.74542,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1755362100000,
+        "FIRE_STAT_DATE": 1755375000000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.4,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -438,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -469,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -500,7 +562,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -531,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -562,7 +624,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -593,38 +655,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68687,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.28782909653758,
-          47.7023397388585
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68687,
-        "FIRE_NUMBER": "2025281",
-        "FIRE_NUMBER_SHORT": "281",
-        "FIRE_NAME": "281",
-        "DEGREES_LAT": 47.702329999999996,
-        "DEGREES_LONG": 66.28783,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755359340000,
-        "FIRE_STAT_DATE": 1755371760000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 2.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -655,7 +686,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -686,7 +717,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -717,7 +748,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -748,7 +779,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 120.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -779,7 +810,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -810,7 +841,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -841,7 +872,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -872,7 +903,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -903,7 +934,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -934,7 +965,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -965,7 +996,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -996,7 +1027,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -1027,7 +1058,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -1058,7 +1089,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -1089,7 +1120,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -1120,7 +1151,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
       }
     },
     {
@@ -1151,7 +1182,38 @@
         "PERCENT_CONTAINED": 20,
         "FIRE_SIZE": 250.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755384298
+        "FETCHED_FROM_ERD": 1755387741
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68702,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.20526864034073,
+          46.07315948637249
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68702,
+        "FIRE_NUMBER": "2025286",
+        "FIRE_NUMBER_SHORT": "286",
+        "FIRE_NAME": "286",
+        "DEGREES_LAT": 46.07315,
+        "DEGREES_LONG": 65.20527,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755373320000,
+        "FIRE_STAT_DATE": 1755376936000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": null,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755387741
       }
     }
   ]
