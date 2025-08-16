@@ -30,7 +30,9 @@
         --oc:#ef4444; --cont:#fb923c; --uc:#facc15; --pat:#22c55e; --mon:#3b82f6;
         --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
         --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
-        --footer-offset: 0px; /* dynamic bottom lift for the footer (set by JS) */
+
+        --footer-offset: 0px;           /* dynamic height of footer link (set by JS) */
+        --smoke-bottom: 28px;           /* dynamic bottom lift for smoke controls (set by JS) */
       }
 
       html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
@@ -118,7 +120,7 @@
       .ws-speed{font-weight:800;font-size:14px}
       .ws-small{font-weight:700;font-size:10px;opacity:.95}
 
-      /* Smoke timeline UI (responsive & offset from footer) */
+      /* Smoke timeline UI (now positioned with --smoke-bottom) */
       #smokeControls{
         position:absolute; right:12px; z-index:2100;
         display:none; align-items:center; gap:10px;
@@ -127,11 +129,11 @@
         backdrop-filter:blur(6px);
         font-size:var(--fs-14);
         max-width: min(96vw, 560px);
-        bottom: calc(28px + var(--footer-offset, 0px));
+        bottom: calc(var(--smoke-bottom, 28px) + var(--footer-offset, 0px));
       }
       @supports (bottom: calc(12px + env(safe-area-inset-bottom))) {
         #smokeControls{
-          bottom: calc(28px + var(--footer-offset, 0px) + env(safe-area-inset-bottom));
+          bottom: calc(var(--smoke-bottom, 28px) + var(--footer-offset, 0px) + env(safe-area-inset-bottom));
         }
       }
       #smokePlay{
@@ -152,7 +154,7 @@
   <body>
     <div id="map" aria-label="Interactive wildfire map"></div>
 
-    <!-- Smoke timeline controls (hidden until Smoke layer is toggled on) -->
+    <!-- Smoke timeline controls -->
     <div id="smokeControls" aria-live="polite">
       <button id="smokePlay" type="button" title="Play/Pause" aria-label="Play animation">▶</button>
       <input id="smokeTime" type="range" min="0" max="0" value="0" step="1" aria-label="Smoke time slider" />
@@ -252,7 +254,7 @@
         const fmtDateTZ = (ms, tz=ATLANTIC_TZ) => ms == null ? '—'
           : new Date(+ms).toLocaleDateString(undefined, { year:'numeric', month:'2-digit', day:'2-digit', timeZone: tz });
 
-        /* ---------- Date helpers (Atlantic day bucketing) ---------- */
+        /* ---------- Date helpers ---------- */
         const ymdInTz = (ms, tz=ATLANTIC_TZ) => {
           const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
           const parts = fmt.formatToParts(new Date(ms));
@@ -314,7 +316,7 @@
           ['radarPane',413],
           ['lightningPane',413],
           ['viirsPane',414],
-          ['weatherPane',640],   // above default markerPane (600)
+          ['weatherPane',640],
           ['aqiPane',416],
           ['firesPane',650],
           ['planesPane',1000,true]
@@ -341,47 +343,45 @@
             ...options
           });
         };
-        map.whenReady(() => fitProvinceToView({ animate: false }));
-
-        let userHasInteracted = false;
-        ['zoomstart','dragstart'].forEach(ev => map.on(ev, () => { userHasInteracted = true; }));
-        const maybeRefit = () => { if (!userHasInteracted) fitProvinceToView({ animate: false }); };
-        window.addEventListener('resize', maybeRefit, { passive: true });
-        window.addEventListener('orientationchange', maybeRefit);
 
         /* ====================== Fires: GeoJSON + markercluster ====================== */
         const fireStore = new Map();
-        const fireClusters = L.markerClusterGroup({
-          disableClusteringAtZoom: 11,
-          spiderfyOnMaxZoom: true,
-          zoomToBoundsOnClick: true,
-          showCoverageOnHover: false,
-          iconCreateFunction:(cluster)=>{
-            const markers = cluster.getAllChildMarkers();
-            let worstSev = -2, worstKey = 'extinguished';
-            for(const m of markers){
-              const k = m.options._statusKey || 'extinguished';
-              const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
-              if(sev > worstSev){ worstSev = sev; worstKey = k; }
-            }
-            const ring = statusColor(worstKey);
-            const count = cluster.getChildCount();
-            return L.divIcon({
-              className:'fire-cluster-icon',
-              html: `
-                <div style="position:relative;display:inline-grid;place-items:center">
-                  <div class="marker-badge" style="--ring:${ring};width:42px;height:42px">
-                    <i class="fa-solid fa-fire"></i>
-                  </div>
-                  <div style="position:absolute;bottom:-6px;right:-6px;background:var(--panel-strong);border:2px solid ${ring};border-radius:999px;
-                              font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${count}</div>
-                </div>`,
-              iconSize:[42,42], iconAnchor:[21,28], popupAnchor:[0,-24]
-            });
-          },
-          pane: 'firesPane',
-          clusterPane: 'firesPane'
-        }).addTo(map);
+
+        let fireClusters = null;
+        function ensureFireClusters(){
+          if (fireClusters) return;
+          fireClusters = L.markerClusterGroup({
+            disableClusteringAtZoom: 11,
+            spiderfyOnMaxZoom: true,
+            zoomToBoundsOnClick: true,
+            showCoverageOnHover: false,
+            iconCreateFunction:(cluster)=>{
+              const markers = cluster.getAllChildMarkers();
+              let worstSev = -2, worstKey = 'extinguished';
+              for(const m of markers){
+                const k = m.options._statusKey || 'extinguished';
+                const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
+                if(sev > worstSev){ worstSev = sev; worstKey = k; }
+              }
+              const ring = statusColor(worstKey);
+              const count = cluster.getChildCount();
+              return L.divIcon({
+                className:'fire-cluster-icon',
+                html: `
+                  <div style="position:relative;display:inline-grid;place-items:center">
+                    <div class="marker-badge" style="--ring:${ring};width:42px;height:42px">
+                      <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div style="position:absolute;bottom:-6px;right:-6px;background:var(--panel-strong);border:2px solid ${ring};border-radius:999px;
+                                font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${count}</div>
+                  </div>`,
+                iconSize:[42,42], iconAnchor:[21,28], popupAnchor:[0,-24]
+              });
+            },
+            pane: 'firesPane',
+            clusterPane: 'firesPane'
+          }).addTo(map);
+        }
 
         const activeMarkersAll = [];
         const outMarkersAll = [];
@@ -441,6 +441,22 @@
           throw new Error(`Could not load ${base} from any known path`);
         }
 
+        function applyFireFilter(){
+          ensureFireClusters();
+          const cbs = $$('.fire-filter-block input[type="checkbox"]');
+          const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
+
+          // Clear all from cluster first, then add back what's enabled
+          fireClusters.clearLayers();
+
+          for (const m of activeMarkersAll) {
+            if (enabled.has(m.options._statusKey)) fireClusters.addLayer(m);
+          }
+          if (enabled.has('extinguished')) {
+            for (const m of outMarkersAll) fireClusters.addLayer(m);
+          }
+        }
+
         async function loadLocalFires(){
           try {
             const [activeData, outData] = await Promise.all([
@@ -452,7 +468,6 @@
               if (!f || f.geometry?.type !== 'Point') return;
               const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, f.properties?.FIRE_STAT_DESC_E);
               activeMarkersAll.push(m);
-              fireClusters.addLayer(m);
             });
 
             (outData.features||[]).forEach((f)=>{
@@ -465,20 +480,25 @@
             refreshSummary();
           } catch (e) { console.error('Loading local fires failed:', e); }
         }
-        loadLocalFires();
+
+        /* Load fires once the map is ready */
+        map.whenReady(() => {
+          fitProvinceToView({ animate: false });
+          loadLocalFires();
+        });
 
         /* ====================== MODIS, Perimeters, NB boundary ====================== */
         const modis48 = L.esri.featureLayer({
           url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
           pane:'viirsPane',
           pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:5,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.9})
-        }).addTo(map);
+        }).addTo(map); // OFF
 
         const modis7d = L.esri.featureLayer({
           url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1',
           pane:'viirsPane',
           pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:4,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.65})
-        });
+        }); // OFF
 
         const perimeterLabelLayers = new Set();
         const activefires = L.esri.featureLayer({
@@ -493,7 +513,7 @@
             );
             perimeterLabelLayers.add(layer);
           }
-        }).addTo(map);
+        }); // OFF
 
         const setPerimeterLabels = ()=> {
           const show = map.getZoom() >= 11;
@@ -514,14 +534,14 @@
         const sentinel2 = L.esri.imageMapLayer({
           url:'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer',
           opacity:0.75, pane:'sentinelPane'
-        });
+        }); // OFF
         sentinel2.on('load', ()=> sentinel2.bringToFront());
 
         /* ====================== Burn Bans (NB) ====================== */
         const nbBurnBans = L.esri.dynamicMapLayer({
           url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
           opacity:.7, pane:'perimetersPane'
-        });
+        }); // OFF
 
         /* ====================== Weather (clustered), Radar, Lightning, AQHI ====================== */
         function stationPopupHTML(p) {
@@ -610,15 +630,15 @@
               iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44]
             });
           }
-        }).addTo(map);
+        }); // OFF
 
         const noaaRadar = L.esri.imageMapLayer({
           url:'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
           opacity:.8, pane:'radarPane'
-        });
+        }); // OFF
         const lightningLayer = L.tileLayer.wms('https://geo.weather.gc.ca/geomet',{
           layers:'Lightning_2.5km_Density',version:'1.3.0',format:'image/png',transparent:true,opacity:1,pane:'lightningPane'
-        });
+        }); // OFF
         let lightningTimer=null;
         const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
         const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
@@ -628,7 +648,7 @@
         const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
           layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
           opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
-        }));
+        })); // ON
 
         /* ====================== NOAA Smoke (timelapse) ====================== */
         const smokeLayer = L.esri.imageMapLayer({
@@ -638,6 +658,7 @@
           opacity: 0.72,
           pane: 'smokePane'
         });
+        smokeLayer.addTo(map); // ON
 
         const smokeControls   = $('#smokeControls');
         const smokePlayBtn    = $('#smokePlay');
@@ -649,11 +670,11 @@
         let smokeIdx = 0;
         let smokeTimer = null;
 
+        // Local-only label, e.g., "Aug 16, 2025, 18:00 (local)"
         const smokeFmt = (ms) => {
           const d = new Date(ms);
           const local = d.toLocaleString(undefined, { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false });
-          const iso = d.toISOString().replace('T',' ').replace('.000Z','Z');
-          return `${local} (local) | ${iso} • frame ${smokeIdx+1}/${smokeTimesMs.length}${smokeUsedFallback ? ' • closest frames to now' : ''}`;
+          return `${local} (local)`;
         };
         function smokeSetIndex(i){
           if (!smokeTimesMs.length) return;
@@ -675,6 +696,12 @@
         }
         smokePlayBtn.addEventListener('click', () => (smokeTimer ? smokePause() : smokePlay()));
         smokeSlider.addEventListener('input', (e) => { smokePause(); smokeSetIndex(parseInt(e.target.value, 10)); });
+
+        const nearestIndex = (arr, target) => {
+          let bestI = 0, bestD = Infinity;
+          for (let i=0;i<arr.length;i++){ const d = Math.abs(arr[i]-target); if(d<bestD){ bestD=d; bestI=i; } }
+          return bestI;
+        };
 
         async function initSmokeTimes(){
           try{
@@ -710,9 +737,14 @@
 
             smokeTimesMs = within;
             smokeSlider.max = String(within.length - 1);
-            smokeIdx = 0;
-            smokeSlider.value = '0';
-            smokeTsLabel.textContent = 'Ready';
+            smokeIdx = nearestIndex(within, now); // start at the current hour
+            smokeSlider.value = String(smokeIdx);
+
+            if (map.hasLayer(smokeLayer)) {
+              smokeSetIndex(smokeIdx);
+            } else {
+              smokeTsLabel.textContent = smokeFmt(within[smokeIdx]);
+            }
           } catch (e){
             console.error('Smoke slices error:', e);
             smokeTsLabel.textContent = 'Error loading smoke timeline';
@@ -720,7 +752,7 @@
         }
         initSmokeTimes();
 
-        // Keep the controls above the footer (measure dynamically)
+        // Keep the controls above the footer and above the summary button on mobile
         function updateFooterOffset(){
           const footer = $('.nb-footer');
           let offset = 0;
@@ -731,16 +763,27 @@
           }
           D.documentElement.style.setProperty('--footer-offset', offset + 'px');
         }
-        updateFooterOffset();
-        window.addEventListener('resize', updateFooterOffset, { passive: true });
-        window.addEventListener('orientationchange', updateFooterOffset);
+        function updateSmokeBottom(){
+          const fsBtn = $('#fireSummaryBtn');
+          let bottom = 28; // desktop default
+          if (isMobile() && fsBtn){
+            const h = fsBtn.getBoundingClientRect().height || 0;
+            // place the smoke controls just above the Fire Summary button area
+            bottom = 86 + h + 12; // 86px button offset + its height + small gap
+          }
+          D.documentElement.style.setProperty('--smoke-bottom', bottom + 'px');
+        }
+        function updateOffsets(){ updateFooterOffset(); updateSmokeBottom(); }
+        updateOffsets();
+        window.addEventListener('resize', updateOffsets, { passive: true });
+        window.addEventListener('orientationchange', updateOffsets);
 
-        // Show/hide controls + start/stop when the overlay is toggled
+        // Show/hide controls + refresh timestamp when the overlay toggles
         map.on('overlayadd', (e) => {
           if (e.layer === smokeLayer) {
-            updateFooterOffset();
+            updateOffsets();
             smokeControls.style.display = 'flex';
-            if (smokeTimesMs.length) { smokeSetIndex(smokeIdx || 0); smokePlay(); }
+            if (smokeTimesMs.length) { smokeSetIndex(smokeIdx); }
             else { smokeTsLabel.textContent = 'Loading…'; }
             smokeLayer.bringToBack();
           }
@@ -748,6 +791,14 @@
         map.on('overlayremove', (e) => {
           if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; }
         });
+
+        /* If Smoke is ON by default, show controls on load */
+        if (map.hasLayer(smokeLayer)) {
+          updateOffsets();
+          smokeControls.style.display = 'flex';
+          smokeTsLabel.textContent = 'Loading…';
+          smokeLayer.bringToBack();
+        }
 
         /* ====================== AQHI ====================== */
         const aqhiLayer = L.esri.featureLayer({
@@ -772,7 +823,7 @@
             m.bindTooltip(`${loc?loc+' — ':''}AQHI ${val ?? '—'} • ${label}${when?' • '+when:''}`,{direction:'top',offset:[0,-20],opacity:0});
             return m;
           }
-        });
+        }); // OFF
 
         /* ====================== Aircraft (OpenSky) ====================== */
         const planesLayer = L.layerGroup();
@@ -824,6 +875,7 @@
           ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
             .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
         );
+        cityMarkers.addTo(map); // ON
 
         /* ====================== Overlays + control ====================== */
         const overlays = {
@@ -852,20 +904,7 @@
           ['Being Monitored',COLORS.mon, true],
           ['Extinguished',   '#9aa0a6', false]
         ];
-        function applyFireFilter(){
-          const cbs = $$('.fire-filter-block input[type="checkbox"]');
-          const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
-          for (const m of activeMarkersAll) {
-            const show = enabled.has(m.options._statusKey);
-            if (show && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
-            if (!show && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
-          }
-          const showOut = enabled.has('extinguished');
-          for (const m of outMarkersAll) {
-            if (showOut && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
-            if (!showOut && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
-          }
-        }
+        function applyFireFilterAndMaybeInit(){ ensureFireClusters(); applyFireFilter(); }
         function injectFireStatusPanel(){
           const overlaysList = D.querySelector('.leaflet-control-layers-overlays');
           if(!overlaysList || overlaysList.querySelector('.fire-filter-block')) return;
@@ -884,7 +923,7 @@
             `).join('')}
           `;
           overlaysList.prepend(block);
-          block.addEventListener('change', applyFireFilter);
+          block.addEventListener('change', applyFireFilterAndMaybeInit);
         }
         injectFireStatusPanel();
 
@@ -990,16 +1029,8 @@
           }, { passive: false });
         }
 
-        const openSummary = () => {
-          refreshSummary();
-          fsOverlay.hidden=false; fsOverlay.style.display='flex';
-          fsClose.focus();
-        };
-        const closeSummary = () => {
-          fsOverlay.style.display='none'; fsOverlay.hidden=true;
-          fsBtn.focus();
-        };
-
+        const openSummary = () => { refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; fsClose.focus(); };
+        const closeSummary = () => { fsOverlay.style.display='none'; fsOverlay.hidden=true; fsBtn.focus(); };
         fsBtn.addEventListener('click', openSummary);
         fsClose.addEventListener('click', closeSummary);
         fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay) closeSummary(); });
@@ -1015,8 +1046,8 @@
           mapToggleBtn.title = label;
           mtbText.textContent = label;
         };
-        // Default: legend visible on desktop, hidden on mobile
-        D.body.classList.toggle('map-ui-hidden', isMobile());
+        // Default: legend hidden on BOTH desktop and mobile
+        D.body.classList.add('map-ui-hidden');
         updateLegendButton();
 
         mapToggleBtn.addEventListener('click', () => { D.body.classList.toggle('map-ui-hidden'); updateLegendButton(); });
