@@ -121,8 +121,9 @@
   <body>
     <div id="map" aria-label="Interactive wildfire map"></div>
 
-    <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show/Hide layers">
-      <span class="icon"><i class="fa-solid fa-layer-group"></i></span><span id="mtb-text">Show Layers</span>
+    <!-- Renamed to “Show Legend” and kept synced with state -->
+    <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show Legend">
+      <span class="icon"><i class="fa-solid fa-layer-group"></i></span><span id="mtb-text">Show Legend</span>
     </button>
     <button id="resetViewBtn" class="map-btn reset-view-btn" type="button" title="Reset map view">
       <span class="icon"><i class="fa-solid fa-compass"></i></span><span>Reset Map View</span>
@@ -832,14 +833,28 @@
         document.getElementById('fs-close').addEventListener('click',()=>{ fsOverlay.style.display='none'; fsOverlay.hidden=true; });
         fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay){ fsOverlay.style.display='none'; fsOverlay.hidden=true; } });
 
-        /* ====================== Show/Hide Layers + Reset view ====================== */
+        /* ====================== Show/Hide Legend + Reset view ====================== */
         const mapToggleBtn = document.getElementById('mapToggleBtn');
         const mtbText = document.getElementById('mtb-text');
-        mapToggleBtn.addEventListener('click', () => {
-          const hidden = document.body.classList.toggle('map-ui-hidden');
+
+        // Keep the button text and aria state in sync with visibility
+        function updateLegendButton(){
+          const hidden = document.body.classList.contains('map-ui-hidden');
+          const label = hidden ? 'Show Legend' : 'Hide Legend';
           mapToggleBtn.setAttribute('aria-pressed', String(!hidden));
-          mtbText.textContent = hidden ? 'Show Layers' : 'Hide Layers';
+          mapToggleBtn.title = label;
+          mtbText.textContent = label;
+        }
+
+        // Default: legend visible on desktop, hidden on mobile
+        document.body.classList.toggle('map-ui-hidden', isMobile());
+        updateLegendButton();
+
+        mapToggleBtn.addEventListener('click', () => {
+          document.body.classList.toggle('map-ui-hidden');
+          updateLegendButton();
         });
+
         document.getElementById('resetViewBtn').addEventListener('click', () => {
           localStorage.removeItem(LS_KEY);
           map.flyTo(INITIAL_VIEW.center, INITIAL_VIEW.zoom, { duration: 0.6 });
