@@ -31,8 +31,9 @@
         --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
         --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
 
-        --footer-offset: 0px;           /* dynamic height of footer link (set by JS) */
-        --smoke-bottom: 28px;           /* dynamic bottom lift for smoke controls (set by JS) */
+        /* dynamic offsets controlled by JS for mobile stacking */
+        --fs-bottom: 86px;          /* default (desktop fallback) for Fire Summary button */
+        --smoke-bottom: 28px;       /* default (desktop fallback) for Smoke controls */
       }
 
       html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
@@ -80,7 +81,10 @@
       .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:rgba(239,68,68,.12);backdrop-filter:blur(2px)}
 
       /* Summary modal */
-      .fire-summary-btn{position:fixed;left:12px;bottom:86px;z-index:2001}
+      .fire-summary-btn{
+        position:fixed; left:12px; z-index:2001;
+        bottom: calc(var(--fs-bottom, 86px) + env(safe-area-inset-bottom));
+      }
       .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
       .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(680px,calc(100% - 24px));color:var(--text);
         max-height:90vh; display:flex; flex-direction:column; overflow:hidden;}
@@ -112,7 +116,7 @@
       .legend-modis-dot{width:10px;height:10px;border-radius:999px;background:var(--modis);display:inline-block;box-shadow:0 0 0 1.5px #111827 inset}
 
       /* Footer */
-      .nb-footer{position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000}
+      .nb-footer{position:fixed;left:0;width:100%;text-align:center;z-index:2000;bottom:calc(10px + env(safe-area-inset-bottom))}
       .nb-footer a{background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:12px;padding:10px 18px;box-shadow:var(--shadow);color:var(--link);font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
 
       /* Weather-station text */
@@ -120,7 +124,7 @@
       .ws-speed{font-weight:800;font-size:14px}
       .ws-small{font-weight:700;font-size:10px;opacity:.95}
 
-      /* Smoke timeline UI (now positioned with --smoke-bottom) */
+      /* Smoke timeline UI (uses --smoke-bottom, set by JS on mobile) */
       #smokeControls{
         position:absolute; right:12px; z-index:2100;
         display:none; align-items:center; gap:10px;
@@ -129,12 +133,7 @@
         backdrop-filter:blur(6px);
         font-size:var(--fs-14);
         max-width: min(96vw, 560px);
-        bottom: calc(var(--smoke-bottom, 28px) + var(--footer-offset, 0px));
-      }
-      @supports (bottom: calc(12px + env(safe-area-inset-bottom))) {
-        #smokeControls{
-          bottom: calc(var(--smoke-bottom, 28px) + var(--footer-offset, 0px) + env(safe-area-inset-bottom));
-        }
+        bottom: calc(var(--smoke-bottom, 28px) + env(safe-area-inset-bottom));
       }
       #smokePlay{
         background:var(--btn-bg); border:1px solid var(--btn-border);
@@ -147,7 +146,7 @@
       @media (max-width: 560px){
         #smokeControls{ left:12px; right:12px; flex-wrap:wrap; justify-content:space-between; gap:8px; }
         #smokeTime{ flex:1 1 auto; min-width:140px; max-width:none; }
-        #smokeTimestamp{ flex: 1 0 100%; order: 3; font-size: var(--fs-12); }
+        #smokeTimestamp{ flex: 1 0 100%; order: 4; font-size: var(--fs-12); }
       }
     </style>
   </head>
@@ -157,6 +156,7 @@
     <!-- Smoke timeline controls -->
     <div id="smokeControls" aria-live="polite">
       <button id="smokePlay" type="button" title="Play/Pause" aria-label="Play animation">▶</button>
+      <span id="smokeLabel" style="font-weight:700">Smoke Animation</span>
       <input id="smokeTime" type="range" min="0" max="0" value="0" step="1" aria-label="Smoke time slider" />
       <span id="smokeTimestamp">Loading…</span>
     </div>
@@ -446,7 +446,6 @@
           const cbs = $$('.fire-filter-block input[type="checkbox"]');
           const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
 
-          // Clear all from cluster first, then add back what's enabled
           fireClusters.clearLayers();
 
           for (const m of activeMarkersAll) {
@@ -481,7 +480,6 @@
           } catch (e) { console.error('Loading local fires failed:', e); }
         }
 
-        /* Load fires once the map is ready */
         map.whenReady(() => {
           fitProvinceToView({ animate: false });
           loadLocalFires();
@@ -513,7 +511,7 @@
             );
             perimeterLabelLayers.add(layer);
           }
-        }); // OFF
+        }).addTo(map); // OFF
 
         const setPerimeterLabels = ()=> {
           const show = map.getZoom() >= 11;
@@ -666,11 +664,10 @@
         const smokeTsLabel    = $('#smokeTimestamp');
 
         let smokeTimesMs = [];
-        let smokeUsedFallback = false;
         let smokeIdx = 0;
         let smokeTimer = null;
 
-        // Local-only label, e.g., "Aug 16, 2025, 18:00 (local)"
+        // Local-only label (e.g., "Aug 16, 2025, 18:00 (local)")
         const smokeFmt = (ms) => {
           const d = new Date(ms);
           const local = d.toLocaleString(undefined, { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false });
@@ -720,10 +717,8 @@
             const windowMs = SMOKE_HOURS_EACH_SIDE * 3600 * 1000;
             let within = allTimes.filter(t => t >= (now - windowMs) && t <= (now + windowMs));
 
-            smokeUsedFallback = false;
             if(within.length === 0){
-              smokeUsedFallback = true;
-              // nearest index to now
+              // nearest 16-ish frames around now
               let lo=0, hi=allTimes.length-1, best=0, bestDiff=Infinity;
               while(lo<=hi){
                 const mid=(lo+hi)>>1, diff=Math.abs(allTimes[mid]-now);
@@ -752,36 +747,47 @@
         }
         initSmokeTimes();
 
-        // Keep the controls above the footer and above the summary button on mobile
-        function updateFooterOffset(){
-          const footer = $('.nb-footer');
-          let offset = 0;
-          if (footer){
-            const rect = footer.getBoundingClientRect();
-            const visible = rect.height > 0 && rect.bottom > 0;
-            if (visible) offset = rect.height + 16;
-          }
-          D.documentElement.style.setProperty('--footer-offset', offset + 'px');
-        }
-        function updateSmokeBottom(){
-          const fsBtn = $('#fireSummaryBtn');
-          let bottom = 28; // desktop default
-          if (isMobile() && fsBtn){
-            const h = fsBtn.getBoundingClientRect().height || 0;
-            // place the smoke controls just above the Fire Summary button area
-            bottom = 86 + h + 12; // 86px button offset + its height + small gap
-          }
-          D.documentElement.style.setProperty('--smoke-bottom', bottom + 'px');
-        }
-        function updateOffsets(){ updateFooterOffset(); updateSmokeBottom(); }
-        updateOffsets();
-        window.addEventListener('resize', updateOffsets, { passive: true });
-        window.addEventListener('orientationchange', updateOffsets);
+        /* ====================== Mobile stacking: equal gaps ====================== */
+        function pxNum(v, d=0){ const n=parseFloat(v); return Number.isFinite(n) ? n : d; }
 
-        // Show/hide controls + refresh timestamp when the overlay toggles
+        function updateStackedGaps(){
+          const mobile = isMobile();
+          const root = document.documentElement;
+
+          if (!mobile){
+            // Desktop/tablet: keep defaults; you can still use controls manually
+            root.style.setProperty('--fs-bottom', '86px');
+            root.style.setProperty('--smoke-bottom', '28px');
+            return;
+          }
+
+          const footer = $('.nb-footer');
+          const fsBtn  = $('#fireSummaryBtn');
+
+          // Use the footer's CSS bottom (e.g., 10px) as the canonical gap
+          const gap = footer ? pxNum(getComputedStyle(footer).bottom, 10) : 10;
+
+          const footerH = footer?.getBoundingClientRect().height || 0;
+          const fsH     = fsBtn?.getBoundingClientRect().height || 0;
+
+          // Summary is one gap above the footer (plus footer's own height)
+          const fsBottom = footerH + gap + gap;
+
+          // Smoke is one gap above summary
+          const smokeBottom = fsBottom + fsH + gap;
+
+          root.style.setProperty('--fs-bottom',     fsBottom + 'px');
+          root.style.setProperty('--smoke-bottom',  smokeBottom + 'px');
+        }
+
+        updateStackedGaps();
+        window.addEventListener('resize', updateStackedGaps, { passive: true });
+        window.addEventListener('orientationchange', updateStackedGaps);
+
+        // When Smoke toggles, keep the stack tidy
         map.on('overlayadd', (e) => {
           if (e.layer === smokeLayer) {
-            updateOffsets();
+            updateStackedGaps();
             smokeControls.style.display = 'flex';
             if (smokeTimesMs.length) { smokeSetIndex(smokeIdx); }
             else { smokeTsLabel.textContent = 'Loading…'; }
@@ -792,9 +798,9 @@
           if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; }
         });
 
-        /* If Smoke is ON by default, show controls on load */
+        // If Smoke starts ON by default, show controls on load
         if (map.hasLayer(smokeLayer)) {
-          updateOffsets();
+          updateStackedGaps();
           smokeControls.style.display = 'flex';
           smokeTsLabel.textContent = 'Loading…';
           smokeLayer.bringToBack();
