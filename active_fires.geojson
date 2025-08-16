@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -128,7 +128,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68562,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.74544887398154,
+          47.05652964292348
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68562,
+        "FIRE_NUMBER": "2025252",
+        "FIRE_NUMBER_SHORT": "252",
+        "FIRE_NAME": "Maple Glen",
+        "DEGREES_LAT": 47.05652,
+        "DEGREES_LONG": 65.74544999999999,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1755104400000,
+        "FIRE_STAT_DATE": 1755347100000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 5.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -148,18 +179,18 @@
         "FIRE_NAME": "274",
         "DEGREES_LAT": 47.347359999999995,
         "DEGREES_LONG": 66.06056,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "FIRE_STAT_ID": 3,
+        "FIRE_STAT_DESC_E": "Under Control",
+        "FIRE_STAT_DESC_F": "Maîtrisé ",
         "TIME_DETECTED": 1755282060000,
-        "FIRE_STAT_DATE": 1755333960000,
+        "FIRE_STAT_DATE": 1755345120000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
+        "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -183,14 +214,14 @@
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
         "TIME_DETECTED": 1755108480000,
-        "FIRE_STAT_DATE": 1755290040000,
+        "FIRE_STAT_DATE": 1755346500000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 20,
+        "PERCENT_CONTAINED": 60,
         "FIRE_SIZE": 50.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -221,7 +252,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -252,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -283,38 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68562,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.74544887398154,
-          47.05652964292348
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68562,
-        "FIRE_NUMBER": "2025252",
-        "FIRE_NUMBER_SHORT": "252",
-        "FIRE_NAME": "Maple Glen",
-        "DEGREES_LAT": 47.05652,
-        "DEGREES_LONG": 65.74544999999999,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1755104400000,
-        "FIRE_STAT_DATE": 1755164220000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 5.5,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -345,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -376,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -407,7 +407,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -438,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -469,7 +469,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 120.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -500,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -531,7 +531,7 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 100.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -562,7 +562,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -593,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -624,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -655,7 +655,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -686,7 +686,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -717,7 +717,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -748,7 +748,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -779,7 +779,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68682,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.62691919777986,
+          47.35488967302019
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68682,
+        "FIRE_NUMBER": "2025276",
+        "FIRE_NUMBER_SHORT": "276",
+        "FIRE_NAME": "276",
+        "DEGREES_LAT": 47.354879999999994,
+        "DEGREES_LONG": 66.62692,
+        "FIRE_STAT_ID": 6,
+        "FIRE_STAT_DESC_E": "Being Monitored",
+        "FIRE_STAT_DESC_F": "Sous surveillance",
+        "TIME_DETECTED": 1755344580000,
+        "FIRE_STAT_DATE": 1755344880000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -810,7 +841,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -841,7 +872,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     },
     {
@@ -865,14 +896,14 @@
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
         "TIME_DETECTED": 1755195600000,
-        "FIRE_STAT_DATE": 1755344658000,
+        "FIRE_STAT_DATE": 1755348203000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": null,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755355463
+        "FETCHED_FROM_ERD": 1755359008
       }
     }
   ]
