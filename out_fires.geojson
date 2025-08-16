@@ -19,6 +19,8 @@
       },
       "properties": {
         "OBJECTID": 66762,
+        "FIRE_NUMBER": "2025098",
+        "FIRE_NUMBER_SHORT": "098",
         "FIRE_NAME": "Chemin des Ancêtres",
         "DEGREES_LAT": 47.72782,
         "DEGREES_LONG": 64.81873999999999,
@@ -33,7 +35,7 @@
         "PERCENT_CONTAINED": 1,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -48,6 +50,8 @@
       },
       "properties": {
         "OBJECTID": 66942,
+        "FIRE_NUMBER": "2025111",
+        "FIRE_NUMBER_SHORT": "111",
         "FIRE_NAME": "Railway",
         "DEGREES_LAT": 46.75783,
         "DEGREES_LONG": 65.44628999999999,
@@ -62,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -77,6 +81,8 @@
       },
       "properties": {
         "OBJECTID": 66943,
+        "FIRE_NUMBER": "2025112",
+        "FIRE_NUMBER_SHORT": "112",
         "FIRE_NAME": "Green hill lake fire",
         "DEGREES_LAT": 46.069700000000005,
         "DEGREES_LONG": 67.04445,
@@ -91,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -106,6 +112,8 @@
       },
       "properties": {
         "OBJECTID": 67422,
+        "FIRE_NUMBER": "2025144",
+        "FIRE_NUMBER_SHORT": "144",
         "FIRE_NAME": "Legacy Road",
         "DEGREES_LAT": 47.52571,
         "DEGREES_LONG": 65.69787,
@@ -120,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -135,6 +143,8 @@
       },
       "properties": {
         "OBJECTID": 67784,
+        "FIRE_NUMBER": "2025164",
+        "FIRE_NUMBER_SHORT": "164",
         "FIRE_NAME": "Mag One",
         "DEGREES_LAT": 45.69547,
         "DEGREES_LONG": 67.18751999999999,
@@ -149,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -164,6 +174,8 @@
       },
       "properties": {
         "OBJECTID": 68524,
+        "FIRE_NUMBER": "2025245",
+        "FIRE_NUMBER_SHORT": "245",
         "FIRE_NAME": "Chemin Duval",
         "DEGREES_LAT": 47.72203,
         "DEGREES_LONG": 65.04912,
@@ -178,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -193,6 +205,8 @@
       },
       "properties": {
         "OBJECTID": 68523,
+        "FIRE_NUMBER": "2025244",
+        "FIRE_NUMBER_SHORT": "244",
         "FIRE_NAME": "Maltais route 260",
         "DEGREES_LAT": 47.61862,
         "DEGREES_LONG": 67.34530000000001,
@@ -207,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -222,6 +236,8 @@
       },
       "properties": {
         "OBJECTID": 65962,
+        "FIRE_NUMBER": "2025005",
+        "FIRE_NUMBER_SHORT": "005",
         "FIRE_NAME": "DIRT ROAD",
         "DEGREES_LAT": 46.49303,
         "DEGREES_LONG": 65.14242,
@@ -236,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -251,6 +267,8 @@
       },
       "properties": {
         "OBJECTID": 66683,
+        "FIRE_NUMBER": "2025089",
+        "FIRE_NUMBER_SHORT": "089",
         "FIRE_NAME": "Rake",
         "DEGREES_LAT": 46.60774,
         "DEGREES_LONG": 64.81324,
@@ -265,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -280,6 +298,8 @@
       },
       "properties": {
         "OBJECTID": 66802,
+        "FIRE_NUMBER": "2025101",
+        "FIRE_NUMBER_SHORT": "101",
         "FIRE_NAME": "Pile",
         "DEGREES_LAT": 46.82119,
         "DEGREES_LONG": 65.31408,
@@ -294,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -309,6 +329,8 @@
       },
       "properties": {
         "OBJECTID": 66842,
+        "FIRE_NUMBER": "2025103",
+        "FIRE_NUMBER_SHORT": "103",
         "FIRE_NAME": "County Line",
         "DEGREES_LAT": 46.59292,
         "DEGREES_LONG": 67.7269,
@@ -323,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -338,6 +360,8 @@
       },
       "properties": {
         "OBJECTID": 66863,
+        "FIRE_NUMBER": "2025105",
+        "FIRE_NUMBER_SHORT": "105",
         "FIRE_NAME": "Dugan Pine",
         "DEGREES_LAT": 46.04027,
         "DEGREES_LONG": 67.68168,
@@ -352,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -367,6 +391,8 @@
       },
       "properties": {
         "OBJECTID": 68002,
+        "FIRE_NUMBER": "2025180",
+        "FIRE_NUMBER_SHORT": "180",
         "FIRE_NAME": "Popple Road",
         "DEGREES_LAT": 47.386669999999995,
         "DEGREES_LONG": 66.3563,
@@ -381,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -396,6 +422,8 @@
       },
       "properties": {
         "OBJECTID": 68085,
+        "FIRE_NUMBER": "2025190",
+        "FIRE_NUMBER_SHORT": "190",
         "FIRE_NAME": "Cedar Bank Lane",
         "DEGREES_LAT": 45.172000000000004,
         "DEGREES_LONG": 66.95607,
@@ -410,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -425,6 +453,8 @@
       },
       "properties": {
         "OBJECTID": 68083,
+        "FIRE_NUMBER": "2025188",
+        "FIRE_NUMBER_SHORT": "188",
         "FIRE_NAME": "Light House Road",
         "DEGREES_LAT": 45.100500000000004,
         "DEGREES_LONG": 66.9075,
@@ -439,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -454,6 +484,8 @@
       },
       "properties": {
         "OBJECTID": 68222,
+        "FIRE_NUMBER": "2025197",
+        "FIRE_NUMBER_SHORT": "197",
         "FIRE_NAME": "Mill Cove Point",
         "DEGREES_LAT": 45.14722,
         "DEGREES_LONG": 67.00527,
@@ -468,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -483,6 +515,8 @@
       },
       "properties": {
         "OBJECTID": 68302,
+        "FIRE_NUMBER": "2025203",
+        "FIRE_NUMBER_SHORT": "203",
         "FIRE_NAME": "st cecile",
         "DEGREES_LAT": 47.85272,
         "DEGREES_LONG": 64.66908,
@@ -497,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -512,6 +546,8 @@
       },
       "properties": {
         "OBJECTID": 68482,
+        "FIRE_NUMBER": "2025237",
+        "FIRE_NUMBER_SHORT": "237",
         "FIRE_NAME": "Lauvina Road",
         "DEGREES_LAT": 45.7712,
         "DEGREES_LONG": 66.4671,
@@ -526,7 +562,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -541,6 +577,8 @@
       },
       "properties": {
         "OBJECTID": 68462,
+        "FIRE_NUMBER": "2025235",
+        "FIRE_NUMBER_SHORT": "235",
         "FIRE_NAME": "Black River Fire",
         "DEGREES_LAT": 46.83877,
         "DEGREES_LONG": 64.9929,
@@ -555,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -570,6 +608,8 @@
       },
       "properties": {
         "OBJECTID": 68385,
+        "FIRE_NUMBER": "2025220",
+        "FIRE_NUMBER_SHORT": "220",
         "FIRE_NAME": "Smithfield Road",
         "DEGREES_LAT": 45.82908,
         "DEGREES_LONG": 66.92452999999999,
@@ -584,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -599,6 +639,8 @@
       },
       "properties": {
         "OBJECTID": 68486,
+        "FIRE_NUMBER": "2025241",
+        "FIRE_NUMBER_SHORT": "241",
         "FIRE_NAME": "Post Hydroline",
         "DEGREES_LAT": 46.124249999999996,
         "DEGREES_LONG": 65.99082,
@@ -613,7 +655,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -628,6 +670,8 @@
       },
       "properties": {
         "OBJECTID": 68442,
+        "FIRE_NUMBER": "2025231",
+        "FIRE_NUMBER_SHORT": "231",
         "FIRE_NAME": "Wedge Extension Road",
         "DEGREES_LAT": 47.46236,
         "DEGREES_LONG": 65.76693,
@@ -642,7 +686,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -657,6 +701,8 @@
       },
       "properties": {
         "OBJECTID": 67902,
+        "FIRE_NUMBER": "2025174",
+        "FIRE_NUMBER_SHORT": "174",
         "FIRE_NAME": "Shepody Camp",
         "DEGREES_LAT": 45.587469999999996,
         "DEGREES_LONG": 65.42938,
@@ -671,7 +717,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -686,6 +732,8 @@
       },
       "properties": {
         "OBJECTID": 65942,
+        "FIRE_NUMBER": "2025004",
+        "FIRE_NUMBER_SHORT": "004",
         "FIRE_NAME": "Pipeline",
         "DEGREES_LAT": 45.190529999999995,
         "DEGREES_LONG": 66.4822,
@@ -700,7 +748,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -715,6 +763,8 @@
       },
       "properties": {
         "OBJECTID": 65963,
+        "FIRE_NUMBER": "2025006",
+        "FIRE_NUMBER_SHORT": "006",
         "FIRE_NAME": "Anfield",
         "DEGREES_LAT": 46.9309,
         "DEGREES_LONG": 67.52096999999999,
@@ -729,7 +779,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -744,6 +794,8 @@
       },
       "properties": {
         "OBJECTID": 66043,
+        "FIRE_NUMBER": "2025014",
+        "FIRE_NUMBER_SHORT": "014",
         "FIRE_NAME": "Pallet",
         "DEGREES_LAT": 45.8605,
         "DEGREES_LONG": 66.72655,
@@ -758,7 +810,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -773,6 +825,8 @@
       },
       "properties": {
         "OBJECTID": 66062,
+        "FIRE_NUMBER": "2025016",
+        "FIRE_NUMBER_SHORT": "016",
         "FIRE_NAME": "Dead Fir",
         "DEGREES_LAT": 46.387229999999995,
         "DEGREES_LONG": 64.79842,
@@ -787,7 +841,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -802,6 +856,8 @@
       },
       "properties": {
         "OBJECTID": 66202,
+        "FIRE_NUMBER": "2025034",
+        "FIRE_NUMBER_SHORT": "034",
         "FIRE_NAME": "East Coldstream Road",
         "DEGREES_LAT": 46.41097,
         "DEGREES_LONG": 67.4413,
@@ -816,7 +872,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -831,6 +887,8 @@
       },
       "properties": {
         "OBJECTID": 66302,
+        "FIRE_NUMBER": "2025040",
+        "FIRE_NUMBER_SHORT": "040",
         "FIRE_NAME": "Square",
         "DEGREES_LAT": 46.168879999999994,
         "DEGREES_LONG": 66.60571999999999,
@@ -845,7 +903,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -860,6 +918,8 @@
       },
       "properties": {
         "OBJECTID": 66322,
+        "FIRE_NUMBER": "2025041",
+        "FIRE_NUMBER_SHORT": "041",
         "FIRE_NAME": "Coal Creek",
         "DEGREES_LAT": 46.098389999999995,
         "DEGREES_LONG": 65.88226999999999,
@@ -874,7 +934,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -889,6 +949,8 @@
       },
       "properties": {
         "OBJECTID": 66362,
+        "FIRE_NUMBER": "2025043",
+        "FIRE_NUMBER_SHORT": "043",
         "FIRE_NAME": "Dam Overlook",
         "DEGREES_LAT": 45.947779999999995,
         "DEGREES_LONG": 66.86572,
@@ -903,7 +965,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -918,6 +980,8 @@
       },
       "properties": {
         "OBJECTID": 66423,
+        "FIRE_NUMBER": "2025050",
+        "FIRE_NUMBER_SHORT": "050",
         "FIRE_NAME": "RJ Fire",
         "DEGREES_LAT": 45.11946,
         "DEGREES_LONG": 66.59667999999999,
@@ -932,7 +996,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -947,6 +1011,8 @@
       },
       "properties": {
         "OBJECTID": 66442,
+        "FIRE_NUMBER": "2025051",
+        "FIRE_NUMBER_SHORT": "051",
         "FIRE_NAME": "Hewitt Meadow Fire",
         "DEGREES_LAT": 45.30225,
         "DEGREES_LONG": 67.10996,
@@ -961,7 +1027,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -976,6 +1042,8 @@
       },
       "properties": {
         "OBJECTID": 66607,
+        "FIRE_NUMBER": "2025075",
+        "FIRE_NUMBER_SHORT": "075",
         "FIRE_NAME": "Vanoord",
         "DEGREES_LAT": 45.98153,
         "DEGREES_LONG": 66.90496999999999,
@@ -990,7 +1058,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1005,6 +1073,8 @@
       },
       "properties": {
         "OBJECTID": 66671,
+        "FIRE_NUMBER": "2025087",
+        "FIRE_NUMBER_SHORT": "087",
         "FIRE_NAME": "Smith",
         "DEGREES_LAT": 47.345259999999996,
         "DEGREES_LONG": 68.16923,
@@ -1019,7 +1089,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1034,6 +1104,8 @@
       },
       "properties": {
         "OBJECTID": 66663,
+        "FIRE_NUMBER": "2025079",
+        "FIRE_NUMBER_SHORT": "079",
         "FIRE_NAME": "Algonquin",
         "DEGREES_LAT": 47.20108,
         "DEGREES_LONG": 65.12953,
@@ -1048,7 +1120,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1063,6 +1135,8 @@
       },
       "properties": {
         "OBJECTID": 66704,
+        "FIRE_NUMBER": "2025093",
+        "FIRE_NUMBER_SHORT": "093",
         "FIRE_NAME": "Lobster",
         "DEGREES_LAT": 46.72638,
         "DEGREES_LONG": 64.95655,
@@ -1077,7 +1151,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1092,6 +1166,8 @@
       },
       "properties": {
         "OBJECTID": 66664,
+        "FIRE_NUMBER": "2025080",
+        "FIRE_NUMBER_SHORT": "080",
         "FIRE_NAME": "Dead Pine Fire",
         "DEGREES_LAT": 45.149300000000004,
         "DEGREES_LONG": 66.73622,
@@ -1106,7 +1182,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1121,6 +1197,8 @@
       },
       "properties": {
         "OBJECTID": 67923,
+        "FIRE_NUMBER": "2025176",
+        "FIRE_NUMBER_SHORT": "176",
         "FIRE_NAME": "Dirty Pine",
         "DEGREES_LAT": 45.111149999999995,
         "DEGREES_LONG": 66.86592,
@@ -1135,7 +1213,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1150,6 +1228,8 @@
       },
       "properties": {
         "OBJECTID": 68526,
+        "FIRE_NUMBER": "2025247",
+        "FIRE_NUMBER_SHORT": "247",
         "FIRE_NAME": "Rue Morais",
         "DEGREES_LAT": 47.7762,
         "DEGREES_LONG": 64.80883,
@@ -1164,36 +1244,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 65862,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.08327864216646,
-          47.059979658830954
-        ]
-      },
-      "properties": {
-        "OBJECTID": 65862,
-        "FIRE_NAME": "Skeet",
-        "DEGREES_LAT": 47.05997,
-        "DEGREES_LONG": 65.08328,
-        "FIRE_STAT_ID": 5,
-        "FIRE_STAT_DESC_E": "Out",
-        "FIRE_STAT_DESC_F": "Éteint",
-        "TIME_DETECTED": 1734685200000,
-        "FIRE_STAT_DATE": 1734688800000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1208,6 +1259,8 @@
       },
       "properties": {
         "OBJECTID": 65882,
+        "FIRE_NUMBER": "2025001",
+        "FIRE_NUMBER_SHORT": "001",
         "FIRE_NAME": "Covedell",
         "DEGREES_LAT": 47.30983,
         "DEGREES_LONG": 64.97258,
@@ -1222,7 +1275,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1237,6 +1290,8 @@
       },
       "properties": {
         "OBJECTID": 66042,
+        "FIRE_NUMBER": "2025013",
+        "FIRE_NUMBER_SHORT": "013",
         "FIRE_NAME": "Shoulder",
         "DEGREES_LAT": 46.828179999999996,
         "DEGREES_LONG": 65.0942,
@@ -1251,7 +1306,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1266,6 +1321,8 @@
       },
       "properties": {
         "OBJECTID": 66082,
+        "FIRE_NUMBER": "2025017",
+        "FIRE_NUMBER_SHORT": "017",
         "FIRE_NAME": "Electric",
         "DEGREES_LAT": 47.3106,
         "DEGREES_LONG": 65.05673,
@@ -1280,7 +1337,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1295,6 +1352,8 @@
       },
       "properties": {
         "OBJECTID": 66163,
+        "FIRE_NUMBER": "2025032",
+        "FIRE_NUMBER_SHORT": "032",
         "FIRE_NAME": "Portagevale 1",
         "DEGREES_LAT": 45.820479999999996,
         "DEGREES_LONG": 65.29147,
@@ -1309,7 +1368,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1324,6 +1383,8 @@
       },
       "properties": {
         "OBJECTID": 66162,
+        "FIRE_NUMBER": "2025031",
+        "FIRE_NUMBER_SHORT": "031",
         "FIRE_NAME": "Porter Cove",
         "DEGREES_LAT": 46.49753,
         "DEGREES_LONG": 66.34917,
@@ -1338,7 +1399,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1353,6 +1414,8 @@
       },
       "properties": {
         "OBJECTID": 66403,
+        "FIRE_NUMBER": "2025047",
+        "FIRE_NUMBER_SHORT": "047",
         "FIRE_NAME": "Km 54",
         "DEGREES_LAT": 45.134429999999995,
         "DEGREES_LONG": 66.79862,
@@ -1367,7 +1430,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1382,6 +1445,8 @@
       },
       "properties": {
         "OBJECTID": 66463,
+        "FIRE_NUMBER": "2025053",
+        "FIRE_NUMBER_SHORT": "053",
         "FIRE_NAME": "Justason",
         "DEGREES_LAT": 45.15748,
         "DEGREES_LONG": 66.81218,
@@ -1396,7 +1461,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1411,6 +1476,8 @@
       },
       "properties": {
         "OBJECTID": 66543,
+        "FIRE_NUMBER": "2025067",
+        "FIRE_NUMBER_SHORT": "067",
         "FIRE_NAME": "Powerline",
         "DEGREES_LAT": 46.575179999999996,
         "DEGREES_LONG": 66.0908,
@@ -1425,7 +1492,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1440,6 +1507,8 @@
       },
       "properties": {
         "OBJECTID": 66603,
+        "FIRE_NUMBER": "2025071",
+        "FIRE_NUMBER_SHORT": "071",
         "FIRE_NAME": "Box Fire",
         "DEGREES_LAT": 45.137249999999995,
         "DEGREES_LONG": 66.70667,
@@ -1454,7 +1523,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 13.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1469,6 +1538,8 @@
       },
       "properties": {
         "OBJECTID": 66606,
+        "FIRE_NUMBER": "2025074",
+        "FIRE_NUMBER_SHORT": "074",
         "FIRE_NAME": "Butte D'Or",
         "DEGREES_LAT": 47.54035,
         "DEGREES_LONG": 65.22663,
@@ -1483,7 +1554,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1498,6 +1569,8 @@
       },
       "properties": {
         "OBJECTID": 66670,
+        "FIRE_NUMBER": "2025086",
+        "FIRE_NUMBER_SHORT": "086",
         "FIRE_NAME": "Gully Brook",
         "DEGREES_LAT": 45.9928,
         "DEGREES_LONG": 66.9645,
@@ -1512,7 +1585,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1527,6 +1600,8 @@
       },
       "properties": {
         "OBJECTID": 66882,
+        "FIRE_NUMBER": "2025106",
+        "FIRE_NUMBER_SHORT": "106",
         "FIRE_NAME": "Wood Stove Ashes",
         "DEGREES_LAT": 47.62554,
         "DEGREES_LONG": 64.81152999999999,
@@ -1541,7 +1616,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1556,6 +1631,8 @@
       },
       "properties": {
         "OBJECTID": 66922,
+        "FIRE_NUMBER": "2025108",
+        "FIRE_NUMBER_SHORT": "108",
         "FIRE_NAME": "Coal Creek 2",
         "DEGREES_LAT": 46.141279999999995,
         "DEGREES_LONG": 65.89023,
@@ -1570,7 +1647,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1585,6 +1662,8 @@
       },
       "properties": {
         "OBJECTID": 66962,
+        "FIRE_NUMBER": "2025113",
+        "FIRE_NUMBER_SHORT": "113",
         "FIRE_NAME": "Pecheur Nord",
         "DEGREES_LAT": 47.82506,
         "DEGREES_LONG": 64.61098,
@@ -1599,7 +1678,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1614,6 +1693,8 @@
       },
       "properties": {
         "OBJECTID": 66982,
+        "FIRE_NUMBER": "2025117",
+        "FIRE_NUMBER_SHORT": "117",
         "FIRE_NAME": "Sunpoke Cow",
         "DEGREES_LAT": 45.7965,
         "DEGREES_LONG": 66.59903,
@@ -1628,7 +1709,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1643,6 +1724,8 @@
       },
       "properties": {
         "OBJECTID": 66983,
+        "FIRE_NUMBER": "2025118",
+        "FIRE_NUMBER_SHORT": "118",
         "FIRE_NAME": "Wire",
         "DEGREES_LAT": 46.618249999999996,
         "DEGREES_LONG": 64.90326999999999,
@@ -1657,7 +1740,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1672,6 +1755,8 @@
       },
       "properties": {
         "OBJECTID": 67022,
+        "FIRE_NUMBER": "2025121",
+        "FIRE_NUMBER_SHORT": "121",
         "FIRE_NAME": "Oak Hill Slash",
         "DEGREES_LAT": 45.35942,
         "DEGREES_LONG": 67.34572,
@@ -1686,7 +1771,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1701,6 +1786,8 @@
       },
       "properties": {
         "OBJECTID": 67302,
+        "FIRE_NUMBER": "2025138",
+        "FIRE_NUMBER_SHORT": "138",
         "FIRE_NAME": "Tobique Dam",
         "DEGREES_LAT": 46.781800000000004,
         "DEGREES_LONG": 67.69765,
@@ -1715,7 +1802,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1730,6 +1817,8 @@
       },
       "properties": {
         "OBJECTID": 67362,
+        "FIRE_NUMBER": "2025141",
+        "FIRE_NUMBER_SHORT": "141",
         "FIRE_NAME": "St. David Ridge",
         "DEGREES_LAT": 45.25869,
         "DEGREES_LONG": 67.24686,
@@ -1744,7 +1833,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1759,6 +1848,8 @@
       },
       "properties": {
         "OBJECTID": 68424,
+        "FIRE_NUMBER": "2025227",
+        "FIRE_NUMBER_SHORT": "227",
         "FIRE_NAME": "Brittain road",
         "DEGREES_LAT": 45.47435,
         "DEGREES_LONG": 66.17752,
@@ -1773,7 +1864,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1788,6 +1879,8 @@
       },
       "properties": {
         "OBJECTID": 65902,
+        "FIRE_NUMBER": "2025002",
+        "FIRE_NUMBER_SHORT": "002",
         "FIRE_NAME": "Enniskillen",
         "DEGREES_LAT": 45.53763,
         "DEGREES_LONG": 66.52505,
@@ -1802,7 +1895,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1817,6 +1910,8 @@
       },
       "properties": {
         "OBJECTID": 66469,
+        "FIRE_NUMBER": "2025059",
+        "FIRE_NUMBER_SHORT": "059",
         "FIRE_NAME": "Old Springfield",
         "DEGREES_LAT": 45.99977,
         "DEGREES_LONG": 67.01514999999999,
@@ -1831,7 +1926,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1846,6 +1941,8 @@
       },
       "properties": {
         "OBJECTID": 66763,
+        "FIRE_NUMBER": "2025099",
+        "FIRE_NUMBER_SHORT": "099",
         "FIRE_NAME": "Swamp",
         "DEGREES_LAT": 47.80191,
         "DEGREES_LONG": 64.85179,
@@ -1860,7 +1957,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1875,6 +1972,8 @@
       },
       "properties": {
         "OBJECTID": 66964,
+        "FIRE_NUMBER": "2025115",
+        "FIRE_NUMBER_SHORT": "115",
         "FIRE_NAME": "Shoulder 2",
         "DEGREES_LAT": 46.3607,
         "DEGREES_LONG": 64.93576999999999,
@@ -1889,7 +1988,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1904,6 +2003,8 @@
       },
       "properties": {
         "OBJECTID": 67002,
+        "FIRE_NUMBER": "2025120",
+        "FIRE_NUMBER_SHORT": "120",
         "FIRE_NAME": "Crow",
         "DEGREES_LAT": 46.68213,
         "DEGREES_LONG": 64.71853,
@@ -1918,7 +2019,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1933,6 +2034,8 @@
       },
       "properties": {
         "OBJECTID": 67442,
+        "FIRE_NUMBER": "2025109",
+        "FIRE_NUMBER_SHORT": "109",
         "FIRE_NAME": "Camp des Americain",
         "DEGREES_LAT": 47.4012,
         "DEGREES_LONG": 65.16253,
@@ -1947,7 +2050,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1962,6 +2065,8 @@
       },
       "properties": {
         "OBJECTID": 66984,
+        "FIRE_NUMBER": "2025119",
+        "FIRE_NUMBER_SHORT": "119",
         "FIRE_NAME": "Rue du Tré Carré",
         "DEGREES_LAT": 47.73108,
         "DEGREES_LONG": 64.74376,
@@ -1976,7 +2081,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -1991,6 +2096,8 @@
       },
       "properties": {
         "OBJECTID": 67084,
+        "FIRE_NUMBER": "2025127",
+        "FIRE_NUMBER_SHORT": "127",
         "FIRE_NAME": "Nickel Mine",
         "DEGREES_LAT": 45.22193,
         "DEGREES_LONG": 67.30414999999999,
@@ -2005,7 +2112,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2020,6 +2127,8 @@
       },
       "properties": {
         "OBJECTID": 67922,
+        "FIRE_NUMBER": "2025175",
+        "FIRE_NUMBER_SHORT": "175",
         "FIRE_NAME": "Kilpatrick Wetland",
         "DEGREES_LAT": 45.346579999999996,
         "DEGREES_LONG": 66.00142,
@@ -2034,7 +2143,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2049,6 +2158,8 @@
       },
       "properties": {
         "OBJECTID": 68043,
+        "FIRE_NUMBER": "2025183",
+        "FIRE_NUMBER_SHORT": "183",
         "FIRE_NAME": "Four Road Peat Moss",
         "DEGREES_LAT": 47.62705,
         "DEGREES_LONG": 64.80999,
@@ -2063,7 +2174,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2078,6 +2189,8 @@
       },
       "properties": {
         "OBJECTID": 68122,
+        "FIRE_NUMBER": "2025192",
+        "FIRE_NUMBER_SHORT": "192",
         "FIRE_NAME": "Southfield",
         "DEGREES_LAT": 45.608329999999995,
         "DEGREES_LONG": 65.65178,
@@ -2092,7 +2205,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2107,6 +2220,8 @@
       },
       "properties": {
         "OBJECTID": 68162,
+        "FIRE_NUMBER": "2025194",
+        "FIRE_NUMBER_SHORT": "194",
         "FIRE_NAME": "Valley farm",
         "DEGREES_LAT": 45.207249999999995,
         "DEGREES_LONG": 66.86627,
@@ -2121,7 +2236,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2136,6 +2251,8 @@
       },
       "properties": {
         "OBJECTID": 67282,
+        "FIRE_NUMBER": "2025137",
+        "FIRE_NUMBER_SHORT": "137",
         "FIRE_NAME": "Block D",
         "DEGREES_LAT": 46.734449999999995,
         "DEGREES_LONG": 67.72001999999999,
@@ -2150,7 +2267,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2165,6 +2282,8 @@
       },
       "properties": {
         "OBJECTID": 67762,
+        "FIRE_NUMBER": "2025161",
+        "FIRE_NUMBER_SHORT": "161",
         "FIRE_NAME": "Red Barn",
         "DEGREES_LAT": 47.092169999999996,
         "DEGREES_LONG": 67.84101,
@@ -2179,7 +2298,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2194,6 +2313,8 @@
       },
       "properties": {
         "OBJECTID": 67825,
+        "FIRE_NUMBER": "2025170",
+        "FIRE_NUMBER_SHORT": "170",
         "FIRE_NAME": "Urqhart rd",
         "DEGREES_LAT": 47.18672,
         "DEGREES_LONG": 65.83278,
@@ -2208,7 +2329,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2223,6 +2344,8 @@
       },
       "properties": {
         "OBJECTID": 67982,
+        "FIRE_NUMBER": "2025179",
+        "FIRE_NUMBER_SHORT": "179",
         "FIRE_NAME": "Grande Rivière",
         "DEGREES_LAT": 47.1976,
         "DEGREES_LONG": 67.95054999999999,
@@ -2237,7 +2360,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2252,6 +2375,8 @@
       },
       "properties": {
         "OBJECTID": 68242,
+        "FIRE_NUMBER": "2025198",
+        "FIRE_NUMBER_SHORT": "198",
         "FIRE_NAME": "Tetagouche River",
         "DEGREES_LAT": 47.61206,
         "DEGREES_LONG": 65.87684,
@@ -2266,7 +2391,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2281,6 +2406,8 @@
       },
       "properties": {
         "OBJECTID": 68308,
+        "FIRE_NUMBER": "2025209",
+        "FIRE_NUMBER_SHORT": "209",
         "FIRE_NAME": "Rouse sign",
         "DEGREES_LAT": 45.887769999999996,
         "DEGREES_LONG": 65.36538,
@@ -2295,7 +2422,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2310,6 +2437,8 @@
       },
       "properties": {
         "OBJECTID": 68303,
+        "FIRE_NUMBER": "2025204",
+        "FIRE_NUMBER_SHORT": "204",
         "FIRE_NAME": "Middle River",
         "DEGREES_LAT": 47.60453,
         "DEGREES_LONG": 65.73774,
@@ -2324,7 +2453,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2339,6 +2468,8 @@
       },
       "properties": {
         "OBJECTID": 68310,
+        "FIRE_NUMBER": "2025211",
+        "FIRE_NUMBER_SHORT": "211",
         "FIRE_NAME": "Dobson Trail",
         "DEGREES_LAT": 46.017500000000005,
         "DEGREES_LONG": 64.80738,
@@ -2353,7 +2484,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2368,6 +2499,8 @@
       },
       "properties": {
         "OBJECTID": 68342,
+        "FIRE_NUMBER": "2025214",
+        "FIRE_NUMBER_SHORT": "214",
         "FIRE_NAME": "Salem",
         "DEGREES_LAT": 45.914519999999996,
         "DEGREES_LONG": 64.70291999999999,
@@ -2382,7 +2515,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2397,6 +2530,8 @@
       },
       "properties": {
         "OBJECTID": 67162,
+        "FIRE_NUMBER": "2025131",
+        "FIRE_NUMBER_SHORT": "131",
         "FIRE_NAME": "Route 115",
         "DEGREES_LAT": 46.26083,
         "DEGREES_LONG": 64.78,
@@ -2411,7 +2546,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2426,6 +2561,8 @@
       },
       "properties": {
         "OBJECTID": 66142,
+        "FIRE_NUMBER": "2025030",
+        "FIRE_NUMBER_SHORT": "030",
         "FIRE_NAME": "Campground",
         "DEGREES_LAT": 46.82645,
         "DEGREES_LONG": 65.78708,
@@ -2440,7 +2577,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2455,6 +2592,8 @@
       },
       "properties": {
         "OBJECTID": 66562,
+        "FIRE_NUMBER": "2025068",
+        "FIRE_NUMBER_SHORT": "068",
         "FIRE_NAME": "Km 208 East",
         "DEGREES_LAT": 46.0031,
         "DEGREES_LONG": 67.51977,
@@ -2469,7 +2608,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2484,6 +2623,8 @@
       },
       "properties": {
         "OBJECTID": 67582,
+        "FIRE_NUMBER": "2025151",
+        "FIRE_NUMBER_SHORT": "151",
         "FIRE_NAME": "Parlee Brook",
         "DEGREES_LAT": 45.68787,
         "DEGREES_LONG": 65.4157,
@@ -2498,7 +2639,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2513,6 +2654,8 @@
       },
       "properties": {
         "OBJECTID": 68402,
+        "FIRE_NUMBER": "2025221",
+        "FIRE_NUMBER_SHORT": "221",
         "FIRE_NAME": "Tweedie Brook",
         "DEGREES_LAT": 46.78485,
         "DEGREES_LONG": 65.14847999999999,
@@ -2527,7 +2670,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2542,6 +2685,8 @@
       },
       "properties": {
         "OBJECTID": 68427,
+        "FIRE_NUMBER": "2025229",
+        "FIRE_NUMBER_SHORT": "229",
         "FIRE_NAME": "Bloomfield Station",
         "DEGREES_LAT": 45.58383,
         "DEGREES_LONG": 65.76167,
@@ -2556,7 +2701,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2571,6 +2716,8 @@
       },
       "properties": {
         "OBJECTID": 68182,
+        "FIRE_NUMBER": "2025195",
+        "FIRE_NUMBER_SHORT": "195",
         "FIRE_NAME": "Lavillette",
         "DEGREES_LAT": 47.263329999999996,
         "DEGREES_LONG": 65.32055,
@@ -2585,7 +2732,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2600,6 +2747,8 @@
       },
       "properties": {
         "OBJECTID": 68483,
+        "FIRE_NUMBER": "2025238",
+        "FIRE_NUMBER_SHORT": "238",
         "FIRE_NAME": "Chemin Tommy",
         "DEGREES_LAT": 47.462509999999995,
         "DEGREES_LONG": 65.00901,
@@ -2614,7 +2763,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2629,6 +2778,8 @@
       },
       "properties": {
         "OBJECTID": 68443,
+        "FIRE_NUMBER": "2025232",
+        "FIRE_NUMBER_SHORT": "232",
         "FIRE_NAME": "Plumweseep Cross",
         "DEGREES_LAT": 45.749,
         "DEGREES_LONG": 65.48772,
@@ -2643,7 +2794,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2658,6 +2809,8 @@
       },
       "properties": {
         "OBJECTID": 68445,
+        "FIRE_NUMBER": "2025234",
+        "FIRE_NUMBER_SHORT": "234",
         "FIRE_NAME": "Gray Road",
         "DEGREES_LAT": 45.80103,
         "DEGREES_LONG": 65.30013,
@@ -2672,7 +2825,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2687,6 +2840,8 @@
       },
       "properties": {
         "OBJECTID": 68022,
+        "FIRE_NUMBER": "2025181",
+        "FIRE_NUMBER_SHORT": "181",
         "FIRE_NAME": "Four-Road",
         "DEGREES_LAT": 47.612449999999995,
         "DEGREES_LONG": 64.86903,
@@ -2701,7 +2856,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2716,6 +2871,8 @@
       },
       "properties": {
         "OBJECTID": 68084,
+        "FIRE_NUMBER": "2025189",
+        "FIRE_NUMBER_SHORT": "189",
         "FIRE_NAME": "Camping Shippagan",
         "DEGREES_LAT": 47.7532,
         "DEGREES_LONG": 64.77120000000001,
@@ -2730,7 +2887,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2745,6 +2902,8 @@
       },
       "properties": {
         "OBJECTID": 67942,
+        "FIRE_NUMBER": "2025177",
+        "FIRE_NUMBER_SHORT": "177",
         "FIRE_NAME": "Bypass",
         "DEGREES_LAT": 45.5784,
         "DEGREES_LONG": 67.32600000000001,
@@ -2759,7 +2918,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2774,6 +2933,8 @@
       },
       "properties": {
         "OBJECTID": 68463,
+        "FIRE_NUMBER": "2025236",
+        "FIRE_NUMBER_SHORT": "236",
         "FIRE_NAME": "Rehab road fire",
         "DEGREES_LAT": 46.775200000000005,
         "DEGREES_LONG": 67.71395,
@@ -2788,7 +2949,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2803,6 +2964,8 @@
       },
       "properties": {
         "OBJECTID": 66084,
+        "FIRE_NUMBER": "2025019",
+        "FIRE_NUMBER_SHORT": "019",
         "FIRE_NAME": "Trendle Place",
         "DEGREES_LAT": 45.27068,
         "DEGREES_LONG": 67.06688,
@@ -2817,7 +2980,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 4.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2832,6 +2995,8 @@
       },
       "properties": {
         "OBJECTID": 65964,
+        "FIRE_NUMBER": "2025007",
+        "FIRE_NUMBER_SHORT": "007",
         "FIRE_NAME": "Sea Breeze",
         "DEGREES_LAT": 46.46425,
         "DEGREES_LONG": 64.66725,
@@ -2846,7 +3011,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2861,6 +3026,8 @@
       },
       "properties": {
         "OBJECTID": 66468,
+        "FIRE_NUMBER": "2025058",
+        "FIRE_NUMBER_SHORT": "058",
         "FIRE_NAME": "Deal Road",
         "DEGREES_LAT": 46.34702,
         "DEGREES_LONG": 67.64045,
@@ -2875,7 +3042,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2890,6 +3057,8 @@
       },
       "properties": {
         "OBJECTID": 67182,
+        "FIRE_NUMBER": "2025132",
+        "FIRE_NUMBER_SHORT": "132",
         "FIRE_NAME": "Gaspereau forks",
         "DEGREES_LAT": 46.23901,
         "DEGREES_LONG": 65.88999,
@@ -2904,7 +3073,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2919,6 +3088,8 @@
       },
       "properties": {
         "OBJECTID": 67662,
+        "FIRE_NUMBER": "2025155",
+        "FIRE_NUMBER_SHORT": "155",
         "FIRE_NAME": "Melvin",
         "DEGREES_LAT": 46.1899,
         "DEGREES_LONG": 64.97086999999999,
@@ -2933,7 +3104,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2948,6 +3119,8 @@
       },
       "properties": {
         "OBJECTID": 66083,
+        "FIRE_NUMBER": "2025018",
+        "FIRE_NUMBER_SHORT": "018",
         "FIRE_NAME": "Covered Bridge",
         "DEGREES_LAT": 45.255829999999996,
         "DEGREES_LONG": 67.00672999999999,
@@ -2962,7 +3135,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -2977,6 +3150,8 @@
       },
       "properties": {
         "OBJECTID": 66242,
+        "FIRE_NUMBER": "2025036",
+        "FIRE_NUMBER_SHORT": "036",
         "FIRE_NAME": "Cody",
         "DEGREES_LAT": 45.08593,
         "DEGREES_LONG": 66.82204999999999,
@@ -2991,7 +3166,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3006,6 +3181,8 @@
       },
       "properties": {
         "OBJECTID": 67742,
+        "FIRE_NUMBER": "2025160",
+        "FIRE_NUMBER_SHORT": "160",
         "FIRE_NAME": "Dilman Rd",
         "DEGREES_LAT": 45.15897,
         "DEGREES_LONG": 66.82821,
@@ -3020,7 +3197,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3035,6 +3212,8 @@
       },
       "properties": {
         "OBJECTID": 67783,
+        "FIRE_NUMBER": "2025163",
+        "FIRE_NUMBER_SHORT": "163",
         "FIRE_NAME": "Fayle Road",
         "DEGREES_LAT": 47.33291,
         "DEGREES_LONG": 65.02850000000001,
@@ -3049,7 +3228,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3064,6 +3243,8 @@
       },
       "properties": {
         "OBJECTID": 67802,
+        "FIRE_NUMBER": "2025165",
+        "FIRE_NUMBER_SHORT": "165",
         "FIRE_NAME": "pigeon hill",
         "DEGREES_LAT": 47.86278,
         "DEGREES_LONG": 64.52358,
@@ -3078,7 +3259,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3093,6 +3274,8 @@
       },
       "properties": {
         "OBJECTID": 67962,
+        "FIRE_NUMBER": "2025178",
+        "FIRE_NUMBER_SHORT": "178",
         "FIRE_NAME": "Shippagan",
         "DEGREES_LAT": 47.727869999999996,
         "DEGREES_LONG": 64.70188999999999,
@@ -3107,7 +3290,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3122,6 +3305,8 @@
       },
       "properties": {
         "OBJECTID": 68243,
+        "FIRE_NUMBER": "2025199",
+        "FIRE_NUMBER_SHORT": "199",
         "FIRE_NAME": "Picketts Cove",
         "DEGREES_LAT": 45.871900000000004,
         "DEGREES_LONG": 65.90071999999999,
@@ -3136,7 +3321,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3151,6 +3336,8 @@
       },
       "properties": {
         "OBJECTID": 68262,
+        "FIRE_NUMBER": "2025200",
+        "FIRE_NUMBER_SHORT": "200",
         "FIRE_NAME": "Gravel Road",
         "DEGREES_LAT": 45.483529999999995,
         "DEGREES_LONG": 66.15684999999999,
@@ -3165,7 +3352,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3180,6 +3367,8 @@
       },
       "properties": {
         "OBJECTID": 68309,
+        "FIRE_NUMBER": "2025210",
+        "FIRE_NUMBER_SHORT": "210",
         "FIRE_NAME": "Golf",
         "DEGREES_LAT": 46.5797,
         "DEGREES_LONG": 65.01323,
@@ -3194,7 +3383,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3209,6 +3398,8 @@
       },
       "properties": {
         "OBJECTID": 68527,
+        "FIRE_NUMBER": "2025248",
+        "FIRE_NUMBER_SHORT": "248",
         "FIRE_NAME": "Cam Dri",
         "DEGREES_LAT": 45.87349,
         "DEGREES_LONG": 66.37031,
@@ -3223,7 +3414,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3238,6 +3429,8 @@
       },
       "properties": {
         "OBJECTID": 65966,
+        "FIRE_NUMBER": "2025009",
+        "FIRE_NUMBER_SHORT": "009",
         "FIRE_NAME": "Tobique Narrows",
         "DEGREES_LAT": 46.76658,
         "DEGREES_LONG": 67.6987,
@@ -3252,7 +3445,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3267,6 +3460,8 @@
       },
       "properties": {
         "OBJECTID": 65982,
+        "FIRE_NUMBER": "2025010",
+        "FIRE_NUMBER_SHORT": "010",
         "FIRE_NAME": "Church",
         "DEGREES_LAT": 46.71525,
         "DEGREES_LONG": 65.28603,
@@ -3281,7 +3476,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3296,6 +3491,8 @@
       },
       "properties": {
         "OBJECTID": 66022,
+        "FIRE_NUMBER": "2025012",
+        "FIRE_NUMBER_SHORT": "012",
         "FIRE_NAME": "McCoy Meadows",
         "DEGREES_LAT": 45.239509999999996,
         "DEGREES_LONG": 66.80413,
@@ -3310,7 +3507,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 4.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3325,6 +3522,8 @@
       },
       "properties": {
         "OBJECTID": 66467,
+        "FIRE_NUMBER": "2025057",
+        "FIRE_NUMBER_SHORT": "057",
         "FIRE_NAME": "Tweedie",
         "DEGREES_LAT": 46.79743,
         "DEGREES_LONG": 65.0133,
@@ -3339,7 +3538,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3354,6 +3553,8 @@
       },
       "properties": {
         "OBJECTID": 67082,
+        "FIRE_NUMBER": "2025125",
+        "FIRE_NUMBER_SHORT": "125",
         "FIRE_NAME": "Curtis Lane",
         "DEGREES_LAT": 45.94293,
         "DEGREES_LONG": 67.14165,
@@ -3368,7 +3569,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3383,6 +3584,8 @@
       },
       "properties": {
         "OBJECTID": 67122,
+        "FIRE_NUMBER": "2025129",
+        "FIRE_NUMBER_SHORT": "129",
         "FIRE_NAME": "Little River",
         "DEGREES_LAT": 47.57225,
         "DEGREES_LONG": 65.69878,
@@ -3397,7 +3600,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3412,6 +3615,8 @@
       },
       "properties": {
         "OBJECTID": 67262,
+        "FIRE_NUMBER": "2025136",
+        "FIRE_NUMBER_SHORT": "136",
         "FIRE_NAME": "Richardsville",
         "DEGREES_LAT": 48.001619999999996,
         "DEGREES_LONG": 66.63573,
@@ -3426,7 +3631,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3441,6 +3646,8 @@
       },
       "properties": {
         "OBJECTID": 68045,
+        "FIRE_NUMBER": "2025185",
+        "FIRE_NUMBER_SHORT": "185",
         "FIRE_NAME": "Log Falls Campfire",
         "DEGREES_LAT": 45.207409999999996,
         "DEGREES_LONG": 66.37301,
@@ -3455,7 +3662,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3470,6 +3677,8 @@
       },
       "properties": {
         "OBJECTID": 68082,
+        "FIRE_NUMBER": "2025187",
+        "FIRE_NUMBER_SHORT": "187",
         "FIRE_NAME": "Orange Hill",
         "DEGREES_LAT": 45.362,
         "DEGREES_LONG": 65.53332999999999,
@@ -3484,7 +3693,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3499,6 +3708,8 @@
       },
       "properties": {
         "OBJECTID": 68622,
+        "FIRE_NUMBER": "2025268",
+        "FIRE_NUMBER_SHORT": "268",
         "FIRE_NAME": "Bass Brook",
         "DEGREES_LAT": 47.485119999999995,
         "DEGREES_LONG": 65.56183,
@@ -3513,7 +3724,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3528,6 +3739,8 @@
       },
       "properties": {
         "OBJECTID": 66002,
+        "FIRE_NUMBER": "2025011",
+        "FIRE_NUMBER_SHORT": "011",
         "FIRE_NAME": "Trailer",
         "DEGREES_LAT": 46.7421,
         "DEGREES_LONG": 65.20112999999999,
@@ -3542,7 +3755,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3557,6 +3770,8 @@
       },
       "properties": {
         "OBJECTID": 66342,
+        "FIRE_NUMBER": "2025042",
+        "FIRE_NUMBER_SHORT": "042",
         "FIRE_NAME": "WSI Road",
         "DEGREES_LAT": 46.097919999999995,
         "DEGREES_LONG": 66.02678,
@@ -3571,7 +3786,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3586,6 +3801,8 @@
       },
       "properties": {
         "OBJECTID": 66604,
+        "FIRE_NUMBER": "2025072",
+        "FIRE_NUMBER_SHORT": "072",
         "FIRE_NAME": "River",
         "DEGREES_LAT": 46.54078,
         "DEGREES_LONG": 64.90841999999999,
@@ -3600,7 +3817,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3615,6 +3832,8 @@
       },
       "properties": {
         "OBJECTID": 66482,
+        "FIRE_NUMBER": "2025060",
+        "FIRE_NUMBER_SHORT": "060",
         "FIRE_NAME": "Broken Shed",
         "DEGREES_LAT": 46.138169999999995,
         "DEGREES_LONG": 67.20344,
@@ -3629,7 +3848,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3644,6 +3863,8 @@
       },
       "properties": {
         "OBJECTID": 66483,
+        "FIRE_NUMBER": "2025061",
+        "FIRE_NUMBER_SHORT": "061",
         "FIRE_NAME": "Monsoon Lagoon",
         "DEGREES_LAT": 45.27131,
         "DEGREES_LONG": 66.84406,
@@ -3658,7 +3879,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3673,6 +3894,8 @@
       },
       "properties": {
         "OBJECTID": 66668,
+        "FIRE_NUMBER": "2025084",
+        "FIRE_NUMBER_SHORT": "084",
         "FIRE_NAME": "ATV 115",
         "DEGREES_LAT": 46.757200000000005,
         "DEGREES_LONG": 67.71463,
@@ -3687,7 +3910,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3702,6 +3925,8 @@
       },
       "properties": {
         "OBJECTID": 66682,
+        "FIRE_NUMBER": "2025088",
+        "FIRE_NUMBER_SHORT": "088",
         "FIRE_NAME": "St Margarets",
         "DEGREES_LAT": 46.907779999999995,
         "DEGREES_LONG": 65.19704999999999,
@@ -3716,7 +3941,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3731,6 +3956,8 @@
       },
       "properties": {
         "OBJECTID": 66702,
+        "FIRE_NUMBER": "2025091",
+        "FIRE_NUMBER_SHORT": "091",
         "FIRE_NAME": "Bottom",
         "DEGREES_LAT": 46.593689999999995,
         "DEGREES_LONG": 64.99896,
@@ -3745,7 +3972,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3760,6 +3987,8 @@
       },
       "properties": {
         "OBJECTID": 66669,
+        "FIRE_NUMBER": "2025085",
+        "FIRE_NUMBER_SHORT": "085",
         "FIRE_NAME": "Long Reach",
         "DEGREES_LAT": 45.47972,
         "DEGREES_LONG": 66.08336,
@@ -3774,7 +4003,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3789,6 +4018,8 @@
       },
       "properties": {
         "OBJECTID": 66282,
+        "FIRE_NUMBER": "2025039",
+        "FIRE_NUMBER_SHORT": "039",
         "FIRE_NAME": "Salt Shed",
         "DEGREES_LAT": 45.947379999999995,
         "DEGREES_LONG": 66.86274999999999,
@@ -3803,7 +4034,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3818,6 +4049,8 @@
       },
       "properties": {
         "OBJECTID": 66722,
+        "FIRE_NUMBER": "2025096",
+        "FIRE_NUMBER_SHORT": "096",
         "FIRE_NAME": "Dirt Pile",
         "DEGREES_LAT": 46.6169,
         "DEGREES_LONG": 64.84772,
@@ -3832,7 +4065,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3847,6 +4080,8 @@
       },
       "properties": {
         "OBJECTID": 66782,
+        "FIRE_NUMBER": "2025100",
+        "FIRE_NUMBER_SHORT": "100",
         "FIRE_NAME": "Old scale",
         "DEGREES_LAT": 47.34173,
         "DEGREES_LONG": 68.20482,
@@ -3861,7 +4096,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3876,6 +4111,8 @@
       },
       "properties": {
         "OBJECTID": 66902,
+        "FIRE_NUMBER": "2025107",
+        "FIRE_NUMBER_SHORT": "107",
         "FIRE_NAME": "8X8",
         "DEGREES_LAT": 46.35988,
         "DEGREES_LONG": 65.96588,
@@ -3890,7 +4127,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3905,6 +4142,8 @@
       },
       "properties": {
         "OBJECTID": 66924,
+        "FIRE_NUMBER": "2025110",
+        "FIRE_NUMBER_SHORT": "110",
         "FIRE_NAME": "The Narrows",
         "DEGREES_LAT": 45.83455,
         "DEGREES_LONG": 65.93196999999999,
@@ -3919,7 +4158,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3934,6 +4173,8 @@
       },
       "properties": {
         "OBJECTID": 67042,
+        "FIRE_NUMBER": "2025122",
+        "FIRE_NUMBER_SHORT": "122",
         "FIRE_NAME": "Buncher",
         "DEGREES_LAT": 46.23855,
         "DEGREES_LONG": 65.0607,
@@ -3948,7 +4189,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3963,6 +4204,8 @@
       },
       "properties": {
         "OBJECTID": 66422,
+        "FIRE_NUMBER": "2025049",
+        "FIRE_NUMBER_SHORT": "049",
         "FIRE_NAME": "Oromocto River",
         "DEGREES_LAT": 45.843669999999996,
         "DEGREES_LONG": 66.51847,
@@ -3977,7 +4220,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -3992,6 +4235,8 @@
       },
       "properties": {
         "OBJECTID": 67083,
+        "FIRE_NUMBER": "2025126",
+        "FIRE_NUMBER_SHORT": "126",
         "FIRE_NAME": "Church 2",
         "DEGREES_LAT": 46.373169999999995,
         "DEGREES_LONG": 65.10482999999999,
@@ -4006,7 +4251,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4021,6 +4266,8 @@
       },
       "properties": {
         "OBJECTID": 67322,
+        "FIRE_NUMBER": "2025139",
+        "FIRE_NUMBER_SHORT": "139",
         "FIRE_NAME": "Drift Pile",
         "DEGREES_LAT": 45.92911,
         "DEGREES_LONG": 67.0428,
@@ -4035,7 +4282,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4050,6 +4297,8 @@
       },
       "properties": {
         "OBJECTID": 67342,
+        "FIRE_NUMBER": "2025140",
+        "FIRE_NUMBER_SHORT": "140",
         "FIRE_NAME": "Hatchery",
         "DEGREES_LAT": 45.20346,
         "DEGREES_LONG": 66.86478,
@@ -4064,7 +4313,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4079,6 +4328,8 @@
       },
       "properties": {
         "OBJECTID": 67462,
+        "FIRE_NUMBER": "2025145",
+        "FIRE_NUMBER_SHORT": "145",
         "FIRE_NAME": "Bear Creek",
         "DEGREES_LAT": 46.144909999999996,
         "DEGREES_LONG": 64.40865,
@@ -4093,7 +4344,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4108,6 +4359,8 @@
       },
       "properties": {
         "OBJECTID": 67683,
+        "FIRE_NUMBER": "2025157",
+        "FIRE_NUMBER_SHORT": "157",
         "FIRE_NAME": "Crooked Falls",
         "DEGREES_LAT": 45.763419999999996,
         "DEGREES_LONG": 64.7487,
@@ -4122,7 +4375,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4137,6 +4390,8 @@
       },
       "properties": {
         "OBJECTID": 67823,
+        "FIRE_NUMBER": "2025168",
+        "FIRE_NUMBER_SHORT": "168",
         "FIRE_NAME": "Vern Fire",
         "DEGREES_LAT": 45.160329999999995,
         "DEGREES_LONG": 67.31942,
@@ -4151,7 +4406,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4166,6 +4421,8 @@
       },
       "properties": {
         "OBJECTID": 66263,
+        "FIRE_NUMBER": "2025038",
+        "FIRE_NUMBER_SHORT": "038",
         "FIRE_NAME": "Drurys Cove",
         "DEGREES_LAT": 45.60593,
         "DEGREES_LONG": 65.6213,
@@ -4180,7 +4437,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4195,6 +4452,8 @@
       },
       "properties": {
         "OBJECTID": 66665,
+        "FIRE_NUMBER": "2025081",
+        "FIRE_NUMBER_SHORT": "081",
         "FIRE_NAME": "Train Track",
         "DEGREES_LAT": 46.638279999999995,
         "DEGREES_LONG": 65.36267,
@@ -4209,7 +4468,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4224,6 +4483,8 @@
       },
       "properties": {
         "OBJECTID": 66044,
+        "FIRE_NUMBER": "2025015",
+        "FIRE_NUMBER_SHORT": "015",
         "FIRE_NAME": "Softball",
         "DEGREES_LAT": 45.66872,
         "DEGREES_LONG": 66.71597,
@@ -4238,7 +4499,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4253,6 +4514,8 @@
       },
       "properties": {
         "OBJECTID": 66582,
+        "FIRE_NUMBER": "2025069",
+        "FIRE_NUMBER_SHORT": "069",
         "FIRE_NAME": "North Barnaby",
         "DEGREES_LAT": 46.889779999999995,
         "DEGREES_LONG": 65.5383,
@@ -4267,7 +4530,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4282,6 +4545,8 @@
       },
       "properties": {
         "OBJECTID": 66862,
+        "FIRE_NUMBER": "2025104",
+        "FIRE_NUMBER_SHORT": "104",
         "FIRE_NAME": "Oil Filter",
         "DEGREES_LAT": 46.486909999999995,
         "DEGREES_LONG": 67.42985,
@@ -4296,7 +4561,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4311,6 +4576,8 @@
       },
       "properties": {
         "OBJECTID": 67102,
+        "FIRE_NUMBER": "2025128",
+        "FIRE_NUMBER_SHORT": "128",
         "FIRE_NAME": "MacLeod Brook",
         "DEGREES_LAT": 46.39487,
         "DEGREES_LONG": 65.70772,
@@ -4325,7 +4592,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4340,6 +4607,8 @@
       },
       "properties": {
         "OBJECTID": 67882,
+        "FIRE_NUMBER": "2025173",
+        "FIRE_NUMBER_SHORT": "173",
         "FIRE_NAME": "Christmas Tree",
         "DEGREES_LAT": 46.30735,
         "DEGREES_LONG": 67.56788,
@@ -4354,7 +4623,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4369,6 +4638,8 @@
       },
       "properties": {
         "OBJECTID": 68042,
+        "FIRE_NUMBER": "2025182",
+        "FIRE_NUMBER_SHORT": "182",
         "FIRE_NAME": "Rue de L'église",
         "DEGREES_LAT": 47.794619999999995,
         "DEGREES_LONG": 64.55762,
@@ -4383,7 +4654,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4398,6 +4669,8 @@
       },
       "properties": {
         "OBJECTID": 68282,
+        "FIRE_NUMBER": "2025202",
+        "FIRE_NUMBER_SHORT": "202",
         "FIRE_NAME": "KC",
         "DEGREES_LAT": 47.631879999999995,
         "DEGREES_LONG": 65.68466,
@@ -4412,7 +4685,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4427,6 +4700,8 @@
       },
       "properties": {
         "OBJECTID": 68306,
+        "FIRE_NUMBER": "2025207",
+        "FIRE_NUMBER_SHORT": "207",
         "FIRE_NAME": "2296 Route 890",
         "DEGREES_LAT": 45.90118,
         "DEGREES_LONG": 65.35425,
@@ -4441,7 +4716,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4456,6 +4731,8 @@
       },
       "properties": {
         "OBJECTID": 68382,
+        "FIRE_NUMBER": "2025217",
+        "FIRE_NUMBER_SHORT": "217",
         "FIRE_NAME": "Bouctouche River",
         "DEGREES_LAT": 46.32167,
         "DEGREES_LONG": 64.98962,
@@ -4470,7 +4747,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4485,6 +4762,8 @@
       },
       "properties": {
         "OBJECTID": 66126,
+        "FIRE_NUMBER": "2025026",
+        "FIRE_NUMBER_SHORT": "026",
         "FIRE_NAME": "Ripples Station",
         "DEGREES_LAT": 45.96644,
         "DEGREES_LONG": 66.21954,
@@ -4499,7 +4778,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4514,6 +4793,8 @@
       },
       "properties": {
         "OBJECTID": 68423,
+        "FIRE_NUMBER": "2025226",
+        "FIRE_NUMBER_SHORT": "226",
         "FIRE_NAME": "Brittain Road II",
         "DEGREES_LAT": 45.47705,
         "DEGREES_LONG": 66.17148999999999,
@@ -4528,7 +4809,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4543,6 +4824,8 @@
       },
       "properties": {
         "OBJECTID": 66127,
+        "FIRE_NUMBER": "2025027",
+        "FIRE_NUMBER_SHORT": "027",
         "FIRE_NAME": "Limekiln Road",
         "DEGREES_LAT": 45.07515,
         "DEGREES_LONG": 66.82153,
@@ -4557,7 +4840,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4572,6 +4855,8 @@
       },
       "properties": {
         "OBJECTID": 66103,
+        "FIRE_NUMBER": "2025021",
+        "FIRE_NUMBER_SHORT": "021",
         "FIRE_NAME": "Bowmaster Flat",
         "DEGREES_LAT": 46.68587,
         "DEGREES_LONG": 67.72728,
@@ -4586,7 +4871,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4601,6 +4886,8 @@
       },
       "properties": {
         "OBJECTID": 66128,
+        "FIRE_NUMBER": "2025028",
+        "FIRE_NUMBER_SHORT": "028",
         "FIRE_NAME": "845",
         "DEGREES_LAT": 45.4992,
         "DEGREES_LONG": 65.98008,
@@ -4615,7 +4902,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4630,6 +4917,8 @@
       },
       "properties": {
         "OBJECTID": 66222,
+        "FIRE_NUMBER": "2025035",
+        "FIRE_NUMBER_SHORT": "035",
         "FIRE_NAME": "Crossing Road",
         "DEGREES_LAT": 46.45755,
         "DEGREES_LONG": 66.47744999999999,
@@ -4644,7 +4933,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4659,6 +4948,8 @@
       },
       "properties": {
         "OBJECTID": 66382,
+        "FIRE_NUMBER": "2025044",
+        "FIRE_NUMBER_SHORT": "044",
         "FIRE_NAME": "Ivey Road",
         "DEGREES_LAT": 46.040009999999995,
         "DEGREES_LONG": 67.68351,
@@ -4673,7 +4964,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4688,6 +4979,8 @@
       },
       "properties": {
         "OBJECTID": 66466,
+        "FIRE_NUMBER": "2025056",
+        "FIRE_NUMBER_SHORT": "056",
         "FIRE_NAME": "Risteen",
         "DEGREES_LAT": 45.9009,
         "DEGREES_LONG": 67.4894,
@@ -4702,7 +4995,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4717,6 +5010,8 @@
       },
       "properties": {
         "OBJECTID": 66462,
+        "FIRE_NUMBER": "2025052",
+        "FIRE_NUMBER_SHORT": "052",
         "FIRE_NAME": "Rusagonis Birch",
         "DEGREES_LAT": 45.826029999999996,
         "DEGREES_LONG": 66.64784999999999,
@@ -4731,7 +5026,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4746,6 +5041,8 @@
       },
       "properties": {
         "OBJECTID": 66503,
+        "FIRE_NUMBER": "2025063",
+        "FIRE_NUMBER_SHORT": "063",
         "FIRE_NAME": "Ballfield",
         "DEGREES_LAT": 45.9521,
         "DEGREES_LONG": 66.85090000000001,
@@ -4760,7 +5057,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4775,6 +5072,8 @@
       },
       "properties": {
         "OBJECTID": 66542,
+        "FIRE_NUMBER": "2025066",
+        "FIRE_NUMBER_SHORT": "066",
         "FIRE_NAME": "Brundle",
         "DEGREES_LAT": 46.064969999999995,
         "DEGREES_LONG": 67.24893,
@@ -4789,7 +5088,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4804,6 +5103,8 @@
       },
       "properties": {
         "OBJECTID": 66622,
+        "FIRE_NUMBER": "2025076",
+        "FIRE_NUMBER_SHORT": "076",
         "FIRE_NAME": "Beach Glen",
         "DEGREES_LAT": 46.70195,
         "DEGREES_LONG": 67.6884,
@@ -4818,7 +5119,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4833,6 +5134,8 @@
       },
       "properties": {
         "OBJECTID": 66684,
+        "FIRE_NUMBER": "2025090",
+        "FIRE_NUMBER_SHORT": "090",
         "FIRE_NAME": "Line",
         "DEGREES_LAT": 46.528819999999996,
         "DEGREES_LONG": 65.10025,
@@ -4847,7 +5150,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4862,6 +5165,8 @@
       },
       "properties": {
         "OBJECTID": 66642,
+        "FIRE_NUMBER": "2025077",
+        "FIRE_NUMBER_SHORT": "077",
         "FIRE_NAME": "Damascus Road",
         "DEGREES_LAT": 45.454,
         "DEGREES_LONG": 65.80977,
@@ -4876,7 +5181,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4891,6 +5196,8 @@
       },
       "properties": {
         "OBJECTID": 66822,
+        "FIRE_NUMBER": "2025102",
+        "FIRE_NUMBER_SHORT": "102",
         "FIRE_NAME": "la croix",
         "DEGREES_LAT": 47.346869999999996,
         "DEGREES_LONG": 67.87904,
@@ -4905,7 +5212,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4920,6 +5227,8 @@
       },
       "properties": {
         "OBJECTID": 66965,
+        "FIRE_NUMBER": "2025116",
+        "FIRE_NUMBER_SHORT": "116",
         "FIRE_NAME": "House",
         "DEGREES_LAT": 47.34608,
         "DEGREES_LONG": 65.10029,
@@ -4934,7 +5243,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4949,6 +5258,8 @@
       },
       "properties": {
         "OBJECTID": 66963,
+        "FIRE_NUMBER": "2025114",
+        "FIRE_NUMBER_SHORT": "114",
         "FIRE_NAME": "Bridge Street",
         "DEGREES_LAT": 46.90585,
         "DEGREES_LONG": 67.39448,
@@ -4963,7 +5274,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -4978,6 +5289,8 @@
       },
       "properties": {
         "OBJECTID": 67402,
+        "FIRE_NUMBER": "2025143",
+        "FIRE_NUMBER_SHORT": "143",
         "FIRE_NAME": "Peters Road 1",
         "DEGREES_LAT": 47.23133,
         "DEGREES_LONG": 65.12452,
@@ -4992,7 +5305,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5007,6 +5320,8 @@
       },
       "properties": {
         "OBJECTID": 67542,
+        "FIRE_NUMBER": "2025149",
+        "FIRE_NUMBER_SHORT": "149",
         "FIRE_NAME": "Norton Graveyard",
         "DEGREES_LAT": 45.635549999999995,
         "DEGREES_LONG": 65.69313,
@@ -5021,7 +5336,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5036,6 +5351,8 @@
       },
       "properties": {
         "OBJECTID": 67562,
+        "FIRE_NUMBER": "2025150",
+        "FIRE_NUMBER_SHORT": "150",
         "FIRE_NAME": "Pokiok Road",
         "DEGREES_LAT": 45.95787,
         "DEGREES_LONG": 67.24342,
@@ -5050,7 +5367,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5065,6 +5382,8 @@
       },
       "properties": {
         "OBJECTID": 67642,
+        "FIRE_NUMBER": "2025153",
+        "FIRE_NUMBER_SHORT": "153",
         "FIRE_NAME": "Pont Flottant",
         "DEGREES_LAT": 47.903569999999995,
         "DEGREES_LONG": 68.18585,
@@ -5079,7 +5398,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5094,6 +5413,8 @@
       },
       "properties": {
         "OBJECTID": 67622,
+        "FIRE_NUMBER": "2025023",
+        "FIRE_NUMBER_SHORT": "023",
         "FIRE_NAME": "Lloyd road",
         "DEGREES_LAT": 47.577329999999996,
         "DEGREES_LONG": 65.67683,
@@ -5108,7 +5429,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5123,6 +5444,8 @@
       },
       "properties": {
         "OBJECTID": 67682,
+        "FIRE_NUMBER": "2025156",
+        "FIRE_NUMBER_SHORT": "156",
         "FIRE_NAME": "Greys",
         "DEGREES_LAT": 45.937549999999995,
         "DEGREES_LONG": 64.64423,
@@ -5137,7 +5460,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5152,6 +5475,8 @@
       },
       "properties": {
         "OBJECTID": 67822,
+        "FIRE_NUMBER": "2025167",
+        "FIRE_NUMBER_SHORT": "167",
         "FIRE_NAME": "Tracadie Peat",
         "DEGREES_LAT": 47.547889999999995,
         "DEGREES_LONG": 64.92837999999999,
@@ -5166,7 +5491,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5181,6 +5506,8 @@
       },
       "properties": {
         "OBJECTID": 67862,
+        "FIRE_NUMBER": "2025172",
+        "FIRE_NUMBER_SHORT": "172",
         "FIRE_NAME": "inkerman",
         "DEGREES_LAT": 47.673249999999996,
         "DEGREES_LONG": 64.84264,
@@ -5195,7 +5522,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5210,6 +5537,8 @@
       },
       "properties": {
         "OBJECTID": 67602,
+        "FIRE_NUMBER": "2025152",
+        "FIRE_NUMBER_SHORT": "152",
         "FIRE_NAME": "Mounds",
         "DEGREES_LAT": 46.961819999999996,
         "DEGREES_LONG": 64.85470000000001,
@@ -5224,7 +5553,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5239,6 +5568,8 @@
       },
       "properties": {
         "OBJECTID": 68322,
+        "FIRE_NUMBER": "2025213",
+        "FIRE_NUMBER_SHORT": "213",
         "FIRE_NAME": "Wood Island",
         "DEGREES_LAT": 44.62367,
         "DEGREES_LONG": 66.81466999999999,
@@ -5253,7 +5584,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5268,6 +5599,8 @@
       },
       "properties": {
         "OBJECTID": 65922,
+        "FIRE_NUMBER": "2025003",
+        "FIRE_NUMBER_SHORT": "003",
         "FIRE_NAME": "Honey Bee",
         "DEGREES_LAT": 45.978,
         "DEGREES_LONG": 64.6556,
@@ -5282,7 +5615,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5297,6 +5630,8 @@
       },
       "properties": {
         "OBJECTID": 66125,
+        "FIRE_NUMBER": "2025025",
+        "FIRE_NUMBER_SHORT": "025",
         "FIRE_NAME": "Tobique Road",
         "DEGREES_LAT": 47.00678,
         "DEGREES_LONG": 67.61392,
@@ -5311,7 +5646,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5326,6 +5661,8 @@
       },
       "properties": {
         "OBJECTID": 66129,
+        "FIRE_NUMBER": "2025029",
+        "FIRE_NUMBER_SHORT": "029",
         "FIRE_NAME": "Waterside",
         "DEGREES_LAT": 45.804500000000004,
         "DEGREES_LONG": 65.9541,
@@ -5340,7 +5677,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5355,6 +5692,8 @@
       },
       "properties": {
         "OBJECTID": 66102,
+        "FIRE_NUMBER": "2025020",
+        "FIRE_NUMBER_SHORT": "020",
         "FIRE_NAME": "Old Route 106",
         "DEGREES_LAT": 46.61313,
         "DEGREES_LONG": 67.72425,
@@ -5369,7 +5708,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5384,6 +5723,8 @@
       },
       "properties": {
         "OBJECTID": 66464,
+        "FIRE_NUMBER": "2025054",
+        "FIRE_NUMBER_SHORT": "054",
         "FIRE_NAME": "Whittaker barrel",
         "DEGREES_LAT": 45.78892,
         "DEGREES_LONG": 66.6485,
@@ -5398,7 +5739,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5413,6 +5754,8 @@
       },
       "properties": {
         "OBJECTID": 66605,
+        "FIRE_NUMBER": "2025073",
+        "FIRE_NUMBER_SHORT": "073",
         "FIRE_NAME": "Lawn",
         "DEGREES_LAT": 46.621649999999995,
         "DEGREES_LONG": 64.85242,
@@ -5427,7 +5770,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5442,6 +5785,8 @@
       },
       "properties": {
         "OBJECTID": 66667,
+        "FIRE_NUMBER": "2025083",
+        "FIRE_NUMBER_SHORT": "083",
         "FIRE_NAME": "Wallace Fire",
         "DEGREES_LAT": 45.054629999999996,
         "DEGREES_LONG": 66.78926,
@@ -5456,7 +5801,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5471,6 +5816,8 @@
       },
       "properties": {
         "OBJECTID": 67142,
+        "FIRE_NUMBER": "2025130",
+        "FIRE_NUMBER_SHORT": "130",
         "FIRE_NAME": "New Avon",
         "DEGREES_LAT": 46.10547,
         "DEGREES_LONG": 65.51822,
@@ -5485,7 +5832,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5500,6 +5847,8 @@
       },
       "properties": {
         "OBJECTID": 66124,
+        "FIRE_NUMBER": "2025024",
+        "FIRE_NUMBER_SHORT": "024",
         "FIRE_NAME": "Hunters Home",
         "DEGREES_LAT": 46.003389999999996,
         "DEGREES_LONG": 65.63982,
@@ -5514,7 +5863,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5529,6 +5878,8 @@
       },
       "properties": {
         "OBJECTID": 66402,
+        "FIRE_NUMBER": "2025046",
+        "FIRE_NUMBER_SHORT": "046",
         "FIRE_NAME": "Sheffield",
         "DEGREES_LAT": 45.89132,
         "DEGREES_LONG": 66.31777,
@@ -5543,7 +5894,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5558,6 +5909,8 @@
       },
       "properties": {
         "OBJECTID": 66666,
+        "FIRE_NUMBER": "2025082",
+        "FIRE_NUMBER_SHORT": "082",
         "FIRE_NAME": "Charters Brush",
         "DEGREES_LAT": 45.86445,
         "DEGREES_LONG": 66.71144,
@@ -5572,7 +5925,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5587,6 +5940,8 @@
       },
       "properties": {
         "OBJECTID": 66703,
+        "FIRE_NUMBER": "2025092",
+        "FIRE_NUMBER_SHORT": "092",
         "FIRE_NAME": "Swamp Fire",
         "DEGREES_LAT": 45.06532,
         "DEGREES_LONG": 66.86856,
@@ -5601,7 +5956,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5616,6 +5971,8 @@
       },
       "properties": {
         "OBJECTID": 66705,
+        "FIRE_NUMBER": "2025094",
+        "FIRE_NUMBER_SHORT": "094",
         "FIRE_NAME": "Aspen",
         "DEGREES_LAT": 46.743629999999996,
         "DEGREES_LONG": 64.95935,
@@ -5630,7 +5987,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5645,6 +6002,8 @@
       },
       "properties": {
         "OBJECTID": 66706,
+        "FIRE_NUMBER": "2025095",
+        "FIRE_NUMBER_SHORT": "095",
         "FIRE_NAME": "Buck Rd.",
         "DEGREES_LAT": 46.1026,
         "DEGREES_LONG": 66.08552999999999,
@@ -5659,7 +6018,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5674,6 +6033,8 @@
       },
       "properties": {
         "OBJECTID": 68444,
+        "FIRE_NUMBER": "2025233",
+        "FIRE_NUMBER_SHORT": "233",
         "FIRE_NAME": "Post",
         "DEGREES_LAT": 46.118300000000005,
         "DEGREES_LONG": 66.0019,
@@ -5688,7 +6049,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5703,6 +6064,8 @@
       },
       "properties": {
         "OBJECTID": 68525,
+        "FIRE_NUMBER": "2025246",
+        "FIRE_NUMBER_SHORT": "246",
         "FIRE_NAME": "Bordage Rd",
         "DEGREES_LAT": 47.51883,
         "DEGREES_LONG": 65.14511999999999,
@@ -5717,7 +6080,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5732,6 +6095,8 @@
       },
       "properties": {
         "OBJECTID": 67062,
+        "FIRE_NUMBER": "2025123",
+        "FIRE_NUMBER_SHORT": "123",
         "FIRE_NAME": "EEL Rails",
         "DEGREES_LAT": 48.01867,
         "DEGREES_LONG": 66.41511,
@@ -5746,7 +6111,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5761,6 +6126,8 @@
       },
       "properties": {
         "OBJECTID": 67803,
+        "FIRE_NUMBER": "2025166",
+        "FIRE_NUMBER_SHORT": "166",
         "FIRE_NAME": "Oak Haven Slash",
         "DEGREES_LAT": 45.18578,
         "DEGREES_LONG": 67.20452999999999,
@@ -5775,7 +6142,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5790,6 +6157,8 @@
       },
       "properties": {
         "OBJECTID": 68102,
+        "FIRE_NUMBER": "2025191",
+        "FIRE_NUMBER_SHORT": "191",
         "FIRE_NAME": "Mapleton",
         "DEGREES_LAT": 45.814569999999996,
         "DEGREES_LONG": 65.1098,
@@ -5804,7 +6173,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5819,6 +6188,8 @@
       },
       "properties": {
         "OBJECTID": 68062,
+        "FIRE_NUMBER": "2025186",
+        "FIRE_NUMBER_SHORT": "186",
         "FIRE_NAME": "rail line3",
         "DEGREES_LAT": 46.13975,
         "DEGREES_LONG": 65.02081,
@@ -5833,7 +6204,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5848,6 +6219,8 @@
       },
       "properties": {
         "OBJECTID": 68305,
+        "FIRE_NUMBER": "2025206",
+        "FIRE_NUMBER_SHORT": "206",
         "FIRE_NAME": "Clearwater road",
         "DEGREES_LAT": 47.74933,
         "DEGREES_LONG": 67.78586,
@@ -5862,7 +6235,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5877,6 +6250,8 @@
       },
       "properties": {
         "OBJECTID": 66122,
+        "FIRE_NUMBER": "2025022",
+        "FIRE_NUMBER_SHORT": "022",
         "FIRE_NAME": "Route 745",
         "DEGREES_LAT": 45.32472,
         "DEGREES_LONG": 67.32831999999999,
@@ -5891,7 +6266,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5906,6 +6281,8 @@
       },
       "properties": {
         "OBJECTID": 66502,
+        "FIRE_NUMBER": "2025062",
+        "FIRE_NUMBER_SHORT": "062",
         "FIRE_NAME": "Washer Tub",
         "DEGREES_LAT": 45.879200000000004,
         "DEGREES_LONG": 66.49002999999999,
@@ -5920,7 +6297,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5935,6 +6312,8 @@
       },
       "properties": {
         "OBJECTID": 66504,
+        "FIRE_NUMBER": "2025064",
+        "FIRE_NUMBER_SHORT": "064",
         "FIRE_NAME": "Stewart Meadow",
         "DEGREES_LAT": 45.26733,
         "DEGREES_LONG": 66.86514,
@@ -5949,7 +6328,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 33.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5964,6 +6343,8 @@
       },
       "properties": {
         "OBJECTID": 67063,
+        "FIRE_NUMBER": "2025124",
+        "FIRE_NUMBER_SHORT": "124",
         "FIRE_NAME": "Carroll Ridge",
         "DEGREES_LAT": 45.87238,
         "DEGREES_LONG": 67.456,
@@ -5978,7 +6359,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -5993,6 +6374,8 @@
       },
       "properties": {
         "OBJECTID": 67202,
+        "FIRE_NUMBER": "2025133",
+        "FIRE_NUMBER_SHORT": "133",
         "FIRE_NAME": "English Settlement",
         "DEGREES_LAT": 46.19025,
         "DEGREES_LONG": 66.64207999999999,
@@ -6007,7 +6390,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6022,6 +6405,8 @@
       },
       "properties": {
         "OBJECTID": 67242,
+        "FIRE_NUMBER": "2025135",
+        "FIRE_NUMBER_SHORT": "135",
         "FIRE_NAME": "Algonquin1E4",
         "DEGREES_LAT": 47.202569999999994,
         "DEGREES_LONG": 65.12415,
@@ -6036,7 +6421,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6051,6 +6436,8 @@
       },
       "properties": {
         "OBJECTID": 67382,
+        "FIRE_NUMBER": "2025142",
+        "FIRE_NUMBER_SHORT": "142",
         "FIRE_NAME": "Hawkshaw Bridge",
         "DEGREES_LAT": 45.95787,
         "DEGREES_LONG": 67.24342,
@@ -6065,7 +6452,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6080,6 +6467,8 @@
       },
       "properties": {
         "OBJECTID": 67522,
+        "FIRE_NUMBER": "2025148",
+        "FIRE_NUMBER_SHORT": "148",
         "FIRE_NAME": "Eagle Rock Trail",
         "DEGREES_LAT": 45.42608,
         "DEGREES_LONG": 66.32418,
@@ -6094,7 +6483,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6109,6 +6498,8 @@
       },
       "properties": {
         "OBJECTID": 67824,
+        "FIRE_NUMBER": "2025169",
+        "FIRE_NUMBER_SHORT": "169",
         "FIRE_NAME": "Hay Settlement",
         "DEGREES_LAT": 46.02861,
         "DEGREES_LONG": 67.56183,
@@ -6123,7 +6514,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6138,6 +6529,8 @@
       },
       "properties": {
         "OBJECTID": 67842,
+        "FIRE_NUMBER": "2025171",
+        "FIRE_NUMBER_SHORT": "171",
         "FIRE_NAME": "DTI",
         "DEGREES_LAT": 45.12806,
         "DEGREES_LONG": 66.80772999999999,
@@ -6152,7 +6545,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6167,6 +6560,8 @@
       },
       "properties": {
         "OBJECTID": 68044,
+        "FIRE_NUMBER": "2025184",
+        "FIRE_NUMBER_SHORT": "184",
         "FIRE_NAME": "Chemin Hachey",
         "DEGREES_LAT": 47.706109999999995,
         "DEGREES_LONG": 64.95639,
@@ -6181,7 +6576,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6196,6 +6591,8 @@
       },
       "properties": {
         "OBJECTID": 68304,
+        "FIRE_NUMBER": "2025205",
+        "FIRE_NUMBER_SHORT": "205",
         "FIRE_NAME": "22 pit",
         "DEGREES_LAT": 45.360319999999994,
         "DEGREES_LONG": 66.21688,
@@ -6210,7 +6607,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6225,6 +6622,8 @@
       },
       "properties": {
         "OBJECTID": 68383,
+        "FIRE_NUMBER": "2025218",
+        "FIRE_NUMBER_SHORT": "218",
         "FIRE_NAME": "Weldon Creek",
         "DEGREES_LAT": 45.928219999999996,
         "DEGREES_LONG": 64.65662,
@@ -6239,7 +6638,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6254,6 +6653,8 @@
       },
       "properties": {
         "OBJECTID": 68426,
+        "FIRE_NUMBER": "2025225",
+        "FIRE_NUMBER_SHORT": "225",
         "FIRE_NAME": "Crab Road",
         "DEGREES_LAT": 44.714400000000005,
         "DEGREES_LONG": 66.81734999999999,
@@ -6268,7 +6669,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6283,6 +6684,8 @@
       },
       "properties": {
         "OBJECTID": 65965,
+        "FIRE_NUMBER": "2025008",
+        "FIRE_NUMBER_SHORT": "008",
         "FIRE_NAME": "Gallagher Ridge Road",
         "DEGREES_LAT": 46.21085,
         "DEGREES_LONG": 64.99942,
@@ -6297,7 +6700,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6312,6 +6715,8 @@
       },
       "properties": {
         "OBJECTID": 66182,
+        "FIRE_NUMBER": "2025033",
+        "FIRE_NUMBER_SHORT": "033",
         "FIRE_NAME": "Poke",
         "DEGREES_LAT": 45.79202,
         "DEGREES_LONG": 66.58807,
@@ -6326,7 +6731,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6341,6 +6746,8 @@
       },
       "properties": {
         "OBJECTID": 66602,
+        "FIRE_NUMBER": "2025070",
+        "FIRE_NUMBER_SHORT": "070",
         "FIRE_NAME": "Ditch",
         "DEGREES_LAT": 46.218669999999996,
         "DEGREES_LONG": 65.00175,
@@ -6355,7 +6762,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6370,6 +6777,8 @@
       },
       "properties": {
         "OBJECTID": 67722,
+        "FIRE_NUMBER": "2025159",
+        "FIRE_NUMBER_SHORT": "159",
         "FIRE_NAME": "Catchcart",
         "DEGREES_LAT": 45.26106,
         "DEGREES_LONG": 67.1038,
@@ -6384,7 +6793,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6399,6 +6808,8 @@
       },
       "properties": {
         "OBJECTID": 68502,
+        "FIRE_NUMBER": "2025243",
+        "FIRE_NUMBER_SHORT": "243",
         "FIRE_NAME": "Brisley Fire",
         "DEGREES_LAT": 45.66587,
         "DEGREES_LONG": 66.59863,
@@ -6413,7 +6824,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6428,6 +6839,8 @@
       },
       "properties": {
         "OBJECTID": 66383,
+        "FIRE_NUMBER": "2025045",
+        "FIRE_NUMBER_SHORT": "045",
         "FIRE_NAME": "Pocologan Causeway",
         "DEGREES_LAT": 45.11913,
         "DEGREES_LONG": 66.59725,
@@ -6442,7 +6855,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6457,6 +6870,8 @@
       },
       "properties": {
         "OBJECTID": 66404,
+        "FIRE_NUMBER": "2025048",
+        "FIRE_NUMBER_SHORT": "048",
         "FIRE_NAME": "Boarding house RD",
         "DEGREES_LAT": 45.061519999999994,
         "DEGREES_LONG": 66.82128999999999,
@@ -6471,7 +6886,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6486,6 +6901,8 @@
       },
       "properties": {
         "OBJECTID": 66465,
+        "FIRE_NUMBER": "2025055",
+        "FIRE_NUMBER_SHORT": "055",
         "FIRE_NAME": "Blueberry",
         "DEGREES_LAT": 46.03583,
         "DEGREES_LONG": 67.11013,
@@ -6500,7 +6917,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.9,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6515,6 +6932,8 @@
       },
       "properties": {
         "OBJECTID": 66662,
+        "FIRE_NUMBER": "2025078",
+        "FIRE_NUMBER_SHORT": "078",
         "FIRE_NAME": "Willow",
         "DEGREES_LAT": 46.80928,
         "DEGREES_LONG": 65.81705,
@@ -6529,7 +6948,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6544,6 +6963,8 @@
       },
       "properties": {
         "OBJECTID": 67502,
+        "FIRE_NUMBER": "2025147",
+        "FIRE_NUMBER_SHORT": "147",
         "FIRE_NAME": "Bear 1",
         "DEGREES_LAT": 46.199400000000004,
         "DEGREES_LONG": 64.53856999999999,
@@ -6558,7 +6979,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6573,6 +6994,8 @@
       },
       "properties": {
         "OBJECTID": 67702,
+        "FIRE_NUMBER": "2025158",
+        "FIRE_NUMBER_SHORT": "158",
         "FIRE_NAME": "Red Pine",
         "DEGREES_LAT": 47.44367,
         "DEGREES_LONG": 65.10428,
@@ -6587,7 +7010,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6602,6 +7025,8 @@
       },
       "properties": {
         "OBJECTID": 68403,
+        "FIRE_NUMBER": "2025222",
+        "FIRE_NUMBER_SHORT": "222",
         "FIRE_NAME": "Trail forty three",
         "DEGREES_LAT": 45.57725,
         "DEGREES_LONG": 66.75457,
@@ -6616,7 +7041,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6631,6 +7056,8 @@
       },
       "properties": {
         "OBJECTID": 68404,
+        "FIRE_NUMBER": "2025223",
+        "FIRE_NUMBER_SHORT": "223",
         "FIRE_NAME": "Green Drive",
         "DEGREES_LAT": 46.05547,
         "DEGREES_LONG": 66.09660000000001,
@@ -6645,7 +7072,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6660,6 +7087,8 @@
       },
       "properties": {
         "OBJECTID": 66262,
+        "FIRE_NUMBER": "2025037",
+        "FIRE_NUMBER_SHORT": "037",
         "FIRE_NAME": "Roly Smoke",
         "DEGREES_LAT": 45.17435,
         "DEGREES_LONG": 66.46527999999999,
@@ -6674,7 +7103,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.9,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6689,6 +7118,8 @@
       },
       "properties": {
         "OBJECTID": 67643,
+        "FIRE_NUMBER": "2025154",
+        "FIRE_NUMBER_SHORT": "154",
         "FIRE_NAME": "Hilltop",
         "DEGREES_LAT": 46.687639999999995,
         "DEGREES_LONG": 66.89827,
@@ -6703,7 +7134,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6718,6 +7149,8 @@
       },
       "properties": {
         "OBJECTID": 67782,
+        "FIRE_NUMBER": "2025162",
+        "FIRE_NUMBER_SHORT": "162",
         "FIRE_NAME": "St Andrews Trail",
         "DEGREES_LAT": 45.143769999999996,
         "DEGREES_LONG": 67.08032,
@@ -6732,7 +7165,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6747,6 +7180,8 @@
       },
       "properties": {
         "OBJECTID": 66522,
+        "FIRE_NUMBER": "2025065",
+        "FIRE_NUMBER_SHORT": "065",
         "FIRE_NAME": "Wilsey Crossing",
         "DEGREES_LAT": 45.81313,
         "DEGREES_LONG": 66.62196999999999,
@@ -6761,7 +7196,7 @@
         "PERCENT_CONTAINED": 99,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6776,6 +7211,8 @@
       },
       "properties": {
         "OBJECTID": 66742,
+        "FIRE_NUMBER": "2025097",
+        "FIRE_NUMBER_SHORT": "097",
         "FIRE_NAME": "Ward Set Grass",
         "DEGREES_LAT": 46.28791,
         "DEGREES_LONG": 66.71919,
@@ -6790,7 +7227,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6805,6 +7242,8 @@
       },
       "properties": {
         "OBJECTID": 67222,
+        "FIRE_NUMBER": "2025134",
+        "FIRE_NUMBER_SHORT": "134",
         "FIRE_NAME": "Kent",
         "DEGREES_LAT": 47.52211,
         "DEGREES_LONG": 64.93822,
@@ -6819,7 +7258,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6834,6 +7273,8 @@
       },
       "properties": {
         "OBJECTID": 67482,
+        "FIRE_NUMBER": "2025146",
+        "FIRE_NUMBER_SHORT": "146",
         "FIRE_NAME": "Deck",
         "DEGREES_LAT": 45.75362,
         "DEGREES_LONG": 66.48122,
@@ -6848,7 +7289,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6863,6 +7304,8 @@
       },
       "properties": {
         "OBJECTID": 68425,
+        "FIRE_NUMBER": "2025228",
+        "FIRE_NUMBER_SHORT": "228",
         "FIRE_NAME": "Northside",
         "DEGREES_LAT": 46.107679999999995,
         "DEGREES_LONG": 66.07016999999999,
@@ -6877,7 +7320,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6892,6 +7335,8 @@
       },
       "properties": {
         "OBJECTID": 68142,
+        "FIRE_NUMBER": "2025193",
+        "FIRE_NUMBER_SHORT": "193",
         "FIRE_NAME": "Condo",
         "DEGREES_LAT": 47.20357,
         "DEGREES_LONG": 65.12501999999999,
@@ -6906,7 +7351,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6921,6 +7366,8 @@
       },
       "properties": {
         "OBJECTID": 68311,
+        "FIRE_NUMBER": "2025212",
+        "FIRE_NUMBER_SHORT": "212",
         "FIRE_NAME": "Tourbiere chiasson",
         "DEGREES_LAT": 47.779489999999996,
         "DEGREES_LONG": 64.61229,
@@ -6935,7 +7382,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6950,6 +7397,8 @@
       },
       "properties": {
         "OBJECTID": 68362,
+        "FIRE_NUMBER": "2025216",
+        "FIRE_NUMBER_SHORT": "216",
         "FIRE_NAME": "Chemin notre dame",
         "DEGREES_LAT": 47.636869999999995,
         "DEGREES_LONG": 65.24637,
@@ -6964,7 +7413,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -6979,6 +7428,8 @@
       },
       "properties": {
         "OBJECTID": 68484,
+        "FIRE_NUMBER": "2025239",
+        "FIRE_NUMBER_SHORT": "239",
         "FIRE_NAME": "Mallory road fire",
         "DEGREES_LAT": 45.601079999999996,
         "DEGREES_LONG": 65.5171,
@@ -6993,7 +7444,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -7008,6 +7459,8 @@
       },
       "properties": {
         "OBJECTID": 68202,
+        "FIRE_NUMBER": "2025196",
+        "FIRE_NUMBER_SHORT": "196",
         "FIRE_NAME": "Rubber Matt",
         "DEGREES_LAT": 45.21083,
         "DEGREES_LONG": 66.27667,
@@ -7022,7 +7475,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -7037,6 +7490,8 @@
       },
       "properties": {
         "OBJECTID": 68343,
+        "FIRE_NUMBER": "2025215",
+        "FIRE_NUMBER_SHORT": "215",
         "FIRE_NAME": "Ross Road",
         "DEGREES_LAT": 47.293279999999996,
         "DEGREES_LONG": 65.04670999999999,
@@ -7051,7 +7506,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -7066,6 +7521,8 @@
       },
       "properties": {
         "OBJECTID": 68384,
+        "FIRE_NUMBER": "2025219",
+        "FIRE_NUMBER_SHORT": "219",
         "FIRE_NAME": "Golden Rod",
         "DEGREES_LAT": 45.42581,
         "DEGREES_LONG": 65.73940999999999,
@@ -7080,7 +7537,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -7095,6 +7552,8 @@
       },
       "properties": {
         "OBJECTID": 68487,
+        "FIRE_NUMBER": "2025242",
+        "FIRE_NUMBER_SHORT": "242",
         "FIRE_NAME": "Honeywood fire",
         "DEGREES_LAT": 45.8262,
         "DEGREES_LONG": 66.613,
@@ -7109,7 +7568,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
       }
     },
     {
@@ -7124,6 +7583,8 @@
       },
       "properties": {
         "OBJECTID": 68263,
+        "FIRE_NUMBER": "2025201",
+        "FIRE_NUMBER_SHORT": "201",
         "FIRE_NAME": "Mckenzie",
         "DEGREES_LAT": 46.57066,
         "DEGREES_LONG": 66.10607,
@@ -7138,7 +7599,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755301451
+        "FETCHED_FROM_ERD": 1755315464
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 65862,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.08327864216646,
+          47.059979658830954
+        ]
+      },
+      "properties": {
+        "OBJECTID": 65862,
+        "FIRE_NUMBER": "2024285",
+        "FIRE_NUMBER_SHORT": "285",
+        "FIRE_NAME": "Skeet",
+        "DEGREES_LAT": 47.05997,
+        "DEGREES_LONG": 65.08328,
+        "FIRE_STAT_ID": 5,
+        "FIRE_STAT_DESC_E": "Out",
+        "FIRE_STAT_DESC_F": "Éteint",
+        "TIME_DETECTED": 1734685200000,
+        "FIRE_STAT_DATE": 1734688800000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755315464
       }
     }
   ]
