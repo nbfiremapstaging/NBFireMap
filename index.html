@@ -35,6 +35,10 @@
         --fs-bottom: 86px;
         --smoke-bottom: 28px;
         --legend-bottom-reserve: 180px; /* dynamic on mobile via JS (fallback only) */
+
+        /* NEW: title guards (set dynamically by JS; safe defaults here) */
+        --title-left: 12px;
+        --title-right: 12px;
       }
 
       html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
@@ -42,29 +46,27 @@
       body{background:var(--bg);color:var(--text);font:var(--fs-14)/1.45 Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;letter-spacing:.1px;
         -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-      /* Leaflet controls */
+      /* Leaflet controls (lowered to make space for title + buttons) */
       .leaflet-bar a,.leaflet-bar a:hover{background:var(--panel);border:1px solid var(--border);color:var(--text);box-shadow:var(--shadow-soft)}
       .leaflet-bar a{width:34px;height:34px;line-height:34px;font-size:16px}
       .leaflet-control-attribution{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-soft);padding:4px 8px}
-      .leaflet-top.leaflet-left{top:52px!important}
-      .leaflet-top.leaflet-right{top:72px!important}
+      .leaflet-top.leaflet-left{top:112px!important}   /* zoom + GPS */
+      .leaflet-top.leaflet-right{top:112px!important}  /* overview panel */
 
       /* Overview (legend) panel */
       .leaflet-control-layers{
         background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
         font-size:var(--fs-14);padding:8px 40px 8px 14px;backdrop-filter:blur(6px);min-width:260px;
 
-        /* NEW: avoid early wrap on desktop before JS kicks in */
-        width: fit-content;                /* grow to content */
-        max-width: calc(100vw - 24px);     /* clamp to viewport */
-        white-space: nowrap;               /* keep labels on one line */
-        overflow-x: auto;                  /* allow scroll if needed */
+        /* avoid early wrap on desktop before JS kicks in */
+        width: fit-content;
+        max-width: calc(100vw - 24px);
+        white-space: nowrap;
+        overflow-x: auto;
       }
       .leaflet-control-layers-expanded,.leaflet-control-layers-list{max-height:none;overflow:visible}
-      /* NEW: use auto not 1fr so the text column doesn't squeeze and force wrapping */
       .leaflet-control-layers-overlays label{display:grid;grid-template-columns:18px 26px auto;align-items:center;column-gap:8px;min-width:0;line-height:1.25}
       .leaflet-control-layers-overlays input{margin:0;width:max-content;height:18px}
-      /* NEW: never wrap the text, let the container widen/scroll instead */
       .leaflet-control-layers-overlays .text{min-width:max-content;white-space:nowrap;overflow:visible;text-overflow:clip}
 
       /* ——— mobile: (kept for clarity; matches desktop defaults now) ——— */
@@ -97,6 +99,16 @@
         z-index: 1;
         backdrop-filter: blur(6px);
       }
+      /* Sticky bottom bar for Help button */
+      .leaflet-control-layers .overview-footbar{
+        position: sticky; bottom: 0;
+        background: var(--panel);
+        margin: 8px -40px -8px -14px;
+        padding: 10px 14px 8px 14px;
+        border-top: 1px solid var(--border);
+        z-index: 1;
+        backdrop-filter: blur(6px);
+      }
 
       /* Buttons */
       .map-btn{position:absolute;z-index:1001;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:999px;padding:10px 14px;
@@ -105,10 +117,33 @@
       .map-btn:hover{background:var(--btn-hover);box-shadow:0 8px 22px rgba(0,0,0,.08)}
       .map-btn:active{transform:translateY(1px)}
       .map-btn:focus-visible{outline:none;box-shadow:var(--focus)}
-      .map-toggle-btn{top:12px;right:12px}
-      .reset-view-btn{top:12px;left:12px;z-index:1002}
+      .map-toggle-btn{top:64px;right:12px}
+      .reset-view-btn{top:64px;left:12px;z-index:1002}
       .map-btn .icon{width:18px;height:18px;display:inline-grid;place-items:center}
       .map-ui-hidden .leaflet-control-layers{opacity:0;pointer-events:none}
+
+      /* Title box (non-interactive) — updated to avoid buttons and stay one line */
+      /* Title box (non-interactive) — intrinsic width, centered, no wrap */
+.map-title{
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  z-index:1003; pointer-events:none; cursor:default;
+  background:var(--btn-bg); border:1px solid var(--btn-border); border-radius:999px; padding:10px 16px;
+  font-weight:800; box-shadow:var(--shadow);
+
+  /* key bits */
+  white-space:nowrap;          /* never wrap */
+  width:max-content;           /* grow/shrink to text */
+  max-width: calc(100vw - var(--left-guard, 0px) - var(--right-guard, 0px));
+  overflow:hidden;             /* clip if too tight */
+  text-overflow:ellipsis;      /* … instead of wrapping */
+}
+
+      /* When the viewport is too tight, allow wrapping for readability */
+      .map-title.wrap{
+        white-space:normal;
+        line-height:1.2;
+        padding:10px 14px;
+      }
 
       /* Fire Summary button: fixed default; moved inside Overview with .in-legend */
       .fire-summary-btn{ position:fixed; left:12px; z-index:2001;
@@ -117,6 +152,14 @@
         position: static !important; left:auto; bottom:auto; width:100%; margin:0;
         justify-content:center; box-shadow:var(--shadow-soft); border-radius:var(--radius-sm);
       }
+      /* Help button style (inside legend) */
+      .legend-help-btn{
+        width:100%; background:var(--btn-bg); border:1px solid var(--btn-border);
+        border-radius:var(--radius-sm); padding:10px 12px; font-weight:800; box-shadow:var(--shadow-soft); cursor:pointer;
+        display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      }
+      .legend-help-btn:hover{ background:var(--btn-hover); }
+      .legend-help-btn:focus-visible{ outline:none; box-shadow:var(--focus); }
 
       /* Labels */
       .city-label-tooltip,.perimeter-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
@@ -254,6 +297,9 @@
       </div>
     </div>
 
+    <!-- Title box -->
+    <div id="mapTitle" class="map-title" aria-hidden="true">NB Wildfire Status (Unofficial)</div>
+
     <!-- Overview toggle / reset / summary -->
     <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show Overview">
       <span class="icon"><i class="fa-solid fa-layer-group"></i></span><span id="mtb-text">Show Overview</span>
@@ -275,6 +321,19 @@
           </button>
         </header>
         <div id="fs-body" class="body"></div>
+      </div>
+    </div>
+
+    <!-- Map Help Modal -->
+    <div id="mapHelpOverlay" class="fire-summary-overlay" role="presentation" hidden>
+      <div class="fire-summary" role="dialog" aria-modal="true" aria-labelledby="mh-title">
+        <header>
+          <h2 id="mh-title">Map Layers &amp; How to Use</h2>
+          <button id="mh-close" class="close-summary" type="button">
+            <span class="icon"><i class="fa-solid fa-xmark"></i></span> Close
+          </button>
+        </header>
+        <div id="mh-body" class="body"></div>
       </div>
     </div>
 
@@ -314,7 +373,7 @@
         const LIGHTNING_REFRESH_MS = 120_000;
 
         const NOAA_SMOKE_URL = 'https://mapservices.weather.noaa.gov/raster/rest/services/air_quality/ndgd_smoke_sfc_1hr_avg_time/ImageServer';
-        const SMOKE_HOURS_EACH_SIDE = 8;
+        const SMOKE_HOURS_EACH_SIDE = 24;
         const SMOKE_FRAME_MS = 1200;
 
         // cached CSS vars
@@ -373,30 +432,32 @@
           } return null;
         };
 
-        /* ---------- Shared UI helpers ---------- */
-        const COMPASS_16 = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
-        const degToCompass = (deg) => {
-          if (!Number.isFinite(deg)) return '—';
-          const d = ((deg % 360) + 360) % 360;
-          return COMPASS_16[Math.round(d / 22.5)];
-        };
+        /* ---------- Title layout: keep centered, avoid buttons, wrap only if needed ---------- */
+        const titleEl = document.getElementById('mapTitle');
+        function layoutTitleBox(){
+          const leftBtn  = document.getElementById('resetViewBtn');
+          const rightBtn = document.getElementById('mapToggleBtn');
 
-        function bindHoverTogglePopup(layer){
-          let clicked=false, openT=null, closeT=null;
-          const OPEN_MS=150, CLOSE_MS=60;
-          const clear=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
-          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
-            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup?.(); },OPEN_MS); }});
-          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
-            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup?.(); },CLOSE_MS); }});
-          layer.on('click',function(){ clicked=!clicked; clear(); clicked?this.openPopup?.():this.closePopup?.(); });
-          layer.on('remove', clear);
+          const leftW  = leftBtn  ? Math.ceil(leftBtn.getBoundingClientRect().width)  : 0;
+          const rightW = rightBtn ? Math.ceil(rightBtn.getBoundingClientRect().width) : 0;
+
+          const GUTTER = 12;
+          const LEFT_GUARD  = 12 + leftW  + GUTTER;
+          const RIGHT_GUARD = 12 + rightW + GUTTER;
+
+          const root = document.documentElement;
+          root.style.setProperty('--title-left',  LEFT_GUARD  + 'px');
+          root.style.setProperty('--title-right', RIGHT_GUARD + 'px');
+
+          if (!titleEl) return;
+          requestAnimationFrame(() => {
+            const tooTight = titleEl.scrollWidth > titleEl.clientWidth;
+            titleEl.classList.toggle('wrap', tooTight);
+          });
         }
 
-        const restored = (() => { try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; } })();
-
         /* ====================== Map init ====================== */
-        const map = L.map('map', { center: restored?.center || INITIAL_VIEW.center, zoom: restored?.zoom || INITIAL_VIEW.zoom });
+        const map = L.map('map', { center: (JSON.parse(localStorage.getItem('nbMapView')||'null')?.center) || INITIAL_VIEW.center, zoom: (JSON.parse(localStorage.getItem('nbMapView')||'null')?.zoom) || INITIAL_VIEW.zoom });
         map.on('moveend', () => {
           const c = map.getCenter();
           localStorage.setItem(LS_KEY, JSON.stringify({ center: [c.lat, c.lng], zoom: map.getZoom() }));
@@ -418,7 +479,7 @@
           ['planesPane',1000,true]
         ].forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
 
-        L.esri.basemapLayer('Imagery').addTo(map);
+        L.esri.basemapLayer('Imagery', { opacity: 0.8 }).addTo(map);
 
         if (isMobile()) {
           L.control.locate({
@@ -428,15 +489,15 @@
         }
 
         /* ===== initial view matches Reset View on all devices ===== */
+        const NB_BOUNDS_CONST = NB_BOUNDS;
         const fitProvinceToView = ({ animate=false } = {}) => {
           const padX = Math.round(innerWidth  * 0.04);
           const padY = Math.round(innerHeight * 0.04);
-          map.fitBounds(NB_BOUNDS, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate });
+          map.fitBounds(NB_BOUNDS_CONST, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate });
         };
 
         /* ====================== Fires: GeoJSON + markercluster ====================== */
         const fireStore = new Map();
-
         let fireClusters = null;
         function ensureFireClusters(){
           if (fireClusters) return;
@@ -475,6 +536,18 @@
 
         const activeMarkersAll = [];
         const outMarkersAll = [];
+
+        function bindHoverTogglePopup(layer){
+          let clicked=false, openT=null, closeT=null;
+          const OPEN_MS=150, CLOSE_MS=60;
+          const clear=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
+          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
+            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup?.(); },OPEN_MS); }});
+          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
+            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup?.(); },CLOSE_MS); }});
+          layer.on('click',function(){ clicked=!clicked; clear(); clicked?this.openPopup?.():this.closePopup?.(); });
+          layer.on('remove', clear);
+        }
 
         function bindFirePopup(props, layer, explicitStatus) {
           const status = explicitStatus || props.FIRE_STAT_DESC_E || '—';
@@ -843,28 +916,23 @@
         const getSafeBottom = () => (safeProbe?.offsetHeight || 0);
 
         // Spacing controls
-        const BASE_GAP = 10;             // general margins used around elements
-        const LEGEND_SMOKE_GAP = 16;     // extra space between legend and smoke controls
-        const FOOTER_SMOKE_GAP = 10;     // space between smoke controls and footer
+        const BASE_GAP = 10;
+        const LEGEND_SMOKE_GAP = 16;
+        const FOOTER_SMOKE_GAP = 10;
 
-        // 1) Width: grow to content width (capped to viewport) so labels don't wrap prematurely.
         function sizeLegendWidth(){
           const legend = D.querySelector('.leaflet-control-layers');
           if (!legend) return;
           const vvW = (window.visualViewport && window.visualViewport.width) || window.innerWidth || document.documentElement.clientWidth || 0;
-          const cap = Math.max(240, Math.floor(vvW - 24)); // 12px margin each side
+          const cap = Math.max(240, Math.floor(vvW - 24));
           legend.style.maxWidth = cap + 'px';
-          // measure natural content width
           legend.style.width = 'fit-content';
-          // if content still exceeds cap, cap it
           const desired = Math.min(legend.scrollWidth, cap);
           legend.style.width = desired + 'px';
-          // keep horizontal scroll if labels exceed cap
           legend.style.overflowX = (legend.scrollWidth > desired) ? 'auto' : 'hidden';
           return desired;
         }
 
-        // 2) Height: compute available space so we never overlap smoke/footer/link.
         function sizeLegendHeight(){
           const legend = D.querySelector('.leaflet-control-layers');
           if (!legend) return;
@@ -881,7 +949,6 @@
 
           const safeB = getSafeBottom();
 
-          // Reserve space: footer + smoke (with extra gap) + base margins + safe area + small fudge
           const reserve = footerH
             + (smokeVisible ? (smokeH + LEGEND_SMOKE_GAP) : 0)
             + (BASE_GAP * 2)
@@ -895,10 +962,8 @@
           legend.style.webkitOverflowScrolling = 'touch';
         }
 
-        // Call width first, then height (width affects wrapping/height).
         const sizeLegend = () => { sizeLegendWidth(); sizeLegendHeight(); };
 
-        // Keep CSS variables for other elements (buttons/smoke placement)
         function updateBottomStackAndLegend(){
           const mobile = isMobile();
           const root = document.documentElement;
@@ -919,12 +984,10 @@
 
           const safeB = getSafeBottom();
 
-          // Position smoke controls above the footer using FOOTER_SMOKE_GAP
           const smokeBottom = footerH + FOOTER_SMOKE_GAP + safeB + FOOTER_SMOKE_GAP;
           root.style.setProperty('--smoke-bottom', smokeBottom + 'px');
           root.style.setProperty('--fs-bottom', (footerH + FOOTER_SMOKE_GAP + safeB + FOOTER_SMOKE_GAP) + 'px');
 
-          // Reserve extra space specifically between legend and smoke using LEGEND_SMOKE_GAP
           const reserve = footerH
             + (smokeVisible ? (smokeH + LEGEND_SMOKE_GAP) : 0)
             + (BASE_GAP * 2)
@@ -933,58 +996,60 @@
 
           root.style.setProperty('--legend-bottom-reserve', Math.max(140, Math.round(reserve)) + 'px');
 
-          sizeLegend(); // precise inline sizing
+          sizeLegend();
         }
 
         const rAF = (fn)=>requestAnimationFrame(()=>requestAnimationFrame(fn));
 
         // Initial layout
         updateBottomStackAndLegend();
+        layoutTitleBox();
 
         // Resize/orientation/visualViewport changes
         window.addEventListener('resize', () => {
           updateBottomStackAndLegend();
-          if (smokeTimesMs.length) smokeTsLabel.textContent = smokeFmt(smokeTimesMs[smokeIdx]);
+          layoutTitleBox();
+          const smokeTs = smokeTimesMs[smokeIdx];
+          if (smokeTimesMs.length && smokeTs != null) smokeTsLabel.textContent = smokeFmt(smokeTs);
         }, { passive: true });
 
-        window.addEventListener('orientationchange', () => rAF(updateBottomStackAndLegend), { passive: true });
+        window.addEventListener('orientationchange', () => rAF(() => {
+          updateBottomStackAndLegend();
+          layoutTitleBox();
+        }), { passive: true });
 
         if (window.visualViewport){
-          const onVV = () => rAF(updateBottomStackAndLegend);
+          const onVV = () => rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); });
           visualViewport.addEventListener('resize', onVV, { passive:true });
           visualViewport.addEventListener('scroll', onVV, { passive:true }); // address bar show/hide
         }
 
-        // React to smoke layer toggling — show first, then measure.
         map.on('overlayadd', (e) => {
           if (e.layer === smokeLayer) {
             smokeControls.style.display = 'flex';
             if (smokeTimesMs.length) { smokeSetIndex(smokeIdx); }
             else { smokeTsLabel.textContent = 'Loading…'; }
             smokeLayer.bringToBack();
-            rAF(updateBottomStackAndLegend);
+            rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); });
           }
         });
         map.on('overlayremove', (e) => {
-          if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; rAF(updateBottomStackAndLegend); }
+          if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); }); }
         });
 
-        // On initial load, if Smoke layer is present, show it first, then measure.
         if (map.hasLayer(smokeLayer)) {
           smokeControls.style.display = 'flex';
           smokeLayer.bringToBack();
           smokeTsLabel.textContent = smokeTimesMs.length ? smokeFmt(smokeTimesMs[smokeIdx]) : 'Loading…';
-          rAF(updateBottomStackAndLegend);
+          rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); });
         }
 
-        // Observe size changes to smoke box or footer (content wraps, fonts, etc.)
-        const ro = ('ResizeObserver' in window) ? new ResizeObserver(() => rAF(updateBottomStackAndLegend)) : null;
+        const ro = ('ResizeObserver' in window) ? new ResizeObserver(() => rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); })) : null;
         ro?.observe(smokeControls);
         const footerEl = $('.nb-footer'); footerEl && ro?.observe(footerEl);
 
-        // Recalc when fonts finish loading (prevents late line-wrap growth)
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(() => rAF(updateBottomStackAndLegend));
+          document.fonts.ready.then(() => rAF(() => { updateBottomStackAndLegend(); layoutTitleBox(); }));
         }
 
         /* ====================== AQHI ====================== */
@@ -1111,7 +1176,6 @@
           `;
           overlaysList.prepend(block);
           block.addEventListener('change', applyFireFilterAndMaybeInit);
-          // content added -> recalc legend
           requestAnimationFrame(sizeLegend);
         }
         injectFireStatusPanel();
@@ -1131,6 +1195,23 @@
         }
         mountSummaryInLegend();
 
+        /* ====================== Add Help button to bottom of Overview ====================== */
+        function mountHelpInLegend(){
+          const layersBox = document.querySelector('.leaflet-control-layers');
+          if (!layersBox || layersBox.querySelector('.overview-footbar')) return;
+          const footbar = document.createElement('div');
+          footbar.className = 'overview-footbar';
+          const helpBtn = document.createElement('button');
+          helpBtn.type = 'button';
+          helpBtn.className = 'legend-help-btn';
+          helpBtn.innerHTML = '<span class="icon"><i class="fa-solid fa-circle-info"></i></span><span>Map Info &amp; How to Use</span>';
+          helpBtn.addEventListener('click', openHelp);
+          footbar.append(helpBtn);
+          layersBox.append(footbar);
+          requestAnimationFrame(sizeLegend);
+        }
+        mountHelpInLegend();
+
         /* ====================== Summary ====================== */
         const fsOverlay=$('#fireSummaryOverlay');
         const fsBody=$('#fs-body');
@@ -1139,8 +1220,10 @@
         const chip=(label,n)=>`<span class="chip"><span class="dot" style="background:${statusColor(label)}"></span>${label} <span style="font-weight:800;margin-left:6px">${n}</span></span>`;
         const sizeOf=(p)=> Number((p?.FIRE_SIZE ?? p?.SIZE_HA ?? p?.AREA) ?? 0) || 0;
 
+        const fireStoreMap = fireStore;
+
         function buildSummaryHTML(){
-          const items=[...fireStore.values()]; const year = new Date().getFullYear();
+          const items=[...fireStoreMap.values()]; const year = new Date().getFullYear();
           let totalArea=0, counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,extinguished:0,other:0};
           let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
@@ -1238,6 +1321,47 @@
         fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay) closeSummary(); });
         window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && !fsOverlay.hidden) closeSummary(); });
 
+        /* ====================== Help modal (content built dynamically) ====================== */
+        const mhOverlay = $('#mapHelpOverlay');
+        const mhBody = $('#mh-body');
+        const mhClose = $('#mh-close');
+
+        function buildHelpHTML(){
+          const desc = {
+            'MODIS Hotspots — Last 48 hours': 'Thermal hotspots detected by NASA MODIS in the past 48 hours.',
+            'MODIS Hotspots — Last 7 days': 'MODIS hotspots detected within the last 7 days.',
+            'Weather Stations': 'Environment Canada stations with wind, temperature and humidity.',
+            'Fire Perimeters': 'Current wildfire perimeter polygons with area labels at close zoom.',
+            'Sentinel-2 Imagery': 'Recent satellite imagery (clouds may obscure).',
+            'NB Burn Bans': 'Official NB burn restrictions layer.',
+            'AQHI Risk': 'Air Quality Health Index observations.',
+            'Weather Radar': 'NOAA base reflectivity radar mosaic.',
+            'Lightning Density': 'Recent lightning strike density (updates automatically).',
+            'Smoke': 'Hourly surface smoke forecast; use the timeline control to scrub or play.',
+            'Fire Risk': 'Daily Fire Danger Rating from CWFIS.',
+            'Aircraft': 'ADS-B aircraft positions (OpenSky Network).',
+            'Major Cities & Towns': 'Labels for major NB communities.'
+          };
+          const list = Object.keys(overlays).map(name => {
+            const d = desc[name] || 'No description available.';
+            return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
+          }).join('');
+          return `
+            <p>Use the <b>Overview</b> panel to toggle layers on and off. Drag the map to pan, use <b>+</b>/<b>−</b> to zoom, or tap <b>Reset Map View</b> to refit to New Brunswick.</p>
+            <p>The <b>Smoke</b> layer includes a timeline near the bottom; press <b>▶</b> to animate or drag the slider to a specific hour.</p>
+            <p>Legend of layers:</p>
+            <ul style="padding-left:16px; margin:8px 0 0;">${list}</ul>
+            <p style="margin-top:10px; font-size:12px; color:var(--muted);">This is an unofficial tool. Data sources include Esri, NOAA, Environment Canada, CWFIS, and OpenSky.</p>
+          `;
+        }
+
+        function openHelp(){ mhBody.innerHTML = buildHelpHTML(); mhOverlay.hidden=false; mhOverlay.style.display='flex'; mhClose.focus(); }
+        function closeHelp(){ mhOverlay.style.display='none'; mhOverlay.hidden=true; }
+
+        mhClose.addEventListener('click', closeHelp);
+        mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
+        window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
+
         /* ====================== Overview toggle + Reset view ====================== */
         const mapToggleBtn = $('#mapToggleBtn');
         const mtbText = $('#mtb-text');
@@ -1247,8 +1371,9 @@
           mapToggleBtn.setAttribute('aria-pressed', String(!hidden));
           mapToggleBtn.title = label;
           mtbText.textContent = label;
+          // Recompute title guards since button width changes with label
+          layoutTitleBox();
         };
-        // Default: Overview hidden
         D.body.classList.add('map-ui-hidden');
         updateOverviewButton();
 
@@ -1257,14 +1382,14 @@
         });
         $('#resetViewBtn').addEventListener('click', () => {
           localStorage.removeItem(LS_KEY);
-          fitProvinceToView({ animate:true });     // same as initial view
+          fitProvinceToView({ animate:true });
         });
 
         // Final recalc once the legend exists in the DOM
-        requestAnimationFrame(() => { sizeLegend(); });
+        requestAnimationFrame(() => { sizeLegend(); layoutTitleBox(); });
 
         // Also recalc on global resizes etc.
-        const onGlobalReflow = () => { requestAnimationFrame(() => { updateBottomStackAndLegend(); }); };
+        const onGlobalReflow = () => { requestAnimationFrame(() => { updateBottomStackAndLegend(); layoutTitleBox(); }); };
         window.addEventListener('resize', onGlobalReflow, { passive:true });
         window.addEventListener('orientationchange', onGlobalReflow, { passive:true });
         if (window.visualViewport){
