@@ -355,6 +355,14 @@
     <script defer src="https://unpkg.com/esri-leaflet-cluster/dist/esri-leaflet-cluster.js"></script>
 
     <script>
+
+      /* ---------- Compass helper (needed by stationSVG & stationPopupHTML) ---------- */
+const COMPASS_16 = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
+function degToCompass(deg){
+  if (!Number.isFinite(deg)) return '—';
+  const d = ((deg % 360) + 360) % 360;      // normalize to 0–359
+  return COMPASS_16[Math.round(d / 22.5)];  // 16-wind compass
+}
       window.addEventListener('DOMContentLoaded', () => {
         'use strict';
 
