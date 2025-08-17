@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -32,8 +31,10 @@
         --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
         --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
 
-        /* dynamic bottom lift for the footer (set by JS) */
-        --footer-offset: 0px;
+        /* desktop fallbacks */
+        --fs-bottom: 86px;
+        --smoke-bottom: 28px;
+        --legend-bottom-reserve: 180px; /* dynamic on mobile via JS (fallback only) */
       }
 
       html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
@@ -48,22 +49,54 @@
       .leaflet-top.leaflet-left{top:52px!important}
       .leaflet-top.leaflet-right{top:72px!important}
 
-      /* Layers panel */
-      .leaflet-control-layers{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-        font-size:var(--fs-14);padding:8px 40px 8px 14px;backdrop-filter:blur(6px);min-width:260px;white-space:nowrap}
+      /* Overview (legend) panel */
+      .leaflet-control-layers{
+        background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+        font-size:var(--fs-14);padding:8px 40px 8px 14px;backdrop-filter:blur(6px);min-width:260px;
+
+        /* NEW: avoid early wrap on desktop before JS kicks in */
+        width: fit-content;                /* grow to content */
+        max-width: calc(100vw - 24px);     /* clamp to viewport */
+        white-space: nowrap;               /* keep labels on one line */
+        overflow-x: auto;                  /* allow scroll if needed */
+      }
       .leaflet-control-layers-expanded,.leaflet-control-layers-list{max-height:none;overflow:visible}
-      .leaflet-control-layers-overlays label{display:grid;grid-template-columns:18px 26px 1fr;align-items:center;column-gap:8px;min-width:max-content;line-height:1.25}
+      /* NEW: use auto not 1fr so the text column doesn't squeeze and force wrapping */
+      .leaflet-control-layers-overlays label{display:grid;grid-template-columns:18px 26px auto;align-items:center;column-gap:8px;min-width:0;line-height:1.25}
       .leaflet-control-layers-overlays input{margin:0;width:max-content;height:18px}
+      /* NEW: never wrap the text, let the container widen/scroll instead */
       .leaflet-control-layers-overlays .text{min-width:max-content;white-space:nowrap;overflow:visible;text-overflow:clip}
 
+      /* ——— mobile: (kept for clarity; matches desktop defaults now) ——— */
       @media (max-width: 640px) {
-        /* constrain legend so the PAGE never scrolls; scroll inside the panel if needed */
-        .leaflet-control-layers { width: var(--layers-w, auto); max-width: calc(100vw - 24px); min-width: 0 !important;
-          white-space: nowrap; overflow-x: auto; max-height: calc(100vh - 180px); overflow-y: auto; }
+        .leaflet-control-layers {
+          width: fit-content;
+          max-width: calc(100vw - 24px);
+          min-width: 0 !important;
+          white-space: nowrap;
+          overflow-x: auto;
+
+          /* fallback height if JS hasn't run yet */
+          max-height: calc(100vh - var(--legend-bottom-reserve, 180px));
+          max-height: calc(100dvh - var(--legend-bottom-reserve, 180px));
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+        }
         .leaflet-control-layers-overlays label { grid-template-columns: 18px 26px auto; }
         .leaflet-control-layers-overlays .text { white-space: nowrap; min-width: max-content; }
       }
       @media (max-width:767.98px){.leaflet-control-layers{font-size:var(--fs-12)}}
+
+      /* Sticky top bar inside Overview for the Summary button */
+      .leaflet-control-layers .overview-topbar{
+        position: sticky; top: 0;
+        background: var(--panel);
+        margin: -8px -40px 8px -14px;
+        padding: 8px 14px 10px 14px;
+        border-bottom: 1px solid var(--border);
+        z-index: 1;
+        backdrop-filter: blur(6px);
+      }
 
       /* Buttons */
       .map-btn{position:absolute;z-index:1001;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:999px;padding:10px 14px;
@@ -77,13 +110,20 @@
       .map-btn .icon{width:18px;height:18px;display:inline-grid;place-items:center}
       .map-ui-hidden .leaflet-control-layers{opacity:0;pointer-events:none}
 
+      /* Fire Summary button: fixed default; moved inside Overview with .in-legend */
+      .fire-summary-btn{ position:fixed; left:12px; z-index:2001;
+        bottom: calc(var(--fs-bottom, 86px) + env(safe-area-inset-bottom)); }
+      .fire-summary-btn.in-legend{
+        position: static !important; left:auto; bottom:auto; width:100%; margin:0;
+        justify-content:center; box-shadow:var(--shadow-soft); border-radius:var(--radius-sm);
+      }
+
       /* Labels */
       .city-label-tooltip,.perimeter-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
       .city-label{font-size:15px;font-weight:800;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.7),0 0 8px rgba(0,0,0,.6),1px 1px 0 rgba(0,0,0,.9)}
       .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:rgba(239,68,68,.12);backdrop-filter:blur(2px)}
 
-      /* Summary modal (scrolls inside the panel, page remains fixed) */
-      .fire-summary-btn{position:fixed;left:12px;bottom:86px;z-index:2001}
+      /* Summary modal */
       .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
       .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(680px,calc(100% - 24px));color:var(--text);
         max-height:90vh; display:flex; flex-direction:column; overflow:hidden;}
@@ -99,7 +139,6 @@
       .summary-list a{color:var(--link);text-decoration:none;font-weight:700}
       .summary-list a:hover{text-decoration:underline}
       .fs-scroll{margin-top:8px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--panel)}
-
       .fs-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
       .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;box-shadow:var(--shadow-soft)}
       .stat .h{font:800 13px/1.2 Inter,system-ui,Arial;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
@@ -116,7 +155,7 @@
       .legend-modis-dot{width:10px;height:10px;border-radius:999px;background:var(--modis);display:inline-block;box-shadow:0 0 0 1.5px #111827 inset}
 
       /* Footer */
-      .nb-footer{position:fixed;bottom:10px;left:0;width:100%;text-align:center;z-index:2000}
+      .nb-footer{position:fixed;left:0;width:100%;text-align:center;z-index:2000;bottom:calc(10px + env(safe-area-inset-bottom))}
       .nb-footer a{background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:12px;padding:10px 18px;box-shadow:var(--shadow);color:var(--link);font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
 
       /* Weather-station text */
@@ -124,59 +163,100 @@
       .ws-speed{font-weight:800;font-size:14px}
       .ws-small{font-weight:700;font-size:10px;opacity:.95}
 
-      /* Smoke timeline UI (responsive & offset from footer) */
+      /* Smoke timeline UI — minimal look */
       #smokeControls{
-        position:absolute; right:12px; z-index:2100;
-        display:none; align-items:center; gap:10px;
+        position:absolute; left:12px; right:12px; z-index:2100;
+        display:none; flex-direction:column; gap:6px;
         background:var(--panel); border:1px solid var(--border);
-        border-radius:12px; padding:8px 12px; box-shadow:var(--shadow);
+        border-radius:12px; padding:8px 10px; box-shadow:var(--shadow);
         backdrop-filter:blur(6px);
         font-size:var(--fs-14);
-        max-width: min(96vw, 560px);
-        /* raised a bit higher so no mobile scroll is needed */
-        bottom: calc(28px + var(--footer-offset, 0px)); /* was 12px */
+        max-width: min(96vw, 680px);
+        bottom: calc(var(--smoke-bottom, 28px) + env(safe-area-inset-bottom));
       }
-      @supports (bottom: calc(12px + env(safe-area-inset-bottom))) {
-        #smokeControls{
-          bottom: calc(28px + var(--footer-offset, 0px) + env(safe-area-inset-bottom));
-        }
-      }
+      .sc-top{ display:flex; align-items:center; gap:10px; }
+      .sc-bottom{ display:flex; align-items:center; gap:8px; font-size:var(--fs-12); opacity:.95; }
+
       #smokePlay{
         background:var(--btn-bg); border:1px solid var(--btn-border);
-        border-radius:8px; padding:6px 10px; cursor:pointer; font-weight:800;
-        white-space:nowrap;
+        border-radius:8px; padding:4px 10px; cursor:pointer; font-weight:800;
+        height:28px; display:inline-grid; place-items:center; line-height:1;
+        min-width:38px; text-align:center;
       }
       #smokePlay:focus-visible{ outline:none; box-shadow:var(--focus); }
-      #smokeTime{ width:320px; max-width:60vw; }
+
+      /* Minimal slider */
+      #smokeTime{
+        -webkit-appearance:none; appearance:none;
+        flex:1 1 auto; min-width:140px; height:22px;
+        background:transparent; outline:none; margin:0;
+      }
+      #smokeTime:focus-visible{ outline:none; box-shadow:var(--focus); border-radius:10px; }
+
+      /* WebKit */
+      #smokeTime::-webkit-slider-runnable-track{
+        height:2px; border-radius:999px; background:var(--border);
+      }
+      #smokeTime::-webkit-slider-thumb{
+        -webkit-appearance:none; appearance:none;
+        width:12px; height:12px; border-radius:50%;
+        background:var(--text); border:2px solid #fff;
+        margin-top:-5px; box-shadow:0 1px 2px rgba(0,0,0,.18);
+      }
+
+      /* Firefox */
+      #smokeTime::-moz-range-track{
+        height:2px; border-radius:999px; background:var(--border);
+      }
+      #smokeTime::-moz-range-thumb{
+        width:12px; height:12px; border-radius:50%;
+        background:var(--text); border:2px solid #fff;
+        box-shadow:0 1px 2px rgba(0,0,0,.18);
+      }
+      #smokeTime::-moz-range-progress{
+        height:2px; background:color-mix(in srgb, var(--text) 35%, transparent);
+        border-radius:999px;
+      }
+
+      #smokeLabel{ font-weight:800; }
+      .dot-sep{ opacity:.6; }
       #smokeTimestamp{ font-weight:700; white-space:nowrap; }
 
-      /* Mobile layout: stretch, wrap, timestamp on its own line; PAGE never scrolls */
-      @media (max-width: 560px){
-        #smokeControls{
-          left:12px; right:12px;
-          /* no display override here — JS toggles it */
-          flex-wrap:wrap;
-          justify-content:space-between;
-          gap:8px;
-        }
-        #smokeTime{ flex:1 1 auto; min-width:140px; max-width:none; }
-        #smokeTimestamp{ flex: 1 0 100%; order: 3; font-size: var(--fs-12); }
+      @media (min-width: 700px){
+        #smokeControls{ left:auto; right:12px; } /* float to right on larger screens */
       }
+
+      @media (max-width: 560px){
+        #smokeControls{ padding:6px 8px; }
+        .sc-top{ gap:8px; }
+        #smokePlay{ padding:4px 8px; min-width:34px; height:26px; }
+        .sc-bottom{ font-size:var(--fs-12); gap:6px; }
+        #smokeTimestamp{ white-space:nowrap; }
+      }
+
+      /* Safe-area probe (invisible) */
+      #sai-probe{ position:fixed; left:0; bottom:0; width:0; height:env(safe-area-inset-bottom); pointer-events:none; opacity:0; }
     </style>
   </head>
   <body>
     <div id="map" aria-label="Interactive wildfire map"></div>
 
-    <!-- Smoke timeline controls (hidden until Smoke layer is toggled on) -->
+    <!-- Smoke timeline controls -->
     <div id="smokeControls" aria-live="polite">
-      <button id="smokePlay" type="button" title="Play/Pause" aria-label="Play animation">▶</button>
-      <input id="smokeTime" type="range" min="0" max="0" value="0" step="1" aria-label="Smoke time slider" />
-      <span id="smokeTimestamp">Loading…</span>
+      <div class="sc-top">
+        <button id="smokePlay" type="button" title="Play/Pause" aria-label="Play animation">▶</button>
+        <input id="smokeTime" type="range" min="0" max="0" value="0" step="1" aria-label="Smoke time slider" />
+      </div>
+      <div class="sc-bottom">
+        <span id="smokeLabel">Wildfire Smoke</span>
+        <span class="dot-sep">•</span>
+        <span id="smokeTimestamp">Loading…</span>
+      </div>
     </div>
 
-    <!-- Renamed to “Show Legend” and kept synced with state -->
-    <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show Legend">
-      <span class="icon"><i class="fa-solid fa-layer-group"></i></span><span id="mtb-text">Show Legend</span>
+    <!-- Overview toggle / reset / summary -->
+    <button id="mapToggleBtn" class="map-btn map-toggle-btn" type="button" aria-pressed="false" title="Show Overview">
+      <span class="icon"><i class="fa-solid fa-layer-group"></i></span><span id="mtb-text">Show Overview</span>
     </button>
     <button id="resetViewBtn" class="map-btn reset-view-btn" type="button" title="Reset map view">
       <span class="icon"><i class="fa-solid fa-compass"></i></span><span>Reset Map View</span>
@@ -185,30 +265,16 @@
       <span class="icon"><i class="fa-solid fa-fire"></i></span><span>Fire Summary</span>
     </button>
 
+    <!-- Fire Summary Modal -->
     <div id="fireSummaryOverlay" class="fire-summary-overlay" role="presentation" hidden>
       <div class="fire-summary" role="dialog" aria-modal="true" aria-labelledby="fs-title">
         <header>
           <h2 id="fs-title">New Brunswick Fire Summary</h2>
-          <button id="fs-close" class="close-summary" type="button"><span class="icon"><i class="fa-solid fa-xmark"></i></span> Close</button>
+          <button id="fs-close" class="close-summary" type="button">
+            <span class="icon"><i class="fa-solid fa-xmark"></i></span> Close
+          </button>
         </header>
         <div id="fs-body" class="body"></div>
-      </div>
-    </div>
-
-    <!-- Soft “data may be unavailable” modal -->
-    <div id="serviceAlertOverlay" class="service-alert-overlay" role="presentation" hidden>
-      <div class="service-alert" role="dialog" aria-modal="true" aria-labelledby="svc-title">
-        <header>
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-          <h2 id="svc-title">Data May Be Unavailable</h2>
-        </header>
-        <div id="svc-body" class="body">
-          <p>We couldn’t load one of the layers.</p>
-          <p>Please try refreshing the page later.</p>
-        </div>
-        <div class="footer">
-          <button id="svc-ack" class="service-btn" type="button">OK</button>
-        </div>
       </div>
     </div>
 
@@ -217,6 +283,9 @@
         <i class="fa-solid fa-up-right-from-square"></i> NB Fire Watch &amp; Burn Restrictions
       </a>
     </div>
+
+    <!-- Safe-area probe -->
+    <div id="sai-probe" aria-hidden="true"></div>
 
     <!-- JS (deferred) -->
     <script defer src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -230,81 +299,124 @@
       window.addEventListener('DOMContentLoaded', () => {
         'use strict';
 
-        /* ====================== Config ====================== */
+        /* =============== Shorthands & Constants =============== */
+        const D = document;
+        const $  = (sel, root=D) => root.querySelector(sel);
+        const $$ = (sel, root=D) => root.querySelectorAll(sel);
+
         const LS_KEY = 'nbMapView';
         const NB_BOUNDS = [[44.0, -69.5], [48.5, -62.0]];
-        const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 }; // safety fallback only
+        const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 };
         const ATLANTIC_TZ = 'America/Moncton';
+
         const OPEN_SKY_URL = 'https://opensky-network.org/api/states/all';
         const OPEN_SKY_INTERVAL_MS = 250_000;
         const LIGHTNING_REFRESH_MS = 120_000;
 
-        /* ====================== Utilities ====================== */
-        const isMobile = () => innerWidth < 768;
-        const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        const NOAA_SMOKE_URL = 'https://mapservices.weather.noaa.gov/raster/rest/services/air_quality/ndgd_smoke_sfc_1hr_avg_time/ImageServer';
+        const SMOKE_HOURS_EACH_SIDE = 8;
+        const SMOKE_FRAME_MS = 1200;
+
+        // cached CSS vars
+        const cssVar = (name) => getComputedStyle(D.documentElement).getPropertyValue(name).trim();
+        const COLORS = {
+          oc:  cssVar('--oc'),
+          cont: cssVar('--cont'),
+          uc: cssVar('--uc'),
+          pat: cssVar('--pat'),
+          mon: cssVar('--mon'),
+          perimeter: cssVar('--perimeter'),
+          boundary: cssVar('--boundary'),
+          modis: cssVar('--modis'),
+        };
+
+        const STATUS = new Map([
+          ['out of control', { color: COLORS.oc,  sev: 3 }],
+          ['contained',      { color: COLORS.cont, sev: 2 }],
+          ['under control',  { color: COLORS.uc,   sev: 1 }],
+          ['being patrolled',{ color: COLORS.pat,  sev: 0 }],
+          ['being monitored',{ color: COLORS.mon,  sev: 0 }],
+          ['extinguished',   { color: '#9aa0a6',   sev: -1 }],
+        ]);
         const norm = (s) => (s || '').toString().trim().toLowerCase();
-        const toNum = (v, d = 1) => (v == null || Number.isNaN(Number(v))) ? '—' : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
-        const fmtDateTime = (ms) => ms == null ? '—' : new Date(+ms).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-        const fmtDateTZ = (ms, tz = ATLANTIC_TZ) => ms == null ? '—' : new Date(+ms).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: tz });
+        const statusColor = (s) => STATUS.get(norm(s))?.color ?? '#9aa0a6';
+        const severityRank = (s) => STATUS.get(norm(s))?.sev ?? -1;
 
-        const statusColor = (s) => ({
-          'out of control': cssVar('--oc'),
-          contained: cssVar('--cont'),
-          'under control': cssVar('--uc'),
-          'being patrolled': cssVar('--pat'),
-          'being monitored': cssVar('--mon'),
-          extinguished: '#9aa0a6'
-        }[norm(s)] || '#9aa0a6');
+        const isMobile = () => innerWidth < 768;
+        const toNum = (v, d=1) => (v==null || Number.isNaN(Number(v))) ? '—'
+          : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
+        const fmtDateTime = (ms) => ms == null ? '—'
+          : new Date(+ms).toLocaleString(undefined, { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+        const fmtDateTZ = (ms, tz=ATLANTIC_TZ) => ms == null ? '—'
+          : new Date(+ms).toLocaleDateString(undefined, { year:'numeric', month:'2-digit', day:'2-digit', timeZone: tz });
 
-        const severityRank = (s) => ({
-          'out of control': 3,
-          contained: 2,
-          'under control': 1,
-          'being patrolled': 0,
-          'being monitored': 0,
-          extinguished: -1
-        }[norm(s)] ?? -1);
-
-        // Atlantic day bucketing
-        const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
+        /* ---------- Date helpers ---------- */
+        const ymdInTz = (ms, tz=ATLANTIC_TZ) => {
           const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
           const parts = fmt.formatToParts(new Date(ms));
-          const grab = (k) => +parts.find((p) => p.type === k)?.value;
-          return { y: grab('year'), m: grab('month'), d: grab('day') };
+          const val = (k) => +parts.find(p => p.type===k)?.value;
+          return { y: val('year'), m: val('month'), d: val('day') };
         };
-        const sameYMD = (a, b, tz) => { if (a == null || b == null) return false; const A = ymdInTz(a, tz); const B = ymdInTz(b, tz); return A.y===B.y && A.m===B.m && A.d===B.d; };
-        const yesterdayUTCms = (tz = ATLANTIC_TZ) => { const t = ymdInTz(Date.now(), tz); return Date.UTC(t.y, t.m - 1, t.d) - 86_400_000; };
+        const sameYMD = (a,b,tz) => { if (a==null || b==null) return false; const A=ymdInTz(a,tz), B=ymdInTz(b,tz); return A.y===B.y && A.m===B.m && A.d===B.d; };
+        const yesterdayUTCms = (tz=ATLANTIC_TZ) => { const t = ymdInTz(Date.now(), tz); return Date.UTC(t.y, t.m-1, t.d) - 86_400_000; };
         const isToday = (ms) => sameYMD(ms, Date.now(), ATLANTIC_TZ);
         const isYesterday = (ms) => sameYMD(ms, yesterdayUTCms(ATLANTIC_TZ), ATLANTIC_TZ);
-        const getExtinguishedMs = (p) => { for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) { const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t; } return null; };
-        const getDetectedMs = (p) => { for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) { const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t; } return null; };
 
-        /* ====================== Map init ====================== */
+        const getExtinguishedMs = (p) => {
+          for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) {
+            const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t;
+          } return null;
+        };
+        const getDetectedMs = (p) => {
+          for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) {
+            const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t;
+          } return null;
+        };
+
+        /* ---------- Shared UI helpers ---------- */
+        const COMPASS_16 = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
+        const degToCompass = (deg) => {
+          if (!Number.isFinite(deg)) return '—';
+          const d = ((deg % 360) + 360) % 360;
+          return COMPASS_16[Math.round(d / 22.5)];
+        };
+
+        function bindHoverTogglePopup(layer){
+          let clicked=false, openT=null, closeT=null;
+          const OPEN_MS=150, CLOSE_MS=60;
+          const clear=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
+          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
+            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup?.(); },OPEN_MS); }});
+          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
+            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup?.(); },CLOSE_MS); }});
+          layer.on('click',function(){ clicked=!clicked; clear(); clicked?this.openPopup?.():this.closePopup?.(); });
+          layer.on('remove', clear);
+        }
+
         const restored = (() => { try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; } })();
 
-        // create the map (we'll fit to province right after)
+        /* ====================== Map init ====================== */
         const map = L.map('map', { center: restored?.center || INITIAL_VIEW.center, zoom: restored?.zoom || INITIAL_VIEW.zoom });
-
-        // Save view as user moves
         map.on('moveend', () => {
           const c = map.getCenter();
           localStorage.setItem(LS_KEY, JSON.stringify({ center: [c.lat, c.lng], zoom: map.getZoom() }));
         });
 
-        // Panes
-        [['alwaysOnTopPopup',9999],
-        ['sentinelPane',400],
-        ['nbBoundaryPane',405],
-        ['smokePane',410],
-        ['perimetersPane',412],
-        ['radarPane',413],
-        ['lightningPane',413],
-        ['viirsPane',414],
-        ['weatherPane',640],   // raised above Leaflet's markerPane (600)
-        ['aqiPane',416],
-        ['firesPane',650],     // fires above stations
-        ['planesPane',1000,true]]
-          .forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
+        // Panes (z ordering)
+        [
+          ['alwaysOnTopPopup',9999],
+          ['sentinelPane',400],
+          ['nbBoundaryPane',405],
+          ['smokePane',410],
+          ['perimetersPane',412],
+          ['radarPane',413],
+          ['lightningPane',413],
+          ['viirsPane',414],
+          ['weatherPane',640],
+          ['aqiPane',416],
+          ['firesPane',650],
+          ['planesPane',1000,true]
+        ].forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
 
         L.esri.basemapLayer('Imagery').addTo(map);
 
@@ -315,63 +427,54 @@
           }).addTo(map);
         }
 
-        /* --- device-aware province fit with buffer --- */
-        const fitPaddingPercent = () => (isMobile() ? 0.0001 : 0.04);
-        function fitProvinceToView(options = {}) {
-          const pct = fitPaddingPercent();
-          const padX = Math.round(innerWidth  * pct);
-          const padY = Math.round(innerHeight * pct);
-          map.fitBounds(NB_BOUNDS, {
-            paddingTopLeft: [padX, padY],
-            paddingBottomRight: [padX, padY],
-            ...options
-          });
+        /* ===== initial view matches Reset View on all devices ===== */
+        const fitProvinceToView = ({ animate=false } = {}) => {
+          const padX = Math.round(innerWidth  * 0.04);
+          const padY = Math.round(innerHeight * 0.04);
+          map.fitBounds(NB_BOUNDS, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate });
+        };
+
+        /* ====================== Fires: GeoJSON + markercluster ====================== */
+        const fireStore = new Map();
+
+        let fireClusters = null;
+        function ensureFireClusters(){
+          if (fireClusters) return;
+          fireClusters = L.markerClusterGroup({
+            disableClusteringAtZoom: 11,
+            spiderfyOnMaxZoom: true,
+            zoomToBoundsOnClick: true,
+            showCoverageOnHover: false,
+            iconCreateFunction:(cluster)=>{
+              const markers = cluster.getAllChildMarkers();
+              let worstSev = -2, worstKey = 'extinguished';
+              for(const m of markers){
+                const k = m.options._statusKey || 'extinguished';
+                const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
+                if(sev > worstSev){ worstSev = sev; worstKey = k; }
+              }
+              const ring = statusColor(worstKey);
+              const count = cluster.getChildCount();
+              return L.divIcon({
+                className:'fire-cluster-icon',
+                html: `
+                  <div style="position:relative;display:inline-grid;place-items:center">
+                    <div class="marker-badge" style="--ring:${ring};width:42px;height:42px">
+                      <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div style="position:absolute;bottom:-6px;right:-6px;background:var(--panel-strong);border:2px solid ${ring};border-radius:999px;
+                                font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${count}</div>
+                  </div>`,
+                iconSize:[42,42], iconAnchor:[21,28], popupAnchor:[0,-24]
+              });
+            },
+            pane: 'firesPane',
+            clusterPane: 'firesPane'
+          }).addTo(map);
         }
 
-        map.whenReady(() => fitProvinceToView({ animate: false }));
-
-        let userHasInteracted = false;
-        ['zoomstart','dragstart'].forEach(ev => map.on(ev, () => { userHasInteracted = true; }));
-        const maybeRefit = () => { if (!userHasInteracted) fitProvinceToView({ animate: false }); };
-        window.addEventListener('resize', maybeRefit);
-        window.addEventListener('orientationchange', maybeRefit);
-
-        /* ====================== Fires: GeoJSON + markercluster (no overlay toggles) ====================== */
-        const fireStore = new Map();
-        const fireClusters = L.markerClusterGroup({
-          disableClusteringAtZoom: 11,
-          spiderfyOnMaxZoom: true,
-          zoomToBoundsOnClick: true,
-          showCoverageOnHover: false,
-          iconCreateFunction:(cluster)=>{
-            const markers = cluster.getAllChildMarkers();
-            let worst = { sev:-2, key:'extinguished' };
-            for(const m of markers){
-              const k = m.options._statusKey || 'extinguished';
-              const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
-              if(sev > worst.sev){ worst = { sev, key: k }; }
-            }
-            const ring = statusColor(worst.key);
-            const count = cluster.getChildCount();
-            return L.divIcon({
-              className:'fire-cluster-icon',
-              html: `
-                <div style="position:relative;display:inline-grid;place-items:center">
-                  <div class="marker-badge" style="--ring:${ring};width:42px;height:42px">
-                    <i class="fa-solid fa-fire"></i>
-                  </div>
-                  <div style="position:absolute;bottom:-6px;right:-6px;background:var(--panel-strong);border:2px solid ${ring};border-radius:999px;
-                              font:800 12px/1.1 Inter,system-ui,Arial;padding:4px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${count}</div>
-                </div>`,
-              iconSize:[42,42], iconAnchor:[21,28], popupAnchor:[0,-24]
-            });
-          },
-          pane: 'firesPane',
-          clusterPane: 'firesPane' // keep clusters aligned with fires pane (ignored if unsupported, harmless)
-        }).addTo(map);
-
-        const activeMarkersAll = []; // all non-extinguished markers (kept for filtering)
-        const outMarkersAll = [];    // extinguished markers
+        const activeMarkersAll = [];
+        const outMarkersAll = [];
 
         function bindFirePopup(props, layer, explicitStatus) {
           const status = explicitStatus || props.FIRE_STAT_DESC_E || '—';
@@ -394,24 +497,14 @@
           const rawId = props.GlobalID || props.OBJECTID || props.FIRE_ID || Math.random().toString(36).slice(2)+Date.now().toString(36);
           const id = String(rawId);
           fireStore.set(id,{ id, props, latlng: layer.getLatLng(), layer, statusKey: layer.options._statusKey });
-
-          // hover/click UX
-          let clicked=false, openT=null, closeT=null;
-          const OPEN_MS=150, CLOSE_MS=60;
-          const clearTimers=()=>{ if(openT){clearTimeout(openT);openT=null} if(closeT){clearTimeout(closeT);closeT=null} };
-          layer.on('mouseover',function(){ if(clicked) return; if(closeT) clearTimeout(closeT);
-            if(!openT){ openT=setTimeout(()=>{ openT=null; this.openPopup(); },OPEN_MS); }});
-          layer.on('mouseout',function(){ if(clicked) return; if(openT) clearTimeout(openT);
-            if(!closeT){ closeT=setTimeout(()=>{ closeT=null; this.closePopup(); },CLOSE_MS); }});
-          layer.on('click',function(){ clicked=!clicked; clearTimers(); clicked?this.openPopup():this.closePopup(); });
-          layer.on('remove', clearTimers);
+          bindHoverTogglePopup(layer);
         }
 
         function makeFireMarker(props, coords, explicitStatus){
           const [lng, lat] = coords; // GeoJSON order
           const statusKey = norm(explicitStatus || props.FIRE_STAT_DESC_E || '—');
           const marker = L.marker([lat, lng], {
-            pane: 'firesPane', // ensure the individual fire markers are in the higher pane
+            pane: 'firesPane',
             icon: L.divIcon({
               className:'fire-badge-icon',
               html:`<div class="marker-badge" style="--ring:${statusColor(statusKey)}"><i class="fa-solid fa-fire"></i></div>`,
@@ -435,7 +528,21 @@
           for (const url of attempts) {
             try { const r = await fetch(url, { cache:'no-store' }); if (r.ok) return await r.json(); } catch {}
           }
-          throw new Error(`Could not load ${base} from any known path`);
+        }
+
+        function applyFireFilter(){
+          ensureFireClusters();
+          const cbs = $$('.fire-filter-block input[type="checkbox"]');
+          const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
+
+          fireClusters.clearLayers();
+
+          for (const m of activeMarkersAll) {
+            if (enabled.has(m.options._statusKey)) fireClusters.addLayer(m);
+          }
+          if (enabled.has('extinguished')) {
+            for (const m of outMarkersAll) fireClusters.addLayer(m);
+          }
         }
 
         async function loadLocalFires(){
@@ -445,57 +552,55 @@
               fetchLocalAny('out_fires')
             ]);
 
-            (activeData.features||[]).forEach((f)=>{
+            (activeData?.features||[]).forEach((f)=>{
               if (!f || f.geometry?.type !== 'Point') return;
               const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, f.properties?.FIRE_STAT_DESC_E);
               activeMarkersAll.push(m);
-              fireClusters.addLayer(m); // ACTIVE visible by default
             });
 
-            (outData.features||[]).forEach((f)=>{
+            (outData?.features||[]).forEach((f)=>{
               if (!f || f.geometry?.type !== 'Point') return;
               const m = makeFireMarker(f.properties||{}, f.geometry.coordinates, 'Extinguished');
               outMarkersAll.push(m);
-              // Extinguished OFF by default — not added
             });
 
-            applyFireFilter();   // enforce initial checkbox state (Extinguished off)
-            refreshSummary();    // summary uses fireStore
-          } catch (e) {
-            console.error('Loading local fires failed:', e);
-          }
+            applyFireFilter();
+            refreshSummary();
+          } catch (e) { console.error('Loading local fires failed:', e); }
         }
-        loadLocalFires();
+
+        map.whenReady(() => {
+          fitProvinceToView({ animate:false });  // initial view = reset view
+          loadLocalFires();
+        });
 
         /* ====================== MODIS, Perimeters, NB boundary ====================== */
         const modis48 = L.esri.featureLayer({
           url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
           pane:'viirsPane',
           pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:5,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.9})
-        }).addTo(map);
+        }).addTo(map); // OFF
 
         const modis7d = L.esri.featureLayer({
           url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1',
           pane:'viirsPane',
           pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:4,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.65})
-        });
+        }); // OFF
 
-        const PERIMETER_COLOR = cssVar('--perimeter');
         const perimeterLabelLayers = new Set();
-
         const activefires = L.esri.featureLayer({
           url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
           pane:'perimetersPane',
-          style:()=>({color:PERIMETER_COLOR,weight:1.2,fillOpacity:.18}),
+          style:()=>({color:COLORS.perimeter,weight:1.2,fillOpacity:.18}),
           onEachFeature:(feature,layer)=>{
             const ha = feature?.properties?.AREA;
             layer.bindTooltip(
-              `<span class="perimeter-label" style="color:${PERIMETER_COLOR}">${toNum(ha,1)} ha</span>`,
+              `<span class="perimeter-label" style="color:${COLORS.perimeter}">${toNum(ha,1)} ha</span>`,
               {permanent:true,className:'perimeter-label-tooltip',direction:'center',opacity:0}
             );
             perimeterLabelLayers.add(layer);
           }
-        }).addTo(map);
+        }).addTo(map); // OFF
 
         const setPerimeterLabels = ()=> {
           const show = map.getZoom() >= 11;
@@ -508,30 +613,26 @@
           url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Provinces_and_Territories_of_Canada/FeatureServer/0',
           where:"Name_EN = 'New Brunswick'",
           pane:'nbBoundaryPane',
-          style:()=>({color: cssVar('--boundary'), weight:5, fill:false}),
+          style:()=>({color: COLORS.boundary, weight:5, fill:false}),
           interactive:false
         }).addTo(map);
 
-        /* ====================== Sentinel-2 imagery (public service) ====================== */
+        /* ====================== Sentinel-2 imagery ====================== */
         const sentinel2 = L.esri.imageMapLayer({
           url:'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer',
           opacity:0.75, pane:'sentinelPane'
-        });
-
+        }); // OFF
         sentinel2.on('load', ()=> sentinel2.bringToFront());
 
         /* ====================== Burn Bans (NB) ====================== */
         const nbBurnBans = L.esri.dynamicMapLayer({
           url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
           opacity:.7, pane:'perimetersPane'
-        });
+        }); // OFF
 
         /* ====================== Weather (clustered), Radar, Lightning, AQHI ====================== */
         function stationPopupHTML(p) {
           const fromDeg = Number(p.WindDirection);
-          const dirTxt = Number.isFinite(fromDeg)
-            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
-            : '—';
           const kmh = Number(p.WindSpeed_kmh);
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
           const hum  = p.Humidity_Percent !== '' && p.Humidity_Percent != null ? Math.round(Number(p.Humidity_Percent)) : null;
@@ -540,7 +641,7 @@
           return `
             <div style="min-width:240px">
               <div style="font-weight:800;margin-bottom:4px">${name}</div>
-              <div><b>Wind:</b> ${Number.isFinite(kmh) ? kmh : '—'} km/h • From ${dirTxt}${Number.isFinite(fromDeg) ? ' ('+Math.round(fromDeg)+'°)' : ''}</div>
+              <div><b>Wind:</b> ${Number.isFinite(kmh) ? kmh : '—'} km/h • From ${degToCompass(fromDeg)}${Number.isFinite(fromDeg) ? ' ('+Math.round(fromDeg)+'°)' : ''}</div>
               <div><b>Temp:</b> ${temp != null ? temp + '°C' : '—'}${hum != null ? ' • ' + hum + '%' : ''}</div>
               ${when ? `<div style="opacity:.8">${when}</div>` : ''}
             </div>`;
@@ -549,9 +650,6 @@
           const fromDeg = Number(p.WindDirection);
           const toDeg = Number.isFinite(fromDeg) ? (fromDeg + 180) % 360 : 0;
           const kmh = Number(p.WindSpeed_kmh);
-          const dirTxt = Number.isFinite(fromDeg)
-            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
-            : '—';
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
           const hum  = p.Humidity_Percent !== '' && p.Humidity_Percent != null ? Math.round(Number(p.Humidity_Percent)) : null;
           const arrowPathD = "M42 14 Q52 30 58 58 Q42 48 42 48 Q42 48 26 58 Q32 30 42 14 Z";
@@ -563,7 +661,7 @@
               <g transform="rotate(${toDeg} 42 42)">
                 <path d="${arrowPathD}" fill="#999999" stroke="#999999" stroke-width="1.8" stroke-linejoin="round"></path>
                 <g transform="rotate(${-toDeg} 42 42)">
-                  <text x="42" y="26" text-anchor="middle" class="ws-small">From ${dirTxt}</text>
+                  <text x="42" y="26" text-anchor="middle" class="ws-small">From ${degToCompass(fromDeg)}</text>
                   <text x="42" y="42" text-anchor="middle" class="ws-speed">${Number.isFinite(kmh) ? kmh : '—'} km/h</text>
                   <text x="42" y="58" text-anchor="middle" class="ws-small">
                     ${temp != null ? temp + '°C' : '—'}${hum != null ? ' • ' + hum + '%' : ''}
@@ -577,19 +675,12 @@
           const icon = L.divIcon({ className: 'ws-div', html: stationSVG(p, 84), iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44] });
           const m = L.marker(latlng, { icon, pane: 'weatherPane' });
           m.options._stationProps = p;
-
           const fromDeg = Number(p.WindDirection);
-          const dirTxt = Number.isFinite(fromDeg)
-            ? (() => { const d=((fromDeg%360)+360)%360; const dirs=['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N']; return dirs[Math.round(d/22.5)]; })()
-            : '—';
           const kmh = Number(p.WindSpeed_kmh);
           const temp = p.Temperature_C !== '' && p.Temperature_C != null ? Math.round(Number(p.Temperature_C)) : null;
           const hum  = p.Humidity_Percent !== '' && p.Humidity_Percent != null ? Math.round(Number(p.Humidity_Percent)) : null;
-
           m.bindTooltip(
-            `Wind: ${Number.isFinite(kmh) ? kmh : '—'} km/h • From ${dirTxt}${
-              temp != null ? ' • ' + temp + '°C' : ''
-            }${hum != null ? ' • ' + hum + '%' : ''}`,
+            `Wind: ${Number.isFinite(kmh) ? kmh : '—'} km/h • From ${degToCompass(fromDeg)}${temp != null ? ' • ' + temp + '°C' : ''}${hum != null ? ' • ' + hum + '%' : ''}`,
             { direction: 'top', offset: [0, -36], opacity: 0 }
           );
           m.bindPopup(stationPopupHTML(p), { pane: 'alwaysOnTopPopup' });
@@ -598,7 +689,7 @@
         const weatherStations = L.esri.Cluster.featureLayer({
           url: 'https://services.arcgis.com/zmLUiqh7X11gGV2d/ArcGIS/rest/services/EnvironmentCanada/FeatureServer/0',
           pane: 'weatherPane',
-          clusterPane: 'weatherPane', // align cluster icons; ignored if unsupported
+          clusterPane: 'weatherPane',
           spiderfyOnMaxZoom: true,
           disableClusteringAtZoom: 10,
           zoomToBoundsOnClick: false,
@@ -626,32 +717,27 @@
               iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44]
             });
           }
-        }).addTo(map);
+        }); // OFF
 
         const noaaRadar = L.esri.imageMapLayer({
           url:'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
           opacity:.8, pane:'radarPane'
-        });
+        }); // OFF
         const lightningLayer = L.tileLayer.wms('https://geo.weather.gc.ca/geomet',{
           layers:'Lightning_2.5km_Density',version:'1.3.0',format:'image/png',transparent:true,opacity:1,pane:'lightningPane'
-        });
+        }); // OFF
         let lightningTimer=null;
         const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
         const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
         map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
         map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
 
-        const fireRiskGroup = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
+        const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
           layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
           opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
-        }));
+        })); // ON
 
-        /* ====================== NOAA Smoke (timelapse, off by default) ====================== */
-        const NOAA_SMOKE_URL = 'https://mapservices.weather.noaa.gov/raster/rest/services/air_quality/ndgd_smoke_sfc_1hr_avg_time/ImageServer';
-        const SMOKE_HOURS_EACH_SIDE = 8;      // ± hours around “now”
-        const SMOKE_FRAME_MS = 1200;          // ms per frame
-
-        // The layer itself (not added to map => OFF by default)
+        /* ====================== NOAA Smoke (timelapse) ====================== */
         const smokeLayer = L.esri.imageMapLayer({
           url: NOAA_SMOKE_URL,
           format: 'png32',
@@ -659,53 +745,52 @@
           opacity: 0.72,
           pane: 'smokePane'
         });
+        smokeLayer.addTo(map); // ON
 
-        // Timeline UI refs
-        const smokeControls   = document.getElementById('smokeControls');
-        const smokePlayBtn    = document.getElementById('smokePlay');
-        const smokeSlider     = document.getElementById('smokeTime');
-        const smokeTsLabel    = document.getElementById('smokeTimestamp');
+        const smokeControls   = $('#smokeControls');
+        const smokePlayBtn    = $('#smokePlay');
+        const smokeSlider     = $('#smokeTime');
+        const smokeTsLabel    = $('#smokeTimestamp');
 
-        // Animation state
         let smokeTimesMs = [];
-        let smokeUsedFallback = false;
         let smokeIdx = 0;
         let smokeTimer = null;
 
-        function smokeFmt(ms){
+        const smokeFmt = (ms) => {
           const d = new Date(ms);
-          const local = d.toLocaleString(undefined, {
-            year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false
-          });
-          const iso = d.toISOString().replace('T',' ').replace('.000Z','Z');
-          return `${local} (local) | ${iso} • frame ${smokeIdx+1}/${smokeTimesMs.length}` +
-                 (smokeUsedFallback ? ' • closest frames to now' : '');
-        }
+          if (isMobile()){
+            return d.toLocaleString(undefined, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:false });
+          }
+          const local = d.toLocaleString(undefined, { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false });
+          return `${local} (local)`;
+        };
 
         function smokeSetIndex(i){
           if (!smokeTimesMs.length) return;
           smokeIdx = Math.max(0, Math.min(smokeTimesMs.length - 1, i));
           const t = smokeTimesMs[smokeIdx];
           const dt = new Date(t);
-          smokeLayer.setTimeRange(dt, dt); // snapshot at t
+          smokeLayer.setTimeRange(dt, dt);
           smokeSlider.value = String(smokeIdx);
           smokeTsLabel.textContent = smokeFmt(t);
         }
-
         function smokePlay(){
           if (smokeTimer || !smokeTimesMs.length) return;
           smokePlayBtn.textContent = '⏸';
-          smokeTimer = setInterval(() => {
-            smokeSetIndex((smokeIdx + 1) % smokeTimesMs.length);
-          }, SMOKE_FRAME_MS);
+          smokeTimer = setInterval(() => smokeSetIndex((smokeIdx + 1) % smokeTimesMs.length), SMOKE_FRAME_MS);
         }
         function smokePause(){
           smokePlayBtn.textContent = '▶';
           if (smokeTimer){ clearInterval(smokeTimer); smokeTimer = null; }
         }
-
         smokePlayBtn.addEventListener('click', () => (smokeTimer ? smokePause() : smokePlay()));
         smokeSlider.addEventListener('input', (e) => { smokePause(); smokeSetIndex(parseInt(e.target.value, 10)); });
+
+        const nearestIndex = (arr, target) => {
+          let bestI = 0, bestD = Infinity;
+          for (let i=0;i<arr.length;i++){ const d = Math.abs(arr[i]-target); if(d<bestD){ bestD=d; bestI=i; } }
+          return bestI;
+        };
 
         async function initSmokeTimes(){
           try{
@@ -718,19 +803,13 @@
               .filter(v => typeof v === 'number')
               .sort((a,b)=>a-b);
 
-            if(!allTimes.length){
-              smokeTsLabel.textContent = 'No time frames available';
-              return;
-            }
+            if(!allTimes.length){ smokeTsLabel.textContent = 'No time frames available'; return; }
 
             const now = Date.now();
             const windowMs = SMOKE_HOURS_EACH_SIDE * 3600 * 1000;
             let within = allTimes.filter(t => t >= (now - windowMs) && t <= (now + windowMs));
 
-            smokeUsedFallback = false;
             if(within.length === 0){
-              smokeUsedFallback = true;
-              // nearest index to now
               let lo=0, hi=allTimes.length-1, best=0, bestDiff=Infinity;
               while(lo<=hi){
                 const mid=(lo+hi)>>1, diff=Math.abs(allTimes[mid]-now);
@@ -744,54 +823,171 @@
 
             smokeTimesMs = within;
             smokeSlider.max = String(within.length - 1);
-            smokeIdx = 0;
-            smokeSlider.value = '0';
-            smokeTsLabel.textContent = 'Ready';
+            smokeIdx = nearestIndex(within, now);
+            smokeSlider.value = String(smokeIdx);
+
+            if (map.hasLayer(smokeLayer)) {
+              smokeSetIndex(smokeIdx);
+            } else {
+              smokeTsLabel.textContent = smokeFmt(within[smokeIdx]);
+            }
           } catch (e){
             console.error('Smoke slices error:', e);
             smokeTsLabel.textContent = 'Error loading smoke timeline';
           }
         }
-
-        // Prepare timeline immediately (controls still hidden until layer is turned on)
         initSmokeTimes();
 
-        // Keep the controls above the footer (measure dynamically)
-        function updateFooterOffset(){
-          const footer = document.querySelector('.nb-footer');
-          let offset = 0;
-          if (footer){
-            const rect = footer.getBoundingClientRect();
-            const visible = rect.height > 0 && rect.bottom > 0;
-            if (visible) offset = rect.height + 16; // breathing room
-          }
-          document.documentElement.style.setProperty('--footer-offset', offset + 'px');
-        }
-        updateFooterOffset();
-        window.addEventListener('resize', updateFooterOffset);
-        window.addEventListener('orientationchange', updateFooterOffset);
+        /* ====================== Mobile stacking + robust legend sizing ====================== */
+        const safeProbe = $('#sai-probe');
+        const getSafeBottom = () => (safeProbe?.offsetHeight || 0);
 
-        // Show/hide controls + start/stop when the overlay is toggled
+        // Spacing controls
+        const BASE_GAP = 10;             // general margins used around elements
+        const LEGEND_SMOKE_GAP = 16;     // extra space between legend and smoke controls
+        const FOOTER_SMOKE_GAP = 10;     // space between smoke controls and footer
+
+        // 1) Width: grow to content width (capped to viewport) so labels don't wrap prematurely.
+        function sizeLegendWidth(){
+          const legend = D.querySelector('.leaflet-control-layers');
+          if (!legend) return;
+          const vvW = (window.visualViewport && window.visualViewport.width) || window.innerWidth || document.documentElement.clientWidth || 0;
+          const cap = Math.max(240, Math.floor(vvW - 24)); // 12px margin each side
+          legend.style.maxWidth = cap + 'px';
+          // measure natural content width
+          legend.style.width = 'fit-content';
+          // if content still exceeds cap, cap it
+          const desired = Math.min(legend.scrollWidth, cap);
+          legend.style.width = desired + 'px';
+          // keep horizontal scroll if labels exceed cap
+          legend.style.overflowX = (legend.scrollWidth > desired) ? 'auto' : 'hidden';
+          return desired;
+        }
+
+        // 2) Height: compute available space so we never overlap smoke/footer/link.
+        function sizeLegendHeight(){
+          const legend = D.querySelector('.leaflet-control-layers');
+          if (!legend) return;
+
+          const vvH = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight || 0;
+          const rect = legend.getBoundingClientRect();
+          const topY = Math.max(0, rect.top);
+
+          const footer = $('.nb-footer');
+          const footerH = footer?.getBoundingClientRect().height || 0;
+
+          const smokeVisible = getComputedStyle(smokeControls).display !== 'none';
+          const smokeH = smokeVisible ? (smokeControls.getBoundingClientRect().height || 0) : 0;
+
+          const safeB = getSafeBottom();
+
+          // Reserve space: footer + smoke (with extra gap) + base margins + safe area + small fudge
+          const reserve = footerH
+            + (smokeVisible ? (smokeH + LEGEND_SMOKE_GAP) : 0)
+            + (BASE_GAP * 2)
+            + safeB
+            + 8;
+
+          const maxH = Math.max(120, Math.floor(vvH - topY - reserve));
+
+          legend.style.maxHeight = maxH + 'px';
+          legend.style.overflowY = 'auto';
+          legend.style.webkitOverflowScrolling = 'touch';
+        }
+
+        // Call width first, then height (width affects wrapping/height).
+        const sizeLegend = () => { sizeLegendWidth(); sizeLegendHeight(); };
+
+        // Keep CSS variables for other elements (buttons/smoke placement)
+        function updateBottomStackAndLegend(){
+          const mobile = isMobile();
+          const root = document.documentElement;
+
+          if (!mobile){
+            root.style.setProperty('--fs-bottom', '86px');
+            root.style.setProperty('--smoke-bottom', '28px');
+            root.style.setProperty('--legend-bottom-reserve', '180px');
+            sizeLegend();
+            return;
+          }
+
+          const footer = $('.nb-footer');
+          const footerH = footer?.getBoundingClientRect().height || 0;
+
+          const smokeVisible = getComputedStyle(smokeControls).display !== 'none';
+          const smokeH = smokeVisible ? (smokeControls.getBoundingClientRect().height || 0) : 0;
+
+          const safeB = getSafeBottom();
+
+          // Position smoke controls above the footer using FOOTER_SMOKE_GAP
+          const smokeBottom = footerH + FOOTER_SMOKE_GAP + safeB + FOOTER_SMOKE_GAP;
+          root.style.setProperty('--smoke-bottom', smokeBottom + 'px');
+          root.style.setProperty('--fs-bottom', (footerH + FOOTER_SMOKE_GAP + safeB + FOOTER_SMOKE_GAP) + 'px');
+
+          // Reserve extra space specifically between legend and smoke using LEGEND_SMOKE_GAP
+          const reserve = footerH
+            + (smokeVisible ? (smokeH + LEGEND_SMOKE_GAP) : 0)
+            + (BASE_GAP * 2)
+            + safeB
+            + 8;
+
+          root.style.setProperty('--legend-bottom-reserve', Math.max(140, Math.round(reserve)) + 'px');
+
+          sizeLegend(); // precise inline sizing
+        }
+
+        const rAF = (fn)=>requestAnimationFrame(()=>requestAnimationFrame(fn));
+
+        // Initial layout
+        updateBottomStackAndLegend();
+
+        // Resize/orientation/visualViewport changes
+        window.addEventListener('resize', () => {
+          updateBottomStackAndLegend();
+          if (smokeTimesMs.length) smokeTsLabel.textContent = smokeFmt(smokeTimesMs[smokeIdx]);
+        }, { passive: true });
+
+        window.addEventListener('orientationchange', () => rAF(updateBottomStackAndLegend), { passive: true });
+
+        if (window.visualViewport){
+          const onVV = () => rAF(updateBottomStackAndLegend);
+          visualViewport.addEventListener('resize', onVV, { passive:true });
+          visualViewport.addEventListener('scroll', onVV, { passive:true }); // address bar show/hide
+        }
+
+        // React to smoke layer toggling — show first, then measure.
         map.on('overlayadd', (e) => {
           if (e.layer === smokeLayer) {
-            updateFooterOffset();
             smokeControls.style.display = 'flex';
-            if (smokeTimesMs.length) {
-              smokeSetIndex(smokeIdx || 0);
-              smokePlay();
-            } else {
-              smokeTsLabel.textContent = 'Loading…';
-            }
+            if (smokeTimesMs.length) { smokeSetIndex(smokeIdx); }
+            else { smokeTsLabel.textContent = 'Loading…'; }
             smokeLayer.bringToBack();
+            rAF(updateBottomStackAndLegend);
           }
         });
         map.on('overlayremove', (e) => {
-          if (e.layer === smokeLayer) {
-            smokePause();
-            smokeControls.style.display = 'none';
-          }
+          if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; rAF(updateBottomStackAndLegend); }
         });
 
+        // On initial load, if Smoke layer is present, show it first, then measure.
+        if (map.hasLayer(smokeLayer)) {
+          smokeControls.style.display = 'flex';
+          smokeLayer.bringToBack();
+          smokeTsLabel.textContent = smokeTimesMs.length ? smokeFmt(smokeTimesMs[smokeIdx]) : 'Loading…';
+          rAF(updateBottomStackAndLegend);
+        }
+
+        // Observe size changes to smoke box or footer (content wraps, fonts, etc.)
+        const ro = ('ResizeObserver' in window) ? new ResizeObserver(() => rAF(updateBottomStackAndLegend)) : null;
+        ro?.observe(smokeControls);
+        const footerEl = $('.nb-footer'); footerEl && ro?.observe(footerEl);
+
+        // Recalc when fonts finish loading (prevents late line-wrap growth)
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => rAF(updateBottomStackAndLegend));
+        }
+
+        /* ====================== AQHI ====================== */
         const aqhiLayer = L.esri.featureLayer({
           url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1',
           pane:'aqiPane',
@@ -814,27 +1010,27 @@
             m.bindTooltip(`${loc?loc+' — ':''}AQHI ${val ?? '—'} • ${label}${when?' • '+when:''}`,{direction:'top',offset:[0,-20],opacity:0});
             return m;
           }
-        });
+        }); // OFF
 
-        /* ====================== Aircraft tracking (OpenSky) ====================== */
-        const planesLayer = L.layerGroup(); const planeMarkers=new Map();
-        const makePlaneIcon=(heading)=>{ const ICON_OFFSET=-45;
-          const rotate=Number.isFinite(heading)?heading:0;
-          return L.divIcon({className:'plane-div-icon',html:`<div style="transform:rotate(${ICON_OFFSET}deg);transform-origin:center;display:inline-block;">
-              <div style="transform:rotate(${rotate}deg);font-size:26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))">✈️</div></div>`,
-            iconSize:[30,46],iconAnchor:[15,23]}); };
+        /* ====================== Aircraft (OpenSky) ====================== */
+        const planesLayer = L.layerGroup();
+        const planeMarkers=new Map();
+        const planeIcon=(heading)=> L.divIcon({
+          className:'plane-div-icon',
+          html:`<div style="transform:rotate(-45deg);transform-origin:center;display:inline-block;">
+                  <div style="transform:rotate(${Number.isFinite(heading)?heading:0}deg);font-size:26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))">✈️</div>
+                </div>`,
+          iconSize:[30,46],iconAnchor:[15,23]
+        });
         const upsertPlane=(id,lat,lon,hdg,callsign,vel)=> {
           const html = `<b>${callsign||'Unknown'}</b><br>Heading: ${Number.isFinite(hdg)?Math.round(hdg):'—'}°<br>Speed: ${vel!=null?Math.round(vel*1.94384):'—'} kt`;
           let m=planeMarkers.get(id);
           if(!m){
-            m=L.marker([lat,lon],{icon:makePlaneIcon(hdg),pane:'planesPane',keyboard:false,zIndexOffset:10000}).bindPopup(html,{pane:'alwaysOnTopPopup'});
-            let clicked=false;
-            m.on('mouseover',function(){ if(!clicked) this.openPopup(); });
-            m.on('mouseout',function(){ if(!clicked) this.closePopup(); });
-            m.on('click',function(){ clicked=!clicked; clicked?this.openPopup():this.closePopup(); });
+            m=L.marker([lat,lon],{icon:planeIcon(hdg),pane:'planesPane',keyboard:false,zIndexOffset:10000}).bindPopup(html,{pane:'alwaysOnTopPopup'});
+            bindHoverTogglePopup(m);
             m.addTo(planesLayer); planeMarkers.set(id,m);
           } else {
-            m.setLatLng([lat,lon]); m.setIcon(makePlaneIcon(hdg)); m.setPopupContent(html);
+            m.setLatLng([lat,lon]); m.setIcon(planeIcon(hdg)); m.setPopupContent(html);
           }
         };
         const pruneMissing=(seen)=>{ for(const [k,m] of planeMarkers.entries()){ if(!seen.has(k)){ planesLayer.removeLayer(m); planeMarkers.delete(k); } } };
@@ -843,8 +1039,10 @@
           const r=await fetch(`${OPEN_SKY_URL}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`, { cache:'no-store' });
           if(!r.ok) throw new Error(r.statusText);
           const data=await r.json(); const states=Array.isArray(data.states)?data.states:[]; const seen=new Set();
-          for(const s of states){ const icao24=s[0], callsign=(s[1]||'').trim().toUpperCase(), lon=s[5], lat=s[6], vel=s[9], hdg=s[10];
-            if(!icao24||lat==null||lon==null) continue; seen.add(icao24); upsertPlane(icao24,lat,lon,hdg,callsign,vel); }
+          for(const s of states){
+            const icao24=s[0], callsign=(s[1]||'').trim().toUpperCase(), lon=s[5], lat=s[6], vel=s[9], hdg=s[10];
+            if(!icao24||lat==null||lon==null) continue; seen.add(icao24); upsertPlane(icao24,lat,lon,hdg,callsign,vel);
+          }
           pruneMissing(seen);
         } catch(e){ console.warn('OpenSky fetch failed:', e); } }
         let planesTimer=null;
@@ -864,8 +1062,9 @@
           ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
             .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
         );
+        cityMarkers.addTo(map); // ON
 
-        /* ====================== Overlays + control (no separate fire toggles) ====================== */
+        /* ====================== Overlays + control ====================== */
         const overlays = {
           'MODIS Hotspots — Last 48 hours': modis48,
           'MODIS Hotspots — Last 7 days': modis7d,
@@ -877,7 +1076,7 @@
           'Weather Radar': noaaRadar,
           'Lightning Density': lightningLayer,
           Smoke: smokeLayer,
-          'Fire Risk': fireRiskGroup,
+          'Fire Risk': fireRisk,
           Aircraft: planesLayer,
           'Major Cities & Towns': cityMarkers
         };
@@ -885,37 +1084,24 @@
 
         /* ======== Fire Status panel (Extinguished OFF by default) ======== */
         const FIRE_STATUS = [
-          ['Out of Control', cssVar('--oc'), true],
-          ['Contained',      cssVar('--cont'), true],
-          ['Under Control',  cssVar('--uc'), true],
-          ['Being Patrolled',cssVar('--pat'), true],
-          ['Being Monitored',cssVar('--mon'), true],
+          ['Out of Control', COLORS.oc, true],
+          ['Contained',      COLORS.cont, true],
+          ['Under Control',  COLORS.uc, true],
+          ['Being Patrolled',COLORS.pat, true],
+          ['Being Monitored',COLORS.mon, true],
           ['Extinguished',   '#9aa0a6', false]
         ];
-        function applyFireFilter(){
-          const cbs = document.querySelectorAll('.fire-filter-block input[type="checkbox"]');
-          const enabled = new Set(); cbs.forEach(cb => { if (cb.checked) enabled.add(norm(cb.getAttribute('data-status'))); });
-          for (const m of activeMarkersAll) {
-            const show = enabled.has(m.options._statusKey);
-            if (show && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
-            if (!show && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
-          }
-          const showOut = enabled.has('extinguished');
-          for (const m of outMarkersAll) {
-            if (showOut && !fireClusters.hasLayer(m)) fireClusters.addLayer(m);
-            if (!showOut && fireClusters.hasLayer(m)) fireClusters.removeLayer(m);
-          }
-        }
+        function applyFireFilterAndMaybeInit(){ ensureFireClusters(); applyFireFilter(); }
         function injectFireStatusPanel(){
-          const overlaysList = document.querySelector('.leaflet-control-layers-overlays');
+          const overlaysList = D.querySelector('.leaflet-control-layers-overlays');
           if(!overlaysList || overlaysList.querySelector('.fire-filter-block')) return;
-          const block = document.createElement('div');
+          const block = D.createElement('div');
           block.className = 'fire-filter-block';
           block.innerHTML = `
             <div class="fire-filter-title">Fire Status</div>
             ${FIRE_STATUS.map(([label, ring, checked]) => `
-              <label class="fire-filter-row">
-                <input type="checkbox" data-status="${label}" ${checked ? 'checked' : ''}>
+              <label class="fire-filter-row" style="display:grid;grid-template-columns:18px 26px 1fr;align-items:center;gap:8px;margin:4px 0;">
+                <input type="checkbox" data-status="${label}" ${checked ? 'checked' : ''} />
                 <span class="legend-badge" style="--ring:${ring}">
                   <i class="fa-solid fa-fire"></i>
                 </span>
@@ -924,20 +1110,37 @@
             `).join('')}
           `;
           overlaysList.prepend(block);
-          block.addEventListener('change', applyFireFilter);
+          block.addEventListener('change', applyFireFilterAndMaybeInit);
+          // content added -> recalc legend
+          requestAnimationFrame(sizeLegend);
         }
         injectFireStatusPanel();
 
-        /* ====================== Summary (scrollable body) ====================== */
-        const fsOverlay=document.getElementById('fireSummaryOverlay');
-        const fsBody=document.getElementById('fs-body');
+        /* ====================== Move Summary button into Overview (top) ====================== */
+        function mountSummaryInLegend(){
+          const layersBox = document.querySelector('.leaflet-control-layers');
+          const fsBtn = document.getElementById('fireSummaryBtn');
+          if (!layersBox || !fsBtn) return;
+
+          const topbar = document.createElement('div');
+          topbar.className = 'overview-topbar';
+          fsBtn.classList.add('in-legend');
+          topbar.append(fsBtn);
+          layersBox.prepend(topbar);
+          requestAnimationFrame(sizeLegend);
+        }
+        mountSummaryInLegend();
+
+        /* ====================== Summary ====================== */
+        const fsOverlay=$('#fireSummaryOverlay');
+        const fsBody=$('#fs-body');
+        const fsBtn=$('#fireSummaryBtn');
+        const fsClose=$('#fs-close');
         const chip=(label,n)=>`<span class="chip"><span class="dot" style="background:${statusColor(label)}"></span>${label} <span style="font-weight:800;margin-left:6px">${n}</span></span>`;
         const sizeOf=(p)=> Number((p?.FIRE_SIZE ?? p?.SIZE_HA ?? p?.AREA) ?? 0) || 0;
 
         function buildSummaryHTML(){
-          const items=[...fireStore.values()];
-          const year = new Date().getFullYear();
-
+          const items=[...fireStore.values()]; const year = new Date().getFullYear();
           let totalArea=0, counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,extinguished:0,other:0};
           let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
@@ -945,7 +1148,7 @@
             const p=it.props||{};
             totalArea += sizeOf(p);
             const key=norm(it.statusKey || p.FIRE_STAT_DESC_E);
-            if (Object.prototype.hasOwnProperty.call(counts,key)) counts[key]++; else counts.other++;
+            if (key in counts) counts[key]++; else counts.other++;
             if (key === 'extinguished') totalExt++; else totalActive++;
 
             const det = getDetectedMs(p);
@@ -972,9 +1175,7 @@
             if (!byStatus.has(st)) byStatus.set(st, []);
             byStatus.get(st).push(it);
           }
-          for (const arr of byStatus.values()) {
-            arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
-          }
+          for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
           const statusOrder = ['out of control','contained','under control','being patrolled','being monitored','extinguished','other'];
 
           const detailSections = statusOrder
@@ -1019,47 +1220,60 @@
 
         function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); }
         function wireSummaryClicks(){
-          const cont = document.getElementById('fs-scroll'); if(!cont) return;
+          const cont = $('#fs-scroll'); if(!cont) return;
           cont.addEventListener('click', (e)=>{
             const a = e.target.closest('a[data-fireid]'); if(!a) return;
             e.preventDefault();
             const rec=fireStore.get(a.getAttribute('data-fireid')); if(!rec) return;
-            fsOverlay.style.display='none'; fsOverlay.hidden=true;
+            closeSummary();
             map.flyTo(rec.latlng,Math.max(map.getZoom(),12),{duration:.6});
             map.once('moveend',()=>rec.layer?.openPopup&&rec.layer.openPopup());
-          });
+          }, { passive: false });
         }
 
-        document.getElementById('fireSummaryBtn').addEventListener('click',()=>{ refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; });
-        document.getElementById('fs-close').addEventListener('click',()=>{ fsOverlay.style.display='none'; fsOverlay.hidden=true; });
-        fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay){ fsOverlay.style.display='none'; fsOverlay.hidden=true; } });
+        const openSummary = () => { refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; fsClose.focus(); };
+        const closeSummary = () => { fsOverlay.style.display='none'; fsOverlay.hidden=true; fsBtn.focus(); };
+        fsBtn.addEventListener('click', openSummary);
+        fsClose.addEventListener('click', closeSummary);
+        fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay) closeSummary(); });
+        window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && !fsOverlay.hidden) closeSummary(); });
 
-        /* ====================== Show/Hide Legend + Reset view ====================== */
-        const mapToggleBtn = document.getElementById('mapToggleBtn');
-        const mtbText = document.getElementById('mtb-text');
-
-        function updateLegendButton(){
-          const hidden = document.body.classList.contains('map-ui-hidden');
-          const label = hidden ? 'Show Legend' : 'Hide Legend';
+        /* ====================== Overview toggle + Reset view ====================== */
+        const mapToggleBtn = $('#mapToggleBtn');
+        const mtbText = $('#mtb-text');
+        const updateOverviewButton=()=>{
+          const hidden = D.body.classList.contains('map-ui-hidden');
+          const label = hidden ? 'Show Overview' : 'Hide Overview';
           mapToggleBtn.setAttribute('aria-pressed', String(!hidden));
           mapToggleBtn.title = label;
           mtbText.textContent = label;
-        }
-
-        // Default: legend visible on desktop, hidden on mobile
-        document.body.classList.toggle('map-ui-hidden', isMobile());
-        updateLegendButton();
+        };
+        // Default: Overview hidden
+        D.body.classList.add('map-ui-hidden');
+        updateOverviewButton();
 
         mapToggleBtn.addEventListener('click', () => {
-          document.body.classList.toggle('map-ui-hidden');
-          updateLegendButton();
+          D.body.classList.toggle('map-ui-hidden'); updateOverviewButton(); requestAnimationFrame(sizeLegend);
         });
-
-        document.getElementById('resetViewBtn').addEventListener('click', () => {
+        $('#resetViewBtn').addEventListener('click', () => {
           localStorage.removeItem(LS_KEY);
-          fitProvinceToView({ animate: true }); // device-aware fit on reset
+          fitProvinceToView({ animate:true });     // same as initial view
         });
 
+        // Final recalc once the legend exists in the DOM
+        requestAnimationFrame(() => { sizeLegend(); });
+
+        // Also recalc on global resizes etc.
+        const onGlobalReflow = () => { requestAnimationFrame(() => { updateBottomStackAndLegend(); }); };
+        window.addEventListener('resize', onGlobalReflow, { passive:true });
+        window.addEventListener('orientationchange', onGlobalReflow, { passive:true });
+        if (window.visualViewport){
+          visualViewport.addEventListener('resize', onGlobalReflow, { passive:true });
+          visualViewport.addEventListener('scroll', onGlobalReflow, { passive:true });
+        }
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(onGlobalReflow);
+        }
       });
     </script>
   </body>
