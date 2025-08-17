@@ -9,37 +9,6 @@
   "features": [
     {
       "type": "Feature",
-      "id": 68583,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.78932889525713,
-          47.186679664440135
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68583,
-        "FIRE_NUMBER": "2025254",
-        "FIRE_NUMBER_SHORT": "254",
-        "FIRE_NAME": "Pats Brook",
-        "DEGREES_LAT": 47.18667,
-        "DEGREES_LONG": 65.78932999999999,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755164700000,
-        "FIRE_STAT_DATE": 1755333060000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
-      }
-    },
-    {
-      "type": "Feature",
       "id": 68602,
       "geometry": {
         "type": "Point",
@@ -66,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -97,38 +66,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68529,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.11489901540172,
-          47.29720967591014
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68529,
-        "FIRE_NUMBER": "2025250",
-        "FIRE_NUMBER_SHORT": "250",
-        "FIRE_NAME": "Chief's",
-        "DEGREES_LAT": 47.297200000000004,
-        "DEGREES_LONG": 66.1149,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755108480000,
-        "FIRE_STAT_DATE": 1755421680000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 20,
-        "FIRE_SIZE": 128.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -159,7 +97,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -190,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -221,7 +159,7 @@
         "PERCENT_CONTAINED": 90,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -252,7 +190,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -283,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -314,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -345,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -376,7 +314,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -407,7 +345,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 50.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -438,7 +376,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -469,7 +407,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -500,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -531,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -562,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -593,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -624,7 +562,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -655,7 +593,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -686,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -717,7 +655,100 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68529,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.11489901540172,
+          47.29720967591014
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68529,
+        "FIRE_NUMBER": "2025250",
+        "FIRE_NUMBER_SHORT": "250",
+        "FIRE_NAME": "Chief's",
+        "DEGREES_LAT": 47.297200000000004,
+        "DEGREES_LONG": 66.1149,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755108480000,
+        "FIRE_STAT_DATE": 1755435300000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 30,
+        "FIRE_SIZE": 218.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755449553
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68723,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.02009857366514,
+          46.03613948344621
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68723,
+        "FIRE_NUMBER": "2025283",
+        "FIRE_NUMBER_SHORT": "283",
+        "FIRE_NAME": "283",
+        "DEGREES_LAT": 46.03613,
+        "DEGREES_LONG": 65.0201,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755431700000,
+        "FIRE_STAT_DATE": 1755436080000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755449553
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68583,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.78932889525713,
+          47.186679664440135
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68583,
+        "FIRE_NUMBER": "2025254",
+        "FIRE_NUMBER_SHORT": "254",
+        "FIRE_NAME": "Pats Brook",
+        "DEGREES_LAT": 47.18667,
+        "DEGREES_LONG": 65.78932999999999,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755164700000,
+        "FIRE_STAT_DATE": 1755437520000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -748,7 +779,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 15.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -779,7 +810,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -810,7 +841,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -841,7 +872,7 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 100.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -872,7 +903,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 120.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -903,7 +934,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -934,7 +965,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -965,7 +996,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -996,7 +1027,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -1027,7 +1058,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -1058,7 +1089,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -1089,7 +1120,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -1120,7 +1151,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
       }
     },
     {
@@ -1151,7 +1182,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755445447
+        "FETCHED_FROM_ERD": 1755449553
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68724,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.74541890189342,
+          47.619729738024596
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68724,
+        "FIRE_NUMBER": "2025288",
+        "FIRE_NUMBER_SHORT": "288",
+        "FIRE_NAME": "288",
+        "DEGREES_LAT": 47.61972,
+        "DEGREES_LONG": 65.74542,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755424800000,
+        "FIRE_STAT_DATE": 1755438748000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": null,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755449553
       }
     }
   ]
