@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 20,
         "FIRE_SIZE": 128.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -159,7 +159,69 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68603,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.73226887866821,
+          47.24325967496597
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68603,
+        "FIRE_NUMBER": "2025261",
+        "FIRE_NUMBER_SHORT": "261",
+        "FIRE_NAME": "Smoker Brook",
+        "DEGREES_LAT": 47.243249999999996,
+        "DEGREES_LONG": 65.73227,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755174900000,
+        "FIRE_STAT_DATE": 1755427380000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68642,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.30057873187947,
+          47.3583897040808
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68642,
+        "FIRE_NUMBER": "2025269",
+        "FIRE_NUMBER_SHORT": "269",
+        "FIRE_NAME": "Moose Brook 2",
+        "DEGREES_LAT": 47.35838,
+        "DEGREES_LONG": 65.30058,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755195600000,
+        "FIRE_STAT_DATE": 1755429300000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 90,
+        "FIRE_SIZE": 8.8,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -190,7 +252,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -221,38 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68582,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.77735888737655,
-          47.09122964823727
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68582,
-        "FIRE_NUMBER": "2025253",
-        "FIRE_NUMBER_SHORT": "253",
-        "FIRE_NAME": "Lumsden Road",
-        "DEGREES_LAT": 47.09122,
-        "DEGREES_LONG": 65.77736,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1755165600000,
-        "FIRE_STAT_DATE": 1755423780000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -283,38 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68690,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.4638287811785,
-          47.19295967224956
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68690,
-        "FIRE_NUMBER": "2025284",
-        "FIRE_NUMBER_SHORT": "284",
-        "FIRE_NAME": "284",
-        "DEGREES_LAT": 47.192949999999996,
-        "DEGREES_LONG": 65.46383,
-        "FIRE_STAT_ID": 6,
-        "FIRE_STAT_DESC_E": "Being Monitored",
-        "FIRE_STAT_DESC_F": "Sous surveillance",
-        "TIME_DETECTED": 1755367500000,
-        "FIRE_STAT_DATE": 1755424020000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -345,38 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68603,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.73226887866821,
-          47.24325967496597
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68603,
-        "FIRE_NUMBER": "2025261",
-        "FIRE_NUMBER_SHORT": "261",
-        "FIRE_NAME": "Smoker Brook",
-        "DEGREES_LAT": 47.243249999999996,
-        "DEGREES_LONG": 65.73227,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755174900000,
-        "FIRE_STAT_DATE": 1755424980000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -407,7 +376,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -427,9 +396,9 @@
         "FIRE_NAME": "281",
         "DEGREES_LAT": 47.702329999999996,
         "DEGREES_LONG": 66.28783,
-        "FIRE_STAT_ID": 6,
-        "FIRE_STAT_DESC_E": "Being Monitored",
-        "FIRE_STAT_DESC_F": "Sous surveillance",
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
         "TIME_DETECTED": 1755359340000,
         "FIRE_STAT_DATE": 1755421200000,
         "FIRE_OF_NOTE_INDCTR": 0,
@@ -438,7 +407,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 50.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -469,7 +438,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -500,38 +469,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68642,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.30057873187947,
-          47.3583897040808
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68642,
-        "FIRE_NUMBER": "2025269",
-        "FIRE_NUMBER_SHORT": "269",
-        "FIRE_NAME": "Moose Brook 2",
-        "DEGREES_LAT": 47.35838,
-        "DEGREES_LONG": 65.30058,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755195600000,
-        "FIRE_STAT_DATE": 1755422580000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 70,
-        "FIRE_SIZE": 4.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -562,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -593,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -624,38 +562,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68562,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.74544887398154,
-          47.05652964292348
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68562,
-        "FIRE_NUMBER": "2025252",
-        "FIRE_NUMBER_SHORT": "252",
-        "FIRE_NAME": "Maple Glen",
-        "DEGREES_LAT": 47.05652,
-        "DEGREES_LONG": 65.74544999999999,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1755104400000,
-        "FIRE_STAT_DATE": 1755423660000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 5.5,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -686,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -717,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -748,7 +655,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -779,7 +686,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -810,7 +717,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -841,7 +748,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 15.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -872,7 +779,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -903,38 +810,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68604,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.31684867828196,
-          46.068929483204585
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68604,
-        "FIRE_NUMBER": "2025262",
-        "FIRE_NUMBER_SHORT": "262",
-        "FIRE_NAME": "John Wallace lane",
-        "DEGREES_LAT": 46.06892,
-        "DEGREES_LONG": 65.31685,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755176400000,
-        "FIRE_STAT_DATE": 1755363180000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -965,7 +841,7 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 100.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -996,7 +872,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 120.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -1027,7 +903,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -1058,7 +934,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -1089,7 +965,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -1120,7 +996,100 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68582,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.77735888737655,
+          47.09122964823727
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68582,
+        "FIRE_NUMBER": "2025253",
+        "FIRE_NUMBER_SHORT": "253",
+        "FIRE_NAME": "Lumsden Road",
+        "DEGREES_LAT": 47.09122,
+        "DEGREES_LONG": 65.77736,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755165600000,
+        "FIRE_STAT_DATE": 1755427320000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68690,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.4638287811785,
+          47.19295967224956
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68690,
+        "FIRE_NUMBER": "2025284",
+        "FIRE_NUMBER_SHORT": "284",
+        "FIRE_NAME": "284",
+        "DEGREES_LAT": 47.192949999999996,
+        "DEGREES_LONG": 65.46383,
+        "FIRE_STAT_ID": 6,
+        "FIRE_STAT_DESC_E": "Being Monitored",
+        "FIRE_STAT_DESC_F": "Sous surveillance",
+        "TIME_DETECTED": 1755367500000,
+        "FIRE_STAT_DATE": 1755427560000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68604,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.31684867828196,
+          46.068929483204585
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68604,
+        "FIRE_NUMBER": "2025262",
+        "FIRE_NUMBER_SHORT": "262",
+        "FIRE_NAME": "John Wallace lane",
+        "DEGREES_LAT": 46.06892,
+        "DEGREES_LONG": 65.31685,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755176400000,
+        "FIRE_STAT_DATE": 1755429480000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
       }
     },
     {
@@ -1151,7 +1120,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755437937
+        "FETCHED_FROM_ERD": 1755441903
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68562,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.74544887398154,
+          47.05652964292348
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68562,
+        "FIRE_NUMBER": "2025252",
+        "FIRE_NUMBER_SHORT": "252",
+        "FIRE_NAME": "Maple Glen",
+        "DEGREES_LAT": 47.05652,
+        "DEGREES_LONG": 65.74544999999999,
+        "FIRE_STAT_ID": 3,
+        "FIRE_STAT_DESC_E": "Under Control",
+        "FIRE_STAT_DESC_F": "Maîtrisé ",
+        "TIME_DETECTED": 1755104400000,
+        "FIRE_STAT_DATE": 1755427260000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 5.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755441903
       }
     }
   ]
