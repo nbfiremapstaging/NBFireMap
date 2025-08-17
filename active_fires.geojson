@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -159,7 +159,69 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68602,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.58214880900113,
+          46.88480961804912
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68602,
+        "FIRE_NUMBER": "2025260",
+        "FIRE_NUMBER_SHORT": "260",
+        "FIRE_NAME": "South Barnaby 2",
+        "DEGREES_LAT": 46.884800000000006,
+        "DEGREES_LONG": 65.58215,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755180000000,
+        "FIRE_STAT_DATE": 1755416520000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755427623
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68609,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.18038868272161,
+          47.21503968286535
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68609,
+        "FIRE_NUMBER": "2025267",
+        "FIRE_NUMBER_SHORT": "267",
+        "FIRE_NAME": "Park Road",
+        "DEGREES_LAT": 47.21503,
+        "DEGREES_LONG": 65.18039,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755196500000,
+        "FIRE_STAT_DATE": 1755416700000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -190,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -221,7 +283,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -252,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -283,7 +345,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -314,38 +376,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68691,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.28924909780034,
-          47.713039740662424
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68691,
-        "FIRE_NUMBER": "2025285",
-        "FIRE_NUMBER_SHORT": "285",
-        "FIRE_NAME": "285",
-        "DEGREES_LAT": 47.713029999999996,
-        "DEGREES_LONG": 66.28925,
-        "FIRE_STAT_ID": 6,
-        "FIRE_STAT_DESC_E": "Being Monitored",
-        "FIRE_STAT_DESC_F": "Sous surveillance",
-        "TIME_DETECTED": 1755370380000,
-        "FIRE_STAT_DATE": 1755371520000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -376,7 +407,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 50.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -407,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -438,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -469,7 +500,7 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 100.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -500,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -531,7 +562,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 10.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -562,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -593,7 +624,38 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68542,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.58014880757104,
+          46.88293961750678
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68542,
+        "FIRE_NUMBER": "2025251",
+        "FIRE_NUMBER_SHORT": "251",
+        "FIRE_NAME": "South Barbaby",
+        "DEGREES_LAT": 46.882929999999995,
+        "DEGREES_LONG": 65.58015,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755108000000,
+        "FIRE_STAT_DATE": 1755416520000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -624,7 +686,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -655,7 +717,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -686,7 +748,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -717,38 +779,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68666,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.3351187363612,
-          47.20788967757172
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68666,
-        "FIRE_NUMBER": "2025275",
-        "FIRE_NUMBER_SHORT": "275",
-        "FIRE_NAME": "275",
-        "DEGREES_LAT": 47.207879999999996,
-        "DEGREES_LONG": 65.33512,
-        "FIRE_STAT_ID": 6,
-        "FIRE_STAT_DESC_E": "Being Monitored",
-        "FIRE_STAT_DESC_F": "Sous surveillance",
-        "TIME_DETECTED": 1755270300000,
-        "FIRE_STAT_DATE": 1755283260000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -779,7 +810,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -810,7 +841,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 120.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -841,7 +872,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -872,100 +903,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68602,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.58214880900113,
-          46.88480961804912
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68602,
-        "FIRE_NUMBER": "2025260",
-        "FIRE_NUMBER_SHORT": "260",
-        "FIRE_NAME": "South Barnaby 2",
-        "DEGREES_LAT": 46.884800000000006,
-        "DEGREES_LONG": 65.58215,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755180000000,
-        "FIRE_STAT_DATE": 1755335880000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68542,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.58014880757104,
-          46.88293961750678
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68542,
-        "FIRE_NUMBER": "2025251",
-        "FIRE_NUMBER_SHORT": "251",
-        "FIRE_NAME": "South Barbaby",
-        "DEGREES_LAT": 46.882929999999995,
-        "DEGREES_LONG": 65.58015,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755108000000,
-        "FIRE_STAT_DATE": 1755335940000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68609,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.18038868272161,
-          47.21503968286535
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68609,
-        "FIRE_NUMBER": "2025267",
-        "FIRE_NUMBER_SHORT": "267",
-        "FIRE_NAME": "Park Road",
-        "DEGREES_LAT": 47.21503,
-        "DEGREES_LONG": 65.18039,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755196500000,
-        "FIRE_STAT_DATE": 1755335940000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -996,7 +934,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1027,7 +965,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1058,7 +996,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1089,7 +1027,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1120,7 +1058,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1151,7 +1089,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1182,7 +1120,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     },
     {
@@ -1213,7 +1151,7 @@
         "PERCENT_CONTAINED": 20,
         "FIRE_SIZE": 250.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755423812
+        "FETCHED_FROM_ERD": 1755427623
       }
     }
   ]
