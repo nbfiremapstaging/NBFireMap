@@ -1534,17 +1534,28 @@ function buildHelpHTML(){
     return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
   }).join('');
 
+  // helper to render a colored status row using your existing palette
+  const statusRow = (label, key, text) => `
+    <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
+      <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
+      <div><b>${label}</b> – ${text}</div>
+    </li>
+  `;
+
   const statusDefs = `
     <div style="margin-top:14px">
-      <h3 style="margin:6px 0;font-size:15px;font-weight:800">Fire Status Definitions</h3>
-      <ul style="padding-left:16px; margin:6px 0; line-height:1.5">
-        <li><b>Out of Control</b> – Any new start or fire not contained and still growing. Escape probable along established breaks. Requires a percent contained value.</li>
-        <li><b>Being Monitored</b> – A known, out of control fire that is not immediately threatening life or infrastructure. Observed by aircraft or satellite with no resources assigned.</li>
-        <li><b>Contained</b> – Fire is within a bulldozed break or wet line that should restrict growth with continued suppression. Still active on some flanks; jump/escape possible.</li>
-        <li><b>Under Control</b> – Control line established and fire activity is low with occasional flare-ups. Jump/escape unlikely. Sustained mop-up underway.</li>
-        <li><b>Being Patrolled</b> – Fire secured within all breaks/wet lines. Activity nil, occasional smokes only. Jump/escape probability nil. Minimal staff required.</li>
-        <li><b>Out</b> – Fire is cold with no visible smoke for at least 24 hours. Declared out when IC confirms all hotspots are extinguished.</li>
-        <li><b>Percent Contained</b> – Estimate of the fire perimeter secured by wet line, dozer break, or natural barriers (roads, lakes, rivers).</li>
+      <h3 style="margin:6px 0 2px;font-size:15px;font-weight:800">Fire Status Definitions</h3>
+      <ul style="padding-left:0; margin:6px 0; list-style:none;">
+        ${statusRow('Out of Control', 'out of control', 'Any new start or fire not contained and still growing. Escape probable along established breaks. Requires a percent contained value.')}
+        ${statusRow('Being Monitored', 'being monitored', 'A known, out of control fire not immediately threatening life or infrastructure. Monitored by aircraft or satellite; no resources currently assigned.')}
+        ${statusRow('Contained', 'contained', 'Within a bulldozed break or wet line that should restrict growth with continued suppression. Fire may still be active on some flanks; jump/escape possible.')}
+        ${statusRow('Under Control', 'under control', 'Control line established; fire activity low with occasional flare-ups. Jump/escape unlikely. Sustained action and mop up underway.')}
+        ${statusRow('Being Patrolled', 'being patrolled', 'Fire secured within all breaks or wet lines. Activity nil with occasional smokes; jump/escape probability nil. Minimal staff needed; mop up mostly complete.')}
+        ${statusRow('Out', 'extinguished', 'Fire is cold with no visible smoke for at least 24 hours. Declared out when the Incident Commander confirms all fire has been found and extinguished.')}
+        <li style="margin:10px 0 0; display:flex; gap:10px; align-items:flex-start;">
+          <span class="legend-swatch" style="background:#fff;"></span>
+          <div><b>Percent Contained</b> – Estimate of the perimeter secured by wet line, dozer break, or natural barriers (e.g., roads, lakes, rivers).</div>
+        </li>
       </ul>
     </div>
   `;
@@ -1577,6 +1588,7 @@ function closeHelp(){
 mhClose.addEventListener('click', closeHelp);
 mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
 window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
+
 
 
 
@@ -1745,3 +1757,4 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
   </script>
 </body>
 </html>
+
