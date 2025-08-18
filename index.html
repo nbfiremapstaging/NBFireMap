@@ -1202,7 +1202,6 @@
         if (!SUMS_BENCH) return '';
         const fetched = SUMS_BENCH.fetchedAt ? ` <span style="opacity:.7">• fetched ${fmtDateTime(SUMS_BENCH.fetchedAt)}</span>` : '';
         return `
-          <div style="margin:10px 0 2px"><b>Benchmarks</b>${fetched}</div>
           <table class="pro-table compact" aria-label="Historic/season benchmarks">
             <thead><tr><th>Metric</th><th>Value</th></tr></thead>
             <tbody>
@@ -1389,3 +1388,4 @@
   </script>
 </body>
 </html>
+
