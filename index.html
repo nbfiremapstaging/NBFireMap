@@ -1578,7 +1578,7 @@ cityClusters.addTo(map); // on
       }
 
       // --- City → Fires proximity (100 km, ACTIVE ONLY) ---------------------
-      const CITY_RADIUS_M = 20_000;
+      const CITY_RADIUS_M = 30_000;
       const cityProximityLayer = L.layerGroup({ pane: 'firesPane' }).addTo(map);
 
       // keep a reference to the current city popup, so we can clear lines when it closes
@@ -1615,7 +1615,7 @@ cityClusters.addTo(map); // on
         if (!nearby.length) {
           const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 360 })
             .setLatLng(cityLatLng)
-            .setContent(`<b>${name}</b><br>No active fires within 20&nbsp;km.`)
+            .setContent(`<b>${name}</b><br>No active fires within 30&nbsp;km.`)
             .openOn(map);
           cityProximityPopup = p;
 
@@ -1661,7 +1661,7 @@ cityClusters.addTo(map); // on
         const html = `
           <div style="min-width:260px">
             <div style="font-weight:800;margin-bottom:6px">${name}</div>
-            <div><b>Active fires within 20&nbsp;km:</b></div>
+            <div><b>Active fires within 30&nbsp;km:</b></div>
             <ol class="summary-list">${listHTML}</ol>
           </div>`;
 
