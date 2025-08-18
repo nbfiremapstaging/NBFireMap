@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1402.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -190,38 +190,7 @@
         "PERCENT_CONTAINED": 30,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68587,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.93049932919075,
-          47.797179738686125
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68587,
-        "FIRE_NUMBER": "2025258",
-        "FIRE_NUMBER_SHORT": "258",
-        "FIRE_NAME": "Ruisseau a Ellol",
-        "DEGREES_LAT": 47.79717,
-        "DEGREES_LONG": 66.93050000000001,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755172500000,
-        "FIRE_STAT_DATE": 1755506940000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -252,7 +221,7 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -283,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -314,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -345,7 +314,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -376,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -407,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -438,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -469,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -500,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -531,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -562,7 +531,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -593,7 +562,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 70.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -624,7 +593,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -655,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -686,7 +655,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -717,7 +686,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -748,7 +717,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -779,7 +748,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -810,7 +779,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -841,7 +810,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -872,7 +841,7 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 650.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -903,7 +872,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -934,7 +903,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -965,7 +934,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -996,7 +965,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.6,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -1027,7 +996,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -1058,7 +1027,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -1089,7 +1058,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     },
     {
@@ -1120,7 +1089,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755532222
+        "FETCHED_FROM_ERD": 1755536286
       }
     }
   ]
