@@ -341,7 +341,7 @@
         ['contained',      { color: COLORS.cont, sev: 2 }],
         ['under control',  { color: COLORS.uc,   sev: 1 }],
         ['being patrolled',{ color: COLORS.pat,  sev: 0 }],
-        ['being monitored',{ color: COLORS.mon,  sev: 0 }],
+        ['being monitored',{ color: COLORS.mon,  sev: 2.5 }],
         ['extinguished',   { color: '#9aa0a6',   sev: -1 }],
       ]);
       const norm = (s) => (s || '').toString().trim().toLowerCase();
@@ -762,7 +762,7 @@
       const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
       const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
       map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
-      map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
+      map.on('overlayremove',(e)=>{ if(e.layer===lightnessLayer) stopLightningRefresh(); });
 
       const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
         layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
@@ -1327,12 +1327,12 @@ cityClusters.addTo(map); // on
           <table class="pro-table compact" aria-label="Historic/season benchmarks">
             <thead><tr><th>Historic</th><th>Value</th></tr></thead>
             <tbody>
-              <tr><td>10-year Avg — Fires</td><td>${toNum(SUMS_BENCH.avg10Fires,0)}</td></tr>
-              <tr><td>10-year Avg — Area Burned</td><td>${toNum(SUMS_BENCH.avg10Burn,1)} ha</td></tr>
-              <tr><td>Last Year — Fires</td><td>${toNum(SUMS_BENCH.lastCount,0)}</td></tr>
-              <tr><td>Last Year — Area Burned</td><td>${toNum(SUMS_BENCH.lastBurn,1)} ha</td></tr>
-              <tr><td>This Year — Fires</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisCount,0)}</td></tr>
-              <tr><td>This Year — Area Burned</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisBurn,1)} ha</td></tr>
+              <tr><td>10-year Avg YTD Fires</td><td>${toNum(SUMS_BENCH.avg10Fires,0)}</td></tr>
+              <tr><td>10-year Avg YTD Area Burned</td><td>${toNum(SUMS_BENCH.avg10Burn,1)} ha</td></tr>
+              <tr><td>Last Year YTD Fires</td><td>${toNum(SUMS_BENCH.lastCount,0)}</td></tr>
+              <tr><td>Last Year YTD Area Burned</td><td>${toNum(SUMS_BENCH.lastBurn,1)} ha</td></tr>
+              <tr><td>YTD Fires</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisCount,0)}</td></tr>
+              <tr><td>YTD Area Burned</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisBurn,1)} ha</td></tr>
             </tbody>
           </table>
         `;
@@ -1508,44 +1508,77 @@ cityClusters.addTo(map); // on
       window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && !fsOverlay.hidden) closeSummary(); });
 
       // --- Help modal --------------------------------------------------------
-      const mhOverlay = $('#mapHelpOverlay');
-      const mhBody = $('#mh-body');
-      const mhClose = $('#mh-close');
+const mhOverlay = $('#mapHelpOverlay');
+const mhBody = $('#mh-body');
+const mhClose = $('#mh-close');
 
-      function buildHelpHTML(){
-        const desc = {
-          'MODIS Hotspots — Last 48 hours': 'Thermal hotspots detected by NASA MODIS in the past 48 hours.',
-          'MODIS Hotspots — Last 7 days': 'MODIS hotspots detected within the last 7 days.',
-          'Weather Stations': 'Environment Canada stations with wind, temperature and humidity.',
-          'Fire Perimeters': 'Current wildfire perimeter polygons with area labels at close zoom.',
-          'Sentinel-2 Imagery': 'Recent satellite imagery (clouds may obscure).',
-          'NB Burn Bans': 'Official NB burn restrictions layer.',
-          'AQHI Risk': 'Air Quality Health Index observations.',
-          'Weather Radar': 'NOAA base reflectivity radar mosaic.',
-          'Lightning Density': 'Recent lightning strike density (updates automatically).',
-          'Smoke': 'Hourly surface smoke forecast; use the timeline control to scrub or play.',
-          'Fire Risk': 'Daily Fire Danger Rating from CWFIS.',
-          'Aircraft': 'ADS-B aircraft positions (OpenSky Network).',
-          'Cities & Towns': 'Labels for NB communities.'
-        };
-        const list = Object.keys(overlays).map(name => {
-          const d = desc[name] || 'No description available.';
-          return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
-        }).join('');
-        return `
-          <p>Use the <b>Overview</b> panel to toggle layers on and off. Drag the map to pan, use <b>+</b>/<b>−</b> to zoom, or tap <b>Reset Map View</b> to refit to New Brunswick.</p>
-          <p>The <b>Smoke</b> layer includes a timeline near the bottom; press <b>▶</b> to animate or drag the slider to a specific hour.</p>
-          <p>Legend of layers:</p>
-          <ul style="padding-left:16px; margin:8px 0 0;">${list}</ul>
-          <p style="margin-top:10px; font-size:12px; color:var(--muted);">This is an unofficial tool. Data sources include Esri, NOAA, Environment Canada, CWFIS, and OpenSky.</p>
-        `;
-      }
+function buildHelpHTML(){
+  const desc = {
+    'Smoke': 'Forecast surface smoke (from NOAA). Use the timeline control at the bottom to scrub or play an animation.',
+    'MODIS Hotspots — Last 48 hours': 'Thermal hotspots detected by NASA MODIS within the last 2 days. Useful for spotting new ignition points.',
+    'MODIS Hotspots — Last 7 days': 'MODIS hotspots detected in the last week (slightly older data).',
+    'Fire Perimeters': 'Current wildfire perimeter polygons, with area labels visible when zoomed in.',
+    'Cities & Towns': 'Labels for NB communities. Click a town name to see nearby fires (within 30 km).',
+    'Aircraft': 'Aircraft in NB airspace from the OpenSky network. Includes waterbombers and other planes.',
+    'Weather Stations': 'Environment Canada stations showing live wind, temperature and humidity.',
+    'AQHI Risk': 'Air Quality Health Index (AQHI) observations at reporting stations.',
+    'Weather Radar': 'NOAA radar reflectivity mosaic (precipitation).',
+    'Lightning Density': 'Recent lightning strike density. Updates automatically.',
+    'NB Burn Bans': 'Official New Brunswick burn restriction map from GNB.',
+    'Fire Risk': 'Daily Fire Danger Rating from the Canadian Wildland Fire Information System.',
+    'Sentinel-2 Imagery': 'Recent high-resolution satellite imagery. Clouds may obscure view.'
+  };
 
-      function openHelp(){ mhBody.innerHTML = buildHelpHTML(); mhOverlay.hidden=false; mhOverlay.style.display='flex'; mhClose.focus(); }
-      function closeHelp(){ mhOverlay.style.display='none'; mhOverlay.hidden=true; }
-      mhClose.addEventListener('click', closeHelp);
-      mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
-      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
+  const list = Object.keys(overlays).map(name => {
+    const d = desc[name] || 'No description available.';
+    return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
+  }).join('');
+
+  const statusDefs = `
+    <div style="margin-top:14px">
+      <h3 style="margin:6px 0;font-size:15px;font-weight:800">Fire Status Definitions</h3>
+      <ul style="padding-left:16px; margin:6px 0; line-height:1.5">
+        <li><b>Out of Control</b> – Any new start or fire not contained and still growing. Escape probable along established breaks. Requires a percent contained value.</li>
+        <li><b>Being Monitored</b> – A known, out of control fire that is not immediately threatening life or infrastructure. Observed by aircraft or satellite with no resources assigned.</li>
+        <li><b>Contained</b> – Fire is within a bulldozed break or wet line that should restrict growth with continued suppression. Still active on some flanks; jump/escape possible.</li>
+        <li><b>Under Control</b> – Control line established and fire activity is low with occasional flare-ups. Jump/escape unlikely. Sustained mop-up underway.</li>
+        <li><b>Being Patrolled</b> – Fire secured within all breaks/wet lines. Activity nil, occasional smokes only. Jump/escape probability nil. Minimal staff required.</li>
+        <li><b>Out</b> – Fire is cold with no visible smoke for at least 24 hours. Declared out when IC confirms all hotspots are extinguished.</li>
+        <li><b>Percent Contained</b> – Estimate of the fire perimeter secured by wet line, dozer break, or natural barriers (roads, lakes, rivers).</li>
+      </ul>
+    </div>
+  `;
+
+  return `
+    <p><b>Basic Navigation:</b> Drag to move the map, scroll or use <b>+</b>/<b>−</b> to zoom. The <b>Reset Map View</b> button fits back to New Brunswick.</p>
+    <p><b>Overview Panel:</b> Use the layer checkboxes to toggle data on/off. At the top you’ll find a fire summary button, and at the bottom this help button.</p>
+    <p><b>Fires:</b> Click fire icons for details (size, status, dates). Hover or tap to preview quickly. Filters let you show/hide statuses (Out of Control, Contained, etc.).</p>
+    <p><b>Smoke Forecast:</b> When the Smoke layer is active, a timeline appears at the bottom. Press ▶ to play or drag the slider to view a specific hour.</p>
+    <p><b>Cities:</b> Click city labels to see all active fires within 30 km, with distance lines and a quick-jump list.</p>
+    <p><b>Layers Explained:</b></p>
+    <ul style="padding-left:16px; margin:8px 0 0;">${list}</ul>
+    ${statusDefs}
+    <p style="margin-top:10px; font-size:12px; color:var(--muted);">
+      This map is an unofficial tool. Data sources include GNB ERD, Esri, NOAA, Environment Canada, CWFIS, and the OpenSky Network.
+    </p>
+  `;
+}
+
+function openHelp(){ 
+  mhBody.innerHTML = buildHelpHTML(); 
+  mhOverlay.hidden=false; 
+  mhOverlay.style.display='flex'; 
+  mhClose.focus(); 
+}
+function closeHelp(){ 
+  mhOverlay.style.display='none'; 
+  mhOverlay.hidden=true; 
+}
+mhClose.addEventListener('click', closeHelp);
+mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
+
+
 
       // --- Overview toggle & reset ------------------------------------------
       const mapToggleBtn = $('#mapToggleBtn');
@@ -1577,7 +1610,7 @@ cityClusters.addTo(map); // on
         }
       }
 
-      // --- City → Fires proximity (100 km, ACTIVE ONLY) ---------------------
+      // --- City → Fires proximity (30 km, ACTIVE ONLY) ----------------------
       const CITY_RADIUS_M = 30_000;
       const cityProximityLayer = L.layerGroup({ pane: 'firesPane' }).addTo(map);
 
@@ -1653,8 +1686,19 @@ cityClusters.addTo(map); // on
 
           bounds.extend(rec.latlng);
 
+          // NEW: include status + distance in the list
           const fname = rec.props.FIRE_NAME || rec.props.FIRE_ID || 'Fire';
-          return `<li><a href="#" data-fireid="${rec.id}"><b>${fname}</b> — ${km} km</a></li>`;
+          const statusKey = norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '—');
+          const statusLabel = statusKey.replace(/\b\w/g, c => c.toUpperCase());
+          const color = statusColor(statusKey);
+          return `<li>
+            <a href="#" data-fireid="${rec.id}">
+              <span class="dot" style="background:${color}; margin-right:6px"></span>
+              <b>${fname}</b>
+              <span style="opacity:.85">• ${statusLabel}</span>
+              <span style="opacity:.85">• ${km} km</span>
+            </a>
+          </li>`;
         }).join('');
 
         // Popup with list (click-through to the fire)
@@ -1667,14 +1711,11 @@ cityClusters.addTo(map); // on
 
         const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 420 })
           .setLatLng(cityLatLng)
-          .setContent(html)
-          .openOn(map);
-        cityProximityPopup = p;
+          .setContent(html);
 
-        // Delegate clicks on the list to zoom/open that fire
-        map.once('popupopen', (e) => {
-          if (e.popup !== cityProximityPopup) return; // only wire our city popup
-          const el = e.popup.getElement();
+        // IMPORTANT: attach click handler on popup "add" so it always exists
+        p.once('add', () => {
+          const el = p.getElement();
           el?.addEventListener('click', (evt) => {
             const a = evt.target.closest('a[data-fireid]');
             if (!a) return;
@@ -1683,10 +1724,14 @@ cityClusters.addTo(map); // on
             if (!rec) return;
             ensureStatusEnabled(rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || ''));
             hideOverviewPanel();
+            // Reliable zoom + open: wait for moveend, then open popup
             map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
-            setTimeout(() => { rec.layer?.openPopup?.(); }, 620);
-          });
+            map.once('moveend', () => { rec.layer?.openPopup?.(); });
+          }, { passive: false });
         });
+
+        p.openOn(map);
+        cityProximityPopup = p;
 
         // Fit all lines + city
         const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
