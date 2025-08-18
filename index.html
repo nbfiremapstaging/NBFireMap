@@ -26,7 +26,18 @@
       --shadow:0 10px 30px rgba(2,8,20,.08); --shadow-soft:0 6px 16px rgba(2,8,20,.06);
       --btn-bg:#fff; --btn-border:#d9dee6; --btn-hover:#f2f4f7;
       --link:#2563eb; --focus:0 0 0 3px rgba(37,99,235,.28);
-      --oc:#ef4444; --cont:#fb923c; --uc:#facc15; --pat:#22c55e; --mon:#3b82f6;
+      /* Fire status colors (updated order & hues)
+         Out of Control = red (unchanged)
+         Being Monitored = orange (moved up)
+         Contained = yellow (shifted down)
+         Under Control = green (shifted down)
+         Being Patrolled = blue (shifted down) */
+      --oc:#ef4444; /* red */
+      --mon:#fb923c; /* orange */
+      --cont:#facc15; /* yellow (was UC) */
+      --uc:#22c55e; /* green (was Patrolled) */
+      --pat:#3b82f6; /* blue (was Monitored) */
+
       --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
       --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
 
@@ -336,12 +347,13 @@
       };
 
       // --- Fire status helpers ----------------------------------------------
+      // Updated severity: OC > Monitored > Contained > Under Control > Patrolled > Out
       const STATUS = new Map([
-        ['out of control', { color: COLORS.oc,  sev: 3 }],
+        ['out of control', { color: COLORS.oc,  sev: 4 }],
+        ['being monitored',{ color: COLORS.mon, sev: 3 }],
         ['contained',      { color: COLORS.cont, sev: 2 }],
         ['under control',  { color: COLORS.uc,   sev: 1 }],
         ['being patrolled',{ color: COLORS.pat,  sev: 0 }],
-        ['being monitored',{ color: COLORS.mon,  sev: 2.5 }],
         ['extinguished',   { color: '#9aa0a6',   sev: -1 }],
       ]);
       const norm = (s) => (s || '').toString().trim().toLowerCase();
@@ -762,7 +774,7 @@
       const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
       const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
       map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
-      map.on('overlayremove',(e)=>{ if(e.layer===lightnessLayer) stopLightningRefresh(); });
+      map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
 
       const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
         layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
@@ -1197,13 +1209,14 @@ cityClusters.addTo(map); // on
       L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
       // --- Fire-status filter panel (checkboxes) -----------------------------
+      // Order updated: OC, Monitored, Contained, Under Control, Patrolled, Extinguished
       const FIRE_STATUS = [
-        ['Out of Control', COLORS.oc, true],
-        ['Contained',      COLORS.cont, true],
-        ['Under Control',  COLORS.uc, true],
-        ['Being Patrolled',COLORS.pat, true],
-        ['Being Monitored',COLORS.mon, true],
-        ['Extinguished',   '#9aa0a6', false]
+        ['Out of Control',  COLORS.oc,  true],
+        ['Being Monitored', COLORS.mon, true],
+        ['Contained',       COLORS.cont,true],
+        ['Under Control',   COLORS.uc,  true],
+        ['Being Patrolled', COLORS.pat, true],
+        ['Extinguished',    '#9aa0a6',  false]
       ];
       function applyFireFilterAndMaybeInit(){ ensureFireClusters(); applyFireFilter(); }
       function injectFireStatusPanel(){
@@ -1289,12 +1302,13 @@ cityClusters.addTo(map); // on
       const fireStoreMap = fireStore;
 
       function pieCSSSegments(counts){
+        // Order updated for pie: OC, Monitored, Contained, Under Control, Patrolled
         const order = [
           ['out of control', 'Out of Control'],
+          ['being monitored','Being Monitored'],
           ['contained', 'Contained'],
           ['under control', 'Under Control'],
-          ['being patrolled', 'Being Patrolled'],
-          ['being monitored', 'Being Monitored']
+          ['being patrolled', 'Being Patrolled']
         ];
         const total = order.reduce((sum,[k]) => sum + (counts[k]||0), 0);
         if (total === 0) return { css:'conic-gradient(#e5e7eb 0 360deg)', legendHTML:'<div class="legend-item"><span class="legend-swatch" style="background:#e5e7eb"></span><span>No active statuses</span></div>' };
@@ -1340,7 +1354,7 @@ cityClusters.addTo(map); // on
 
       function buildSummaryHTML(){
         const items=[...fireStoreMap.values()]; const year = new Date().getFullYear();
-        let totalArea=0, counts={'out of control':0,contained:0,'under control':0,'being patrolled':0,'being monitored':0,extinguished:0,other:0};
+        let totalArea=0, counts={'out of control':0,'being monitored':0,contained:0,'under control':0,'being patrolled':0,extinguished:0,other:0};
         let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
         for(const it of items){
@@ -1385,7 +1399,8 @@ cityClusters.addTo(map); // on
           byStatus.get(st).push(it);
         }
         for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
-        const statusOrder = ['out of control','contained','under control','being patrolled','being monitored','extinguished','other'];
+        // Display detail sections in the same updated order
+        const statusOrder = ['out of control','being monitored','contained','under control','being patrolled','extinguished','other'];
 
         const detailSections = statusOrder
           .filter(k => byStatus.has(k))
@@ -1436,7 +1451,7 @@ cityClusters.addTo(map); // on
 
       // NEW: ensure ALL active statuses are enabled (so all active points show)
       function enableAllActiveStatuses(){
-        const set = new Set(['out of control','contained','under control','being patrolled','being monitored']);
+        const set = new Set(['out of control','being monitored','contained','under control','being patrolled']);
         const cbs = $$('.fire-filter-block input[type="checkbox"]');
         let changed=false;
         cbs.forEach(cb=>{
@@ -1534,7 +1549,7 @@ function buildHelpHTML(){
     return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
   }).join('');
 
-  // helper to render a colored status row using your existing palette
+  // helper to render a colored status row using your updated palette
   const statusRow = (label, key, text) => `
     <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
       <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
@@ -1551,7 +1566,6 @@ function buildHelpHTML(){
         ${statusRow('Contained', 'contained', 'Within a bulldozed break or wet line that should restrict growth with continued suppression. Fire may still be active on some flanks; jump/escape possible.')}
         ${statusRow('Under Control', 'under control', 'Control line established; fire activity low with occasional flare-ups. Jump/escape unlikely. Sustained action and mop up underway.')}
         ${statusRow('Being Patrolled', 'being patrolled', 'Fire secured within all breaks or wet lines. Activity nil with occasional smokes; jump/escape probability nil. Minimal staff needed; mop up mostly complete.')}
-        ${statusRow('Out', 'extinguished', 'Fire is cold with no visible smoke for at least 24 hours. Declared out when the Incident Commander confirms all fire has been found and extinguished.')}
         <li style="margin:10px 0 0; display:flex; gap:10px; align-items:flex-start;">
           <span class="legend-swatch" style="background:#fff;"></span>
           <div><b>Percent Contained</b> – Estimate of the perimeter secured by wet line, dozer break, or natural barriers (e.g., roads, lakes, rivers).</div>
@@ -1563,7 +1577,7 @@ function buildHelpHTML(){
   return `
     <p><b>Basic Navigation:</b> Drag to move the map, scroll or use <b>+</b>/<b>−</b> to zoom. The <b>Reset Map View</b> button fits back to New Brunswick.</p>
     <p><b>Overview Panel:</b> Use the layer checkboxes to toggle data on/off. At the top you’ll find a fire summary button, and at the bottom this help button.</p>
-    <p><b>Fires:</b> Click fire icons for details (size, status, dates). Hover or tap to preview quickly. Filters let you show/hide statuses (Out of Control, Contained, etc.).</p>
+    <p><b>Fires:</b> Click fire icons for details (size, status, dates). Hover or tap to preview quickly. Filters let you show/hide statuses.</p>
     <p><b>Smoke Forecast:</b> When the Smoke layer is active, a timeline appears at the bottom. Press ▶ to play or drag the slider to view a specific hour.</p>
     <p><b>Cities:</b> Click city labels to see all active fires within 30 km, with distance lines and a quick-jump list.</p>
     <p><b>Layers Explained:</b></p>
@@ -1640,7 +1654,7 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
       });
 
       function cityToFires(name, cityLatLng) {
-        // show all ACTIVE fire points (doesn't affect extinguished)
+        // show all ACTIVE fire points
         enableAllActiveStatuses();
 
         // Clear previous graphics
@@ -1656,7 +1670,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
           if (Number.isFinite(d) && d <= CITY_RADIUS_M) nearby.push({ rec, d });
         }
 
-        // If none: say so and center the city
         if (!nearby.length) {
           const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 360 })
             .setLatLng(cityLatLng)
@@ -1669,13 +1682,11 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
           return;
         }
 
-        // Draw lines + distance labels; build list & bounds
         nearby.sort((a, b) => a.d - b.d);
         const bounds = L.latLngBounds([cityLatLng]);
         const listHTML = nearby.map(({ rec, d }) => {
           const km = kmStr(d);
 
-          // high-contrast line with soft casing for dark basemaps
           L.polyline([cityLatLng, rec.latlng], {
             color: '#000000', weight: 6, opacity: 0.55
           }).addTo(cityProximityLayer);
@@ -1683,7 +1694,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
             color: '#ffffff', weight: 3, opacity: 0.95, dashArray: '6,8'
           }).addTo(cityProximityLayer);
 
-          // midpoint distance label
           const mid = L.latLng(
             (cityLatLng.lat + rec.latlng.lat) / 2,
             (cityLatLng.lng + rec.latlng.lng) / 2
@@ -1698,7 +1708,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
 
           bounds.extend(rec.latlng);
 
-          // NEW: include status + distance in the list
           const fname = rec.props.FIRE_NAME || rec.props.FIRE_ID || 'Fire';
           const statusKey = norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '—');
           const statusLabel = statusKey.replace(/\b\w/g, c => c.toUpperCase());
@@ -1713,7 +1722,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
           </li>`;
         }).join('');
 
-        // Popup with list (click-through to the fire)
         const html = `
           <div style="min-width:260px">
             <div style="font-weight:800;margin-bottom:6px">${name}</div>
@@ -1725,7 +1733,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
           .setLatLng(cityLatLng)
           .setContent(html);
 
-        // IMPORTANT: attach click handler on popup "add" so it always exists
         p.once('add', () => {
           const el = p.getElement();
           el?.addEventListener('click', (evt) => {
@@ -1736,7 +1743,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
             if (!rec) return;
             ensureStatusEnabled(rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || ''));
             hideOverviewPanel();
-            // Reliable zoom + open: wait for moveend, then open popup
             map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
             map.once('moveend', () => { rec.layer?.openPopup?.(); });
           }, { passive: false });
@@ -1745,7 +1751,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
         p.openOn(map);
         cityProximityPopup = p;
 
-        // Fit all lines + city
         const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
         hideOverviewPanel();
         map.fitBounds(bounds, { padding: [pad, pad], animate: true });
@@ -1757,4 +1762,3 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
   </script>
 </body>
 </html>
-
