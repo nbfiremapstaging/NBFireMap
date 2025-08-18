@@ -1,6 +1,7 @@
-# New Brunswick Wildfire Map
+# NB Fire Map
 
-A Leaflet + Esri‑Leaflet web map showing NB wildfire points, wildfire perimeters, weather stations, radar, lightning density, smoke, AQHI, and MODIS hotspots for New Brunswick and surrounding areas.
+An interactive web map for monitoring current and recent wildfire activity in New Brunswick, Canada.  
+The map integrates multiple open data sources including wildfire perimeters, active fire points, smoke forecasts, and environmental conditions to provide situational awareness.
 
 **Map:** [NBFireMap](https://nbfiremap.github.io/NBFireMap/)
 
@@ -8,83 +9,62 @@ A Leaflet + Esri‑Leaflet web map showing NB wildfire points, wildfire perimete
 
 ## Features
 
-- Esri Imagery basemap with custom panes and z‑indexing for clean stacking.
-- **NB wildfire points** loaded from local GeoJSON (`active_fires.json`, `out_fires.json`) with rich popups and clustering.
-- **Fire Status filter** (Out of Control, Contained, Under Control, Being Patrolled, Being Monitored, Extinguished). *Extinguished* is off by default. If all statuses are off, no fire points are shown.
-- **Canadian wildfire perimeters** with auto‑labels that appear at higher zoom.
-- **Fire Summary drawer** (Atlantic time): counts, new today/yesterday, extinguished today/yesterday, total burned area, and quick zoom to fires. Drawer content scrolls on mobile.
-- **Environment and Climate Change Canada weather stations** with heading‑aware wind icons and tooltips; cluster icons display the nearest station symbol plus a count badge.
-- **NOAA radar** (time‑enabled base reflectivity image service).
-- **MSC GeoMet lightning density** (WMS) with periodic refresh.
-- **AQHI stations** with category‑coded badges.
-- **MODIS hotspots** (last 48 hours and last 7 days).
-- **Fire Danger (CWFIS)** overlay.
-- **Smoke forecast layer** (Canada).
-- Mobile‑friendly UI with **Show/Hide Layers**, **Reset Map View**, and **Fire Summary** buttons.
+- **Active Fire Locations**: Displays active and extinguished fire points from Government of New Brunswick (GeoNB) data services.
+- **Wildfire Perimeters**: Shows active wildfire boundaries across Canada.
+- **Satellite Hotspots**: Includes MODIS and Sentinel-2 fire detections.
+- **Smoke Forecasts**: NOAA surface smoke forecasts with a timeline animation.
+- **Burn Restrictions**: Links to official NB burn restrictions and fire watch updates.
+- **Environmental Layers**: Weather stations, lightning density, fire danger ratings, radar, and AQHI data.
+- **Aircraft Tracking**: Integrates ADS-B flight positions from OpenSky Network (potentially identifying water bombers and support aircraft).
+- **Community Context**: City and town markers with proximity tools to nearby fires.
 
 ---
 
-## Data Sources
+## Data Sources and Ownership
 
-### Wildfires
-- **NB Wildfire Points (local cache used by the map)**  
-  `active_fires.json`, `out_fires.json` (derived periodically from  
-  [Public_Fires/MapServer/0](https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0))
+This project relies on authoritative open data services. All data is the property of its respective owners:
 
-- **Active Wildfire Perimeters in Canada (polygons)**  
-  [Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0)
+- **Government of New Brunswick (GeoNB)**  
+  - [Active Fire Data](https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html)  
+  - [NB Crown Land](https://geonb.snb.ca/)  
+  Ownership: © Province of New Brunswick. Provided for public awareness.
 
-- **MODIS Hotspots — Last 48 hours**  
-  [MODIS_Thermal_v1/FeatureServer/0](https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0)
+- **Natural Resources Canada (CWFIS)**  
+  - [Canadian Wildland Fire Information System (Fire Danger Rating)](https://cwfis.cfs.nrcan.gc.ca/home)  
+  Ownership: © Government of Canada.
 
-- **MODIS Hotspots — Last 7 days**  
-  [MODIS_Thermal_v1/FeatureServer/1](https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1)
+- **Environment and Climate Change Canada (ECCC)**  
+  - [Weather and Lightning Layers](https://weather.gc.ca/)  
+  - [Air Quality Health Index (AQHI)](https://www.canada.ca/en/environment-climate-change/services/air-quality-health-index.html)  
+  Ownership: © Government of Canada.
 
-### Weather & Air Quality
-- **Environment Canada Stations**  
-  [EnvironmentCanada/FeatureServer/0](https://services.arcgis.com/zmLUiqh7X11gGV2d/arcgis/rest/services/EnvironmentCanada/FeatureServer/0)
+- **NOAA National Weather Service**  
+  - [NOAA Smoke Forecast (Surface Concentration)](https://www.weather.gov/)  
+  Ownership: © United States Government, public domain.
 
-- **NOAA Radar – Base Reflectivity (time‑enabled)**  
-  [radar_base_reflectivity_time/ImageServer](https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer)
+- **NASA / Esri**  
+  - [MODIS Fire Hotspots](https://earthdata.nasa.gov/)  
+  - [Sentinel-2 Imagery via Esri Services](https://sentinel.esa.int/)  
+  Ownership: © NASA / ESA. Licensed for research and public awareness.
 
-- **Lightning Density (WMS)**  
-  [GeoMet WMS](https://geo.weather.gc.ca/geomet?service=WMS&request=GetCapabilities&version=1.3.0)  
-  Layer: `Lightning_2.5km_Density`
+- **OpenSky Network**  
+  - [Aircraft Positions API](https://opensky-network.org/)  
+  Ownership: © OpenSky Network contributors. Licensed for non-commercial use.
 
-- **AQHI Stations**  
-  [aqhi_stations_observations_realtime/FeatureServer/1](https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1)
-
-### Fire Danger & Smoke
-- **Fire Danger (CWFIS)**  
-  WMS: `public:fdr_current`  
-  Endpoint: `https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms`
-
-- **Wildfire Smoke (Canada, forecast)**  
-  [Hosted/Aug12/ImageServer](https://enterpriseim.esriservices.ca/server/rest/services/Hosted/Aug12/ImageServer)
-
----
-
-## How the Map Works
-
-- **Layers & Popups:** Tailored rendering, tooltips, and popups for clarity.
-- **Perimeter Labels:** Shown at zoom ≥ 11 to reduce clutter.
-- **Fire Summary Panel:** Aggregates NB fire data from local GeoJSON with Atlantic‑time calculations for “today” and “yesterday.”
-- **Weather Clusters:** Cluster icons show the nearest station’s wind symbol plus a count badge.
-- **Controls:** “Show/Hide Layers” toggles the UI, “Reset Map View” restores the initial view, and “Fire Summary” opens the drawer.
-
----
-
-## Errors & Omissions
-
-This project relies on multiple live open‑data services. Data availability, timeliness, and accuracy may vary, and some services may be temporarily unavailable. Do not rely on this map for safety‑critical decisions; always consult official government channels for emergency information.
+All data is used strictly for visualization and public information purposes. This repository does not modify, republish, or redistribute the original data.
 
 ---
 
 ## Acknowledgements
 
-Thank you to the open data teams and service maintainers whose work enables this map:
+**Firefighters and emergency response teams** — for their ongoing work protecting lives, communities, and ecosystems.
 
-- **Government of New Brunswick** — wildfire data and other public services  
-- **Environment and Climate Change Canada** — weather, radar, and AQHI data  
-- **Natural Resources Canada / CWFIS** — fire danger ratings and perimeter data  
-- **NASA/NOAA partners** — global satellite hotspot services
+**Open data champions** in New Brunswick, Canada, the United States, and internationally — for making critical environmental and geospatial data openly available.
+
+**Developers and maintainers** of Leaflet, Esri Leaflet, and OpenSky Network libraries for enabling open geospatial analysis.
+
+## Disclaimer
+
+This is an unofficial tool created for situational awareness and data visualization.
+For official wildfire information, alerts, and restrictions, consult:
+[Government of New Brunswick Fire Watch](https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html).
