@@ -3,7 +3,7 @@
 An interactive web map for monitoring current and recent wildfire activity in New Brunswick, Canada.  
 The map integrates multiple open data sources including wildfire perimeters, active fire points, smoke forecasts, and environmental conditions to provide situational awareness.
 
-**Map:** [NBFireMap](https://nbfiremap.github.io/NBFireMap/)
+**Map:** [NBFireMap](https://www.nbfiremap.ca)
 
 ---
 
