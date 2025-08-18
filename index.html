@@ -35,7 +35,7 @@
       --smoke-bottom: 28px;
       --legend-bottom-reserve: 180px;
 
-      /* Title guards set by JS (use these names consistently) */
+      /* JS-updated guards for title width */
       --left-guard: 12px;
       --right-guard: 12px;
     }
@@ -48,7 +48,7 @@
       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
     }
 
-    /* Leaflet controls (lowered to leave room for title/buttons) */
+    /* Leaflet controls (kept lower to leave room for title/buttons) */
     .leaflet-bar a,.leaflet-bar a:hover{background:var(--panel);border:1px solid var(--border);color:var(--text);box-shadow:var(--shadow-soft)}
     .leaflet-bar a{width:34px;height:34px;line-height:34px;font-size:16px}
     .leaflet-control-attribution{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-soft);padding:4px 8px}
@@ -99,15 +99,14 @@
     .map-btn .icon{width:18px;height:18px;display:inline-grid;place-items:center}
     .map-ui-hidden .leaflet-control-layers{opacity:0;pointer-events:none}
 
-    /* Title box (single-line with guards; never wraps unless forced by .wrap) */
+    /* Title (single-line by default) */
     .map-title{
       position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1003;pointer-events:none;cursor:default;
       background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:999px;padding:10px 16px;font-weight:800;box-shadow:var(--shadow);
       white-space:nowrap;width:max-content;max-width:max-content;overflow:hidden;text-overflow:ellipsis;text-wrap: nowrap;
     }
-    /*.map-title.wrap{white-space:normal;line-height:1.2;padding:10px 14px}*/
 
-    /* Summary button (relocated into legend when available) */
+    /* Summary button (relocated into legend on wide UI) */
     .fire-summary-btn{position:fixed;left:12px;z-index:2001;bottom:calc(var(--fs-bottom, 86px) + env(safe-area-inset-bottom))}
     .fire-summary-btn.in-legend{position:static!important;left:auto;bottom:auto;width:100%;margin:0;justify-content:center;box-shadow:var(--shadow-soft);border-radius:var(--radius-sm)}
 
@@ -204,6 +203,8 @@
     .pie{width:110px;height:110px;border-radius:50%;border:1px solid var(--border);box-shadow:var(--shadow-soft);background:#fff}
     .pie-legend{display:grid;gap:6px}
     .legend-item{display:flex;align-items:center;gap:10px;font-weight:700}
+    .legend-item[role="button"]{cursor:pointer}
+    .legend-item[role="button"]:focus-visible{outline:none;box-shadow:var(--focus);border-radius:8px}
     .legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
     .legend-count{opacity:.85;font-weight:800;margin-left:auto}
     .muted-note{margin-top:8px;font-size:12px;color:var(--muted)}
@@ -223,7 +224,7 @@
     </div>
   </div>
 
-  <!-- Title box (stays single-line by default) -->
+  <!-- Title -->
   <div id="mapTitle" class="map-title" aria-hidden="true"><i class="fa-solid fa-fire"></i> NB Fire Map</div>
 
   <!-- Overview toggle / reset / summary -->
@@ -277,12 +278,11 @@
   <script defer src="https://unpkg.com/esri-leaflet-cluster/dist/esri-leaflet-cluster.js"></script>
 
   <script>
-    /* ========================================================================
-       NB Fire Map — Lean cleanup: consistent title guards, tighter comments,
-       preserved symbols/clustering, and organized helpers.
-       ===================================================================== */
+    /* =========================================================================
+       NB Fire Map — cleaned and organized. All symbols/clustering preserved.
+       ========================================================================= */
 
-    /* ----------------- Compass helpers (used in station UI) ---------------- */
+    // --- Compass utils (used in station UI) ---------------------------------
     const COMPASS_16 = ['N','NNE','NE','ENE','E','ESE','SE','S','SSW','SW','WSW','W','WNW','NW','NNW','N'];
     function degToCompass(deg){
       if (!Number.isFinite(deg)) return '—';
@@ -293,7 +293,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       'use strict';
 
-      /* ---------------------- Shorthands & core constants ------------------- */
+      // --- DOM helpers & core constants -------------------------------------
       const D = document;
       const $  = (sel, root=D) => root.querySelector(sel);
       const $$ = (sel, root=D) => root.querySelectorAll(sel);
@@ -303,6 +303,7 @@
       const INITIAL_VIEW = { center: [46.7, -66.2], zoom: 7 };
       const ATLANTIC_TZ = 'America/Moncton';
 
+      // External data sources / intervals
       const OPEN_SKY_URL = 'https://opensky-network.org/api/states/all';
       const PLANE_REFRESH_MS = 250_000;
       const LIGHTNING_REFRESH_MS = 120_000;
@@ -311,7 +312,7 @@
       const SMOKE_HOURS_EACH_SIDE = 24;
       const SMOKE_FRAME_MS = 1200;
 
-      /* ---------------------------- CSS utilities --------------------------- */
+      // --- CSS var reader & color map ---------------------------------------
       const cssVar = (name) => getComputedStyle(D.documentElement).getPropertyValue(name).trim();
       const COLORS = {
         oc:  cssVar('--oc'),
@@ -324,7 +325,7 @@
         modis: cssVar('--modis'),
       };
 
-      /* ------------------------- Fire status helpers ------------------------ */
+      // --- Fire status helpers ----------------------------------------------
       const STATUS = new Map([
         ['out of control', { color: COLORS.oc,  sev: 3 }],
         ['contained',      { color: COLORS.cont, sev: 2 }],
@@ -337,7 +338,7 @@
       const statusColor = (s) => STATUS.get(norm(s))?.color ?? '#9aa0a6';
       const severityRank = (s) => STATUS.get(norm(s))?.sev ?? -1;
 
-      /* ------------------------- Format/date utilities ---------------------- */
+      // --- Formatting & date helpers ----------------------------------------
       const isMobile = () => innerWidth < 768;
       const toNum = (v, d=1) => (v==null || Number.isNaN(Number(v))) ? '—'
         : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
@@ -368,7 +369,7 @@
         } return null;
       };
 
-      /* ---------- Containment % & retrieval metadata (robust parsing) ------- */
+      // Containment % & retrieval info (robust parsing)
       const firstProp = (p, keys) => { for (const k of keys) { const v = p?.[k]; if (v !== undefined && v !== null && v !== '') return [k, v]; } return [null, null]; };
       const clamp01 = (n) => Math.max(0, Math.min(100, n));
       const parseMaybeNumber = (v) => { if (v == null) return null; const n = Number(v); if (Number.isFinite(n)) return n; const m = String(v).match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
@@ -393,7 +394,7 @@
         return { ms:null, bool:null, raw:v };
       };
 
-      /* --------------------------- Title layout ----------------------------- */
+      // --- Title layout (guards to avoid overlap with buttons) ---------------
       const titleEl = $('#mapTitle');
       function layoutTitleBox(){
         const leftBtn  = $('#resetViewBtn');
@@ -404,7 +405,6 @@
         const LEFT_GUARD  = 12 + leftW  + GUTTER;
         const RIGHT_GUARD = 12 + rightW + GUTTER;
         const root = D.documentElement;
-        /* IMPORTANT: set the vars actually used in CSS so title stays one line */
         root.style.setProperty('--left-guard',  LEFT_GUARD  + 'px');
         root.style.setProperty('--right-guard', RIGHT_GUARD + 'px');
         if (!titleEl) return;
@@ -414,7 +414,7 @@
         });
       }
 
-      /* ------------------------------ Map init ------------------------------ */
+      // --- Map init ----------------------------------------------------------
       const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
       const map = L.map('map', { center: saved?.center || INITIAL_VIEW.center, zoom: saved?.zoom || INITIAL_VIEW.zoom });
       map.on('moveend', () => {
@@ -422,7 +422,7 @@
         localStorage.setItem(LS_KEY, JSON.stringify({ center: [c.lat, c.lng], zoom: map.getZoom() }));
       });
 
-      // Panes (z ordering)
+      // Custom panes for z-order
       [
         ['alwaysOnTopPopup',9999],
         ['sentinelPane',400],
@@ -447,15 +447,13 @@
         }).addTo(map);
       }
 
-      // Reset view matches initial fit on all devices
-      const NB_BOUNDS_CONST = NB_BOUNDS;
       const fitProvinceToView = ({ animate=false } = {}) => {
         const padX = Math.round(innerWidth  * 0.04);
         const padY = Math.round(innerHeight * 0.04);
-        map.fitBounds(NB_BOUNDS_CONST, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate });
+        map.fitBounds(NB_BOUNDS, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate });
       };
 
-      /* ---------------- Fires: local GeoJSON + marker clustering ------------ */
+      // --- Local fires (GeoJSON) + marker clustering ------------------------
       const fireStore = new Map();
       let fireClusters = null;
       function ensureFireClusters(){
@@ -542,7 +540,7 @@
       }
 
       function makeFireMarker(props, coords, explicitStatus){
-        const [lng, lat] = coords; // GeoJSON
+        const [lng, lat] = coords; // GeoJSON order
         const statusKey = norm(explicitStatus || props.FIRE_STAT_DESC_E || '—');
         const marker = L.marker([lat, lng], {
           pane: 'firesPane',
@@ -604,18 +602,18 @@
 
       map.whenReady(() => { fitProvinceToView({ animate:false }); loadLocalFires(); });
 
-      /* ----------------- MODIS, Perimeters, Province boundary --------------- */
+      // --- MODIS, perimeters, boundary --------------------------------------
       const modis48 = L.esri.featureLayer({
         url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
         pane:'viirsPane',
         pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:5,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.9})
-      }).addTo(map); // ON by default (as before)
+      }).addTo(map); // on
 
       const modis7d = L.esri.featureLayer({
         url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1',
         pane:'viirsPane',
         pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:4,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.65})
-      }); // OFF
+      }); // off
 
       const perimeterLabelLayers = new Set();
       const activefires = L.esri.featureLayer({
@@ -645,15 +643,15 @@
         interactive:false
       }).addTo(map);
 
-      /* ------------------------- Sentinel imagery & bans --------------------- */
+      // --- Sentinel imagery & burn bans -------------------------------------
       const sentinel2 = L.esri.imageMapLayer({ url:'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer', opacity:0.75, pane:'sentinelPane' });
       sentinel2.on('load', ()=> sentinel2.bringToFront());
       const nbBurnBans = L.esri.dynamicMapLayer({
         url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
         opacity:.7, pane:'perimetersPane'
-      }); // OFF
+      }); // off
 
-      /* ---------------- Weather (clustered), Radar, Lightning, AQHI ---------- */
+      // --- Weather (clustered), radar, lightning, AQHI ----------------------
       function stationPopupHTML(p) {
         const fromDeg = Number(p.WindDirection);
         const kmh = Number(p.WindSpeed_kmh);
@@ -737,19 +735,18 @@
                   ${cluster.getChildCount()}
                 </div>
               </div>`,
-            iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44]
-          });
+            iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44] });
         }
-      }); // OFF
+      }); // off
 
       const noaaRadar = L.esri.imageMapLayer({
         url:'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
         opacity:.8, pane:'radarPane'
-      }); // OFF
+      }); // off
 
       const lightningLayer = L.tileLayer.wms('https://geo.weather.gc.ca/geomet',{
         layers:'Lightning_2.5km_Density',version:'1.3.0',format:'image/png',transparent:true,opacity:1,pane:'lightningPane'
-      }); // OFF
+      }); // off
 
       let lightningTimer=null;
       const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
@@ -760,11 +757,11 @@
       const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
         layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
         opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
-      })); // ON
+      })); // on
 
-      /* ------------------------ NOAA Smoke (timelapse) ---------------------- */
+      // --- NOAA Smoke timeline ----------------------------------------------
       const smokeLayer = L.esri.imageMapLayer({ url: NOAA_SMOKE_URL, format:'png32', transparent:true, opacity:0.72, pane:'smokePane' });
-      smokeLayer.addTo(map); // ON
+      smokeLayer.addTo(map); // on
 
       const smokeControls   = $('#smokeControls');
       const smokePlayBtn    = $('#smokePlay');
@@ -850,7 +847,7 @@
       }
       initSmokeTimes();
 
-      /* ------------------ Mobile stacking + legend sizing ------------------- */
+      // --- Mobile stacking + legend sizing ----------------------------------
       const safeProbe = $('#sai-probe');
       const getSafeBottom = () => (safeProbe?.offsetHeight || 0);
 
@@ -950,7 +947,7 @@
       if (window.visualViewport){
         const onVV = () => rAF(onGlobalReflow);
         visualViewport.addEventListener('resize', onVV, { passive:true });
-        visualViewport.addEventListener('scroll', onVV, { passive:true }); // address bar show/hide
+        visualViewport.addEventListener('scroll', onVV, { passive:true });
       }
       if (document.fonts && document.fonts.ready) { document.fonts.ready.then(() => rAF(onGlobalReflow)); }
 
@@ -976,7 +973,7 @@
       ro?.observe(smokeControls);
       const footerEl = $('.nb-footer'); footerEl && ro?.observe(footerEl);
 
-      /* --------------------------------- AQHI -------------------------------- */
+      // --- AQHI --------------------------------------------------------------
       const aqhiLayer = L.esri.featureLayer({
         url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/aqhi_stations_observations_realtime/FeatureServer/1',
         pane:'aqiPane',
@@ -999,9 +996,9 @@
           m.bindTooltip(`${loc?loc+' — ':''}AQHI ${val ?? '—'} • ${label}${when?' • '+when:''}`,{direction:'top',offset:[0,-20],opacity:0});
           return m;
         }
-      }); // OFF
+      }); // off
 
-      /* -------------------------------- Aircraft ----------------------------- */
+      // --- Aircraft ----------------------------------------------------------
       const planesLayer = L.layerGroup();
       const planeMarkers=new Map();
       const planeIcon=(heading)=> L.divIcon({
@@ -1038,7 +1035,7 @@
       planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,PLANE_REFRESH_MS); });
       planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
 
-      /* --------------------------------- Cities ------------------------------ */
+      // --- City labels -------------------------------------------------------
       const cityMarkers=L.layerGroup(
         [
           ['Fredericton',45.9636,-66.6431],['Saint John',45.2733,-66.0633],['Moncton',46.0878,-64.7782],
@@ -1051,9 +1048,9 @@
         ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
           .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
       );
-      cityMarkers.addTo(map); // ON
+      cityMarkers.addTo(map); // on
 
-      /* ----------------------- Overlays + layer control ---------------------- */
+      // --- Overlays and layer control ---------------------------------------
       const overlays = {
         Smoke: smokeLayer,
         'MODIS Hotspots — Last 48 hours': modis48,
@@ -1071,7 +1068,7 @@
       };
       L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
-      /* ------------------- Fire-status filter panel (UI) -------------------- */
+      // --- Fire-status filter panel (checkboxes) -----------------------------
       const FIRE_STATUS = [
         ['Out of Control', COLORS.oc, true],
         ['Contained',      COLORS.cont, true],
@@ -1104,7 +1101,7 @@
       }
       injectFireStatusPanel();
 
-      /* -------- Move Summary button into Overview (top) + Help in bottom ---- */
+      // --- Move Summary & Help buttons into the legend -----------------------
       function mountSummaryInLegend(){
         const layersBox = D.querySelector('.leaflet-control-layers');
         const fsBtn = $('#fireSummaryBtn');
@@ -1133,12 +1130,11 @@
       mountSummaryInLegend();
       mountHelpInLegend();
 
-      /* -------------------- Benchmarks (sums_table.json) -------------------- */
-      let SUMS_BENCH = null; // filled once loaded
-
+      // --- Benchmarks (sums_table.json) -------------------------------------
+      let SUMS_BENCH = null;
       async function loadSumsBenchmarks(){
         try{
-          const data = await fetchLocalAny('sums_table'); // lives beside index
+          const data = await fetchLocalAny('sums_table');
           const attrs = data?.features?.[0]?.attributes || null;
           if (!attrs) return;
           SUMS_BENCH = {
@@ -1150,15 +1146,14 @@
             thisBurn: attrs.THIS_YEARS_BURN,
             fetchedAt: attrs.FETCHED_FROM_ERD ?? null
           };
-          refreshSummary(); // redraw with benchmarks section
+          refreshSummary();
         } catch (e){
           console.warn('sums_table load failed:', e);
         }
       }
-      // Fire this early; harmless if file missing.
-      loadSumsBenchmarks();
+      loadSumsBenchmarks(); // harmless if file missing
 
-      /* ------------------------------- Summary -------------------------------- */
+      // --- Summary modal content --------------------------------------------
       const fsOverlay=$('#fireSummaryOverlay');
       const fsBody=$('#fs-body');
       const fsBtn=$('#fireSummaryBtn');
@@ -1189,7 +1184,7 @@
           const color = statusColor(k);
           segs.push(`${color} ${start}deg ${end}deg`);
           legend.push(`
-            <div class="legend-item">
+            <div class="legend-item" role="button" tabindex="0" data-status-key="${k}">
               <span class="legend-swatch" style="background:${color}"></span>
               <span>${label}</span>
               <span class="legend-count">${val}</span>
@@ -1203,7 +1198,7 @@
         const fetched = SUMS_BENCH.fetchedAt ? ` <span style="opacity:.7">• fetched ${fmtDateTime(SUMS_BENCH.fetchedAt)}</span>` : '';
         return `
           <table class="pro-table compact" aria-label="Historic/season benchmarks">
-            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+            <thead><tr><th>Historic</th><th>Value</th></tr></thead>
             <tbody>
               <tr><td>10-year Avg — Fires</td><td>${toNum(SUMS_BENCH.avg10Fires,0)}</td></tr>
               <tr><td>10-year Avg — Area Burned</td><td>${toNum(SUMS_BENCH.avg10Burn,1)} ha</td></tr>
@@ -1242,7 +1237,7 @@
 
         const tableHTML = `
           <table class="pro-table compact" aria-label="Fire summary table">
-            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+            <thead><tr><th>Current</th><th>Value</th></tr></thead>
             <tbody>
               <tr><td>Total (${year})</td><td class="pro-kpi">${toNum(totalFiresYear,0)}</td></tr>
               <tr><td>Active</td><td class="pro-kpi">${toNum(totalActive,0)}</td></tr>
@@ -1300,17 +1295,84 @@
           <div class="muted-note">“Today / yesterday” uses Atlantic Time. Sources: local <b>active_fires</b> &amp; <b>out_fires</b>${SUMS_BENCH ? ' • benchmarks: <b>sums_table.json</b>' : ''}. “Status (Active Only)” excludes Extinguished.</div>`;
       }
 
-      function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); }
+      function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); wirePieLegendClicks(); }
+
+      // NEW: make sure a given fire status is enabled (doesn't toggle anything else)
+      function ensureStatusEnabled(statusKey){
+        const target = norm(statusKey);
+        const cbs = $$('.fire-filter-block input[type="checkbox"]');
+        if (!cbs.length) return;
+
+        let changed = false;
+        cbs.forEach(cb => {
+          const k = norm(cb.getAttribute('data-status'));
+          if (k === target && !cb.checked) { cb.checked = true; changed = true; }
+        });
+
+        if (changed) applyFireFilter(); // re-apply only if we actually changed something
+      }
+
       function wireSummaryClicks(){
         const cont = $('#fs-scroll'); if(!cont) return;
         cont.addEventListener('click', (e)=>{
           const a = e.target.closest('a[data-fireid]'); if(!a) return;
           e.preventDefault();
-          const rec=fireStore.get(a.getAttribute('data-fireid')); if(!rec) return;
-          closeSummary();
-          map.flyTo(rec.latlng,Math.max(map.getZoom(),12),{duration:.6});
-          map.once('moveend',()=>rec.layer?.openPopup&&rec.layer.openPopup());
+          const rec = fireStore.get(a.getAttribute('data-fireid')); if(!rec) return;
+
+          // NEW: ensure the fire's type/status is turned on so the marker is visible
+          const statusKey = rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || '');
+          if (statusKey) ensureStatusEnabled(statusKey);
+
+          closeSummary();      // already closed on individual fire
+          hideOverviewPanel(); // keep Overview out of the way
+          map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration:.6 });
+          map.once('moveend', ()=> rec.layer?.openPopup && rec.layer.openPopup());
         }, { passive: false });
+      }
+
+      // Clicking a pie legend item focuses that status on the map
+      function setExclusiveStatusAndZoom(statusKey){
+        const target = norm(statusKey);
+        const cbs = $$('.fire-filter-block input[type="checkbox"]');
+        if (!cbs.length) return;
+
+        cbs.forEach(cb => { cb.checked = (norm(cb.getAttribute('data-status')) === target); });
+        applyFireFilter();
+
+        // NEW: close Summary and hide Overview when zooming via type
+        closeSummary();
+        hideOverviewPanel();
+
+        const matches = [];
+        for (const m of activeMarkersAll) if (m.options._statusKey === target) matches.push(m);
+        if (!matches.length) return;
+
+        if (matches.length === 1){
+          map.flyTo(matches[0].getLatLng(), Math.max(map.getZoom(), 11), { duration: 0.6 });
+          return;
+        }
+        const latlngs = matches.map(m => m.getLatLng());
+        const bounds = L.latLngBounds(latlngs);
+        const padX = Math.round(innerWidth * 0.06);
+        const padY = Math.round(innerHeight * 0.06);
+        map.fitBounds(bounds, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate:true });
+      }
+
+      function wirePieLegendClicks(){
+        const legend = fsBody.querySelector('.pie-legend'); if(!legend) return;
+        const handler = (el) => {
+          const key = el.getAttribute('data-status-key');
+          if (!key) return;
+          setExclusiveStatusAndZoom(key);
+        };
+        legend.addEventListener('click', (e)=>{
+          const item = e.target.closest('.legend-item[data-status-key]'); if(item) handler(item);
+        });
+        legend.addEventListener('keydown', (e)=>{
+          if (e.key === 'Enter' || e.key === ' ') {
+            const item = e.target.closest('.legend-item[data-status-key]'); if(item){ e.preventDefault(); handler(item); }
+          }
+        });
       }
 
       const openSummary = () => { refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; fsClose.focus(); };
@@ -1320,7 +1382,7 @@
       fsOverlay.addEventListener('click',(e)=>{ if(e.target===fsOverlay) closeSummary(); });
       window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && !fsOverlay.hidden) closeSummary(); });
 
-      /* --------------------------------- Help -------------------------------- */
+      // --- Help modal --------------------------------------------------------
       const mhOverlay = $('#mapHelpOverlay');
       const mhBody = $('#mh-body');
       const mhClose = $('#mh-close');
@@ -1360,7 +1422,7 @@
       mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
       window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
 
-      /* ------------------------- Overview toggle / reset --------------------- */
+      // --- Overview toggle & reset ------------------------------------------
       const mapToggleBtn = $('#mapToggleBtn');
       const mtbText = $('#mtb-text');
       const updateOverviewButton=()=>{
@@ -1369,7 +1431,7 @@
         mapToggleBtn.setAttribute('aria-pressed', String(!hidden));
         mapToggleBtn.title = label;
         mtbText.textContent = label;
-        layoutTitleBox(); // width changed with label
+        layoutTitleBox();
       };
       D.body.classList.add('map-ui-hidden');
       updateOverviewButton();
@@ -1382,10 +1444,18 @@
         fitProvinceToView({ animate:true });
       });
 
-      // Final recalcs when legend exists
+      // NEW: helper to hide Overview (keeps button state in sync)
+      function hideOverviewPanel(){
+        if (!D.body.classList.contains('map-ui-hidden')){
+          D.body.classList.add('map-ui-hidden');
+          updateOverviewButton();
+          requestAnimationFrame(sizeLegend);
+        }
+      }
+
+      // Final sizing once legend is in DOM
       requestAnimationFrame(() => { sizeLegend(); layoutTitleBox(); });
     });
   </script>
 </body>
 </html>
-
