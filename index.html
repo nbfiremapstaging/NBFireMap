@@ -119,9 +119,19 @@
     .legend-help-btn:focus-visible{outline:none;box-shadow:var(--focus)}
 
     /* Labels */
-    .city-label-tooltip,.perimeter-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
+    .city-label-tooltip{cursor: pointer;background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
+    .perimeter-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
     .city-label{font-size:15px;font-weight:800;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.7),0 0 8px rgba(0,0,0,.6),1px 1px 0 rgba(0,0,0,.9)}
     .perimeter-label{font-size:12px;font-weight:800;pointer-events:none;padding:2px 6px;border-radius:6px;background:rgba(239,68,68,.12);backdrop-filter:blur(2px)}
+
+    /* NEW: distance labels for dark backgrounds */
+    .distance-label-tooltip{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
+    .distance-label{
+      font-size:12px;font-weight:900;color:#fff;pointer-events:none;padding:2px 8px;border-radius:6px;
+      background:rgba(0,0,0,.55);box-shadow:0 0 0 1.5px rgba(255,255,255,.9) inset, 0 2px 10px rgba(0,0,0,.5);
+      text-shadow:0 0 3px rgba(0,0,0,.9);
+      backdrop-filter:blur(2px)
+    }
 
     /* Summary modal */
     .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
@@ -317,7 +327,7 @@
       const COLORS = {
         oc:  cssVar('--oc'),
         cont: cssVar('--cont'),
-        uc: cssVar('--uc'),
+        uc:  cssVar('--uc'),
         pat: cssVar('--pat'),
         mon: cssVar('--mon'),
         perimeter: cssVar('--perimeter'),
@@ -772,6 +782,10 @@
       let smokeIdx = 0;
       let smokeTimer = null;
 
+      // AUTO-PLAY tweak
+      let smokeShouldAutoplayNextOn = false;
+      let smokePendingAutoplay = false;
+
       const smokeFmt = (ms) => {
         const d = new Date(ms);
         return isMobile()
@@ -837,8 +851,16 @@
           smokeIdx = nearestIndex(within, now);
           smokeSlider.value = String(smokeIdx);
 
-          if (map.hasLayer(smokeLayer)) smokeSetIndex(smokeIdx);
-          else smokeTsLabel.textContent = smokeFmt(within[smokeIdx]);
+          if (map.hasLayer(smokeLayer)) {
+            smokeSetIndex(smokeIdx);
+            if (smokePendingAutoplay || smokeShouldAutoplayNextOn) {
+              smokePlay();
+              smokePendingAutoplay = false;
+              smokeShouldAutoplayNextOn = false;
+            }
+          } else {
+            smokeTsLabel.textContent = smokeFmt(within[smokeIdx]);
+          }
 
         } catch (e){
           console.error('Smoke slices error:', e);
@@ -957,10 +979,25 @@
           smokeTimesMs.length ? smokeSetIndex(smokeIdx) : (smokeTsLabel.textContent = 'Loading…');
           smokeLayer.bringToBack();
           rAF(onGlobalReflow);
+
+          if (smokeShouldAutoplayNextOn) {
+            if (smokeTimesMs.length) {
+              smokePlay();
+              smokeShouldAutoplayNextOn = false;
+            } else {
+              smokePendingAutoplay = true;
+            }
+          }
         }
       });
       map.on('overlayremove', (e) => {
-        if (e.layer === smokeLayer) { smokePause(); smokeControls.style.display = 'none'; rAF(onGlobalReflow); }
+        if (e.layer === smokeLayer) {
+          smokePause();
+          smokeControls.style.display = 'none';
+          rAF(onGlobalReflow);
+          smokeShouldAutoplayNextOn = true;
+          smokePendingAutoplay = false;
+        }
       });
       if (map.hasLayer(smokeLayer)) {
         smokeControls.style.display = 'flex';
@@ -1035,20 +1072,111 @@
       planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,PLANE_REFRESH_MS); });
       planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
 
-      // --- City labels -------------------------------------------------------
-      const cityMarkers=L.layerGroup(
-        [
-          ['Fredericton',45.9636,-66.6431],['Saint John',45.2733,-66.0633],['Moncton',46.0878,-64.7782],
-          ['Bathurst',47.6186,-65.6517],['Miramichi',47.0281,-65.5019],['Edmundston',47.3730,-68.3251],
-          ['Campbellton',48.0075,-66.6731],['Dieppe',46.0842,-64.6877],['Riverview',46.0617,-64.8052],
-          ['Quispamsis',45.4319,-65.9469],['Oromocto',45.8491,-66.4828],['Woodstock',46.1527,-67.6016],
-          ['Grand Falls',47.0469,-67.7394],['Shediac',46.2197,-64.5403],['Tracadie',47.5081,-64.9117],
-          ['St. Stephen',45.1942,-67.2756],['Shippagan',47.7400,-64.7078],['Caraquet',47.7943,-64.9386],
-          ['Bouctouche',46.4711,-64.7400],['Sussex',45.7221,-65.5060]
-        ].map(([name,lat,lng])=>L.marker([lat,lng],{icon:L.divIcon({html:'',iconSize:[0,0]}),interactive:false,zIndexOffset:1000})
-          .bindTooltip(`<span class="city-label">${name}</span>`,{permanent:true,direction:'top',className:'city-label-tooltip'}))
-      );
-      cityMarkers.addTo(map); // on
+      // --- City labels (clustered label markers) -----------------------------
+const CITY_DATA = [
+  ['Moncton',46.0878,-64.7782,79000],
+  ['Saint John',45.2733,-66.0633,69000],
+  ['Fredericton',45.9636,-66.6431,63000],
+  ['Dieppe',46.0842,-64.6877,28500],
+  ['Riverview',46.0617,-64.8052,20500],
+  ['Miramichi',47.0281,-65.5019,17500],
+  ['Edmundston',47.3730,-68.3251,16000],
+  ['Rothesay',45.3830,-65.9965,12000],
+  ['Bathurst',47.6186,-65.6517,12000],
+  ['Quispamsis',45.4319,-65.9469,19500],
+  ['Oromocto',45.8491,-66.4828,9500],
+  ['Campbellton',48.0075,-66.6731,6700],
+  ['Sackville',45.8960,-64.3688,5500],
+  ['Grand Bay-Westfield',45.3629,-66.2306,5200],
+  ['Woodstock',46.1527,-67.6016,5200],
+  ['Grand Falls',47.0469,-67.7394,5200],
+  ['Shediac',46.2197,-64.5403,7000],
+  ['Tracadie',47.5081,-64.9117,16000],
+  ['Caraquet',47.7943,-64.9386,4200],
+  ['Shippagan',47.7400,-64.7078,2700],
+  ['Bouctouche',46.4711,-64.7400,2400],
+  ['Sussex',45.7221,-65.5060,4300],
+  ['St. Stephen',45.1942,-67.2756,4500],
+  ['St. Andrews',45.0730,-67.0530,2100],
+  ['Hampton',45.5322,-65.8332,4400],
+  ['Dalhousie',48.0658,-66.3737,2900],
+  ['Florenceville-Bristol',46.4448,-67.6170,1600],
+  ['Saint-Quentin',47.5120,-67.3920,2100],
+  ['Kedgwick',47.6450,-67.3430,950],
+  ['Plaster Rock',46.9108,-67.3949,1100],
+  ['Perth-Andover',46.7372,-67.7089,1600],
+  ['Saint-Léonard',47.1640,-67.9250,1300],
+  ['Neguac',47.2420,-65.0580,1500],
+  ['Petit-Rocher',47.7900,-65.7130,1400],
+  ['Bas-Caraquet',47.7860,-64.9730,1400],
+  ['Richibucto',46.6770,-64.8710,1300],
+  ['Rexton',46.6490,-64.8750,830],
+  ['Rogersville',46.7370,-65.4380,1200],
+  ['Hillsborough',45.9190,-64.7630,1300],
+  ['St. George',45.1290,-66.8270,1500],
+  ['Blacks Harbour',45.0520,-66.7880,900],
+  ['McAdam',45.5940,-67.3250,1100],
+  ['Minto',46.1480,-66.0840,2400],
+  ['Chipman',46.1680,-65.8820,1200],
+  ['Doaktown',46.5550,-66.1180,800],
+  ['Nackawic',45.9960,-67.2510,950],
+  ['Hartland',46.2990,-67.5150,950],
+  ['Cap-Pelé',46.2260,-64.2750,2400],
+  ['Memramcook',46.0020,-64.5480,5000],
+];
+
+function makeCityMarker(name, lat, lng, pop){
+  const m = L.marker([lat, lng], {
+    icon: L.divIcon({ html:'', iconSize:[0,0] }),
+    interactive: true,
+    zIndexOffset: 1000
+  }).bindTooltip(
+    `<span class="city-label">${name}</span>`,
+    {
+      permanent: true,
+      direction: 'top',
+      className: 'city-label-tooltip',
+      interactive: true
+    }
+  );
+
+  m.options._name = name;
+  m.options._pop  = Number.isFinite(pop) ? pop : 0;
+
+  const handler = () => cityToFires(name, m.getLatLng());
+  m.on('click', handler);
+  m.getTooltip()?.on('click', handler);
+
+  return m;
+}
+
+const cityClusters = L.markerClusterGroup({
+  disableClusteringAtZoom: 9,
+  spiderfyOnMaxZoom: false,
+  zoomToBoundsOnClick: true,
+  showCoverageOnHover: false,
+  iconCreateFunction: (cluster) => {
+    const markers = cluster.getAllChildMarkers();
+    let top = null, best = -1;
+    for (const m of markers){
+      const p = m.options?._pop ?? 0;
+      if (p > best){ best = p; top = m; }
+    }
+    const label = top?.options?._name || `×${markers.length}`;
+    return L.divIcon({
+      className: 'city-cluster-icon',
+      html: `<span class="city-label">${label}</span>`,
+      iconSize: [0,0],
+      popupAnchor: [0,0]
+    });
+  }
+});
+
+CITY_DATA.forEach(([name,lat,lng,pop]) => {
+  cityClusters.addLayer(makeCityMarker(name, lat, lng, pop));
+});
+
+cityClusters.addTo(map); // on
 
       // --- Overlays and layer control ---------------------------------------
       const overlays = {
@@ -1056,7 +1184,7 @@
         'MODIS Hotspots — Last 48 hours': modis48,
         'MODIS Hotspots — Last 7 days': modis7d,
         'Fire Perimeters': activefires,
-        'Major Cities & Towns': cityMarkers,
+        'Cities & Towns': cityClusters,
         Aircraft: planesLayer,
         'Weather Stations': weatherStations,
         'AQHI Risk': aqhiLayer,
@@ -1101,7 +1229,7 @@
       }
       injectFireStatusPanel();
 
-      // --- Move Summary & Help buttons into the legend -----------------------
+      // --- Move Summary & Help into the legend -------------------------------
       function mountSummaryInLegend(){
         const layersBox = D.querySelector('.leaflet-control-layers');
         const fsBtn = $('#fireSummaryBtn');
@@ -1130,7 +1258,7 @@
       mountSummaryInLegend();
       mountHelpInLegend();
 
-      // --- Benchmarks (sums_table.json) -------------------------------------
+      // --- Benchmarks / Summary (unchanged) ----------------------------------
       let SUMS_BENCH = null;
       async function loadSumsBenchmarks(){
         try{
@@ -1151,9 +1279,8 @@
           console.warn('sums_table load failed:', e);
         }
       }
-      loadSumsBenchmarks(); // harmless if file missing
+      loadSumsBenchmarks();
 
-      // --- Summary modal content --------------------------------------------
       const fsOverlay=$('#fireSummaryOverlay');
       const fsBody=$('#fs-body');
       const fsBtn=$('#fireSummaryBtn');
@@ -1290,26 +1417,33 @@
           <div style="margin-top:10px"><b>Fires (largest → smallest)</b></div>
           <div class="fs-scroll" id="fs-scroll">
             ${detailSections}
-          </div>
-
-          <div class="muted-note">“Today / yesterday” uses Atlantic Time. Sources: local <b>active_fires</b> &amp; <b>out_fires</b>${SUMS_BENCH ? ' • benchmarks: <b>sums_table.json</b>' : ''}. “Status (Active Only)” excludes Extinguished.</div>`;
+          </div>`;
       }
 
       function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); wirePieLegendClicks(); }
 
-      // NEW: make sure a given fire status is enabled (doesn't toggle anything else)
       function ensureStatusEnabled(statusKey){
         const target = norm(statusKey);
         const cbs = $$('.fire-filter-block input[type="checkbox"]');
         if (!cbs.length) return;
-
         let changed = false;
         cbs.forEach(cb => {
           const k = norm(cb.getAttribute('data-status'));
           if (k === target && !cb.checked) { cb.checked = true; changed = true; }
         });
+        if (changed) applyFireFilter();
+      }
 
-        if (changed) applyFireFilter(); // re-apply only if we actually changed something
+      // NEW: ensure ALL active statuses are enabled (so all active points show)
+      function enableAllActiveStatuses(){
+        const set = new Set(['out of control','contained','under control','being patrolled','being monitored']);
+        const cbs = $$('.fire-filter-block input[type="checkbox"]');
+        let changed=false;
+        cbs.forEach(cb=>{
+          const k = norm(cb.getAttribute('data-status'));
+          if (set.has(k) && !cb.checked){ cb.checked = true; changed = true; }
+        });
+        if (changed) applyFireFilter();
       }
 
       function wireSummaryClicks(){
@@ -1318,35 +1452,26 @@
           const a = e.target.closest('a[data-fireid]'); if(!a) return;
           e.preventDefault();
           const rec = fireStore.get(a.getAttribute('data-fireid')); if(!rec) return;
-
-          // NEW: ensure the fire's type/status is turned on so the marker is visible
           const statusKey = rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || '');
           if (statusKey) ensureStatusEnabled(statusKey);
-
-          closeSummary();      // already closed on individual fire
-          hideOverviewPanel(); // keep Overview out of the way
+          closeSummary();
+          hideOverviewPanel();
           map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration:.6 });
           map.once('moveend', ()=> rec.layer?.openPopup && rec.layer.openPopup());
         }, { passive: false });
       }
 
-      // Clicking a pie legend item focuses that status on the map
       function setExclusiveStatusAndZoom(statusKey){
         const target = norm(statusKey);
         const cbs = $$('.fire-filter-block input[type="checkbox"]');
         if (!cbs.length) return;
-
         cbs.forEach(cb => { cb.checked = (norm(cb.getAttribute('data-status')) === target); });
         applyFireFilter();
-
-        // NEW: close Summary and hide Overview when zooming via type
         closeSummary();
         hideOverviewPanel();
-
         const matches = [];
         for (const m of activeMarkersAll) if (m.options._statusKey === target) matches.push(m);
         if (!matches.length) return;
-
         if (matches.length === 1){
           map.flyTo(matches[0].getLatLng(), Math.max(map.getZoom(), 11), { duration: 0.6 });
           return;
@@ -1401,7 +1526,7 @@
           'Smoke': 'Hourly surface smoke forecast; use the timeline control to scrub or play.',
           'Fire Risk': 'Daily Fire Danger Rating from CWFIS.',
           'Aircraft': 'ADS-B aircraft positions (OpenSky Network).',
-          'Major Cities & Towns': 'Labels for major NB communities.'
+          'Cities & Towns': 'Labels for NB communities.'
         };
         const list = Object.keys(overlays).map(name => {
           const d = desc[name] || 'No description available.';
@@ -1444,13 +1569,129 @@
         fitProvinceToView({ animate:true });
       });
 
-      // NEW: helper to hide Overview (keeps button state in sync)
       function hideOverviewPanel(){
         if (!D.body.classList.contains('map-ui-hidden')){
           D.body.classList.add('map-ui-hidden');
           updateOverviewButton();
           requestAnimationFrame(sizeLegend);
         }
+      }
+
+      // --- City → Fires proximity (100 km, ACTIVE ONLY) ---------------------
+      const CITY_RADIUS_M = 100_000;
+      const cityProximityLayer = L.layerGroup({ pane: 'firesPane' }).addTo(map);
+
+      // keep a reference to the current city popup, so we can clear lines when it closes
+      let cityProximityPopup = null;
+
+      function kmStr(meters) { return (meters / 1000).toFixed(1); }
+
+      // clear proximity graphics when *that* city popup closes
+      map.on('popupclose', (e) => {
+        if (e.popup === cityProximityPopup) {
+          cityProximityLayer.clearLayers();
+          cityProximityPopup = null;
+        }
+      });
+
+      function cityToFires(name, cityLatLng) {
+        // show all ACTIVE fire points (doesn't affect extinguished)
+        enableAllActiveStatuses();
+
+        // Clear previous graphics
+        cityProximityLayer.clearLayers();
+        cityProximityPopup = null;
+
+        // Collect ONLY ACTIVE fires within radius
+        const nearby = [];
+        for (const rec of fireStore.values()) {
+          const statusKey = norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '');
+          if (statusKey === 'extinguished') continue; // <- only active fires
+          const d = map.distance(cityLatLng, rec.latlng);
+          if (Number.isFinite(d) && d <= CITY_RADIUS_M) nearby.push({ rec, d });
+        }
+
+        // If none: say so and center the city
+        if (!nearby.length) {
+          const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 360 })
+            .setLatLng(cityLatLng)
+            .setContent(`<b>${name}</b><br>No active fires within 100&nbsp;km.`)
+            .openOn(map);
+          cityProximityPopup = p;
+
+          hideOverviewPanel();
+          map.flyTo(cityLatLng, Math.max(map.getZoom(), 9), { duration: 0.5 });
+          return;
+        }
+
+        // Draw lines + distance labels; build list & bounds
+        nearby.sort((a, b) => a.d - b.d);
+        const bounds = L.latLngBounds([cityLatLng]);
+        const listHTML = nearby.map(({ rec, d }) => {
+          const km = kmStr(d);
+
+          // high-contrast line with soft casing for dark basemaps
+          L.polyline([cityLatLng, rec.latlng], {
+            color: '#000000', weight: 6, opacity: 0.55
+          }).addTo(cityProximityLayer);
+          L.polyline([cityLatLng, rec.latlng], {
+            color: '#ffffff', weight: 3, opacity: 0.95, dashArray: '6,8'
+          }).addTo(cityProximityLayer);
+
+          // midpoint distance label
+          const mid = L.latLng(
+            (cityLatLng.lat + rec.latlng.lat) / 2,
+            (cityLatLng.lng + rec.latlng.lng) / 2
+          );
+          L.tooltip({
+            permanent: true, direction: 'center',
+            className: 'distance-label-tooltip', opacity: 1
+          })
+            .setLatLng(mid)
+            .setContent(`<span class="distance-label">${km} km</span>`)
+            .addTo(cityProximityLayer);
+
+          bounds.extend(rec.latlng);
+
+          const fname = rec.props.FIRE_NAME || rec.props.FIRE_ID || 'Fire';
+          return `<li><a href="#" data-fireid="${rec.id}"><b>${fname}</b> — ${km} km</a></li>`;
+        }).join('');
+
+        // Popup with list (click-through to the fire)
+        const html = `
+          <div style="min-width:260px">
+            <div style="font-weight:800;margin-bottom:6px">${name}</div>
+            <div><b>Active fires within 100&nbsp;km:</b></div>
+            <ol class="summary-list">${listHTML}</ol>
+          </div>`;
+
+        const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 420 })
+          .setLatLng(cityLatLng)
+          .setContent(html)
+          .openOn(map);
+        cityProximityPopup = p;
+
+        // Delegate clicks on the list to zoom/open that fire
+        map.once('popupopen', (e) => {
+          if (e.popup !== cityProximityPopup) return; // only wire our city popup
+          const el = e.popup.getElement();
+          el?.addEventListener('click', (evt) => {
+            const a = evt.target.closest('a[data-fireid]');
+            if (!a) return;
+            evt.preventDefault();
+            const rec = fireStore.get(a.getAttribute('data-fireid'));
+            if (!rec) return;
+            ensureStatusEnabled(rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || ''));
+            hideOverviewPanel();
+            map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
+            setTimeout(() => { rec.layer?.openPopup?.(); }, 620);
+          });
+        });
+
+        // Fit all lines + city
+        const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
+        hideOverviewPanel();
+        map.fitBounds(bounds, { padding: [pad, pad], animate: true });
       }
 
       // Final sizing once legend is in DOM
