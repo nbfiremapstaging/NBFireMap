@@ -1,0 +1,182 @@
+name: Daily Fire Data Archive
+
+on:
+  schedule:
+    # Runs every day at ~09:10 UTC (≈05:10 America/Toronto)
+    - cron: "30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  fetch-and-archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          # geopandas pulls wheels on ubuntu-latest; includes shapely/pyproj/fiona
+          pip install geopandas requests
+
+      - name: Run downloader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          import json, os, sys, time
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          import requests
+          import geopandas as gpd
+          from shapely.geometry import box
+
+          # ==== Config ====
+          TZ = ZoneInfo("America/Toronto")
+          today_str = datetime.now(TZ).strftime("%Y%m%d")
+
+          ROOT = "archive"
+          FOLDERS = {
+              "cwfis": os.path.join(ROOT, "cwfis"),
+              "erd": os.path.join(ROOT, "erd"),
+          }
+          for p in FOLDERS.values():
+              os.makedirs(p, exist_ok=True)
+
+          # New Brunswick bounding box (WGS84) — lon_min, lat_min, lon_max, lat_max
+          # Source: EPSG:2219 page WGS84 bounds (New Brunswick)
+          NB_BBOX = (-69.05, 44.56, -63.70, 48.07)
+          nb_poly = box(*NB_BBOX)
+          nb_gdf = gpd.GeoDataFrame(geometry=[nb_poly], crs="EPSG:4326")
+
+          # Data sources
+          DATASETS = [
+              # CWFIS via WFS (GeoServer)
+              {
+                  "key": "24_hour_spots",
+                  "group": "cwfis",
+                  "url": "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
+                         "?service=WFS&version=1.0.0&request=GetFeature"
+                         "&typeName=public:hotspots_last24hrs&outputFormat=application/json",
+              },
+              {
+                  "key": "fire_perimeters",
+                  "group": "cwfis",
+                  "url": "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
+                         "?service=WFS&version=1.0.0&request=GetFeature"
+                         "&typeName=public:m3_polygons_current&outputFormat=application/json",
+              },
+              # ERD (ArcGIS REST → GeoJSON, force outSR=4326)
+              {
+                  "key": "active_fires",
+                  "group": "erd",
+                  "url": "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query"
+                         "?where=1%3D1&outFields=*&f=geojson&outSR=4326",
+              },
+              {
+                  "key": "out_fires",
+                  "group": "erd",
+                  "url": "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query"
+                         "?where=1%3D1&outFields=*&f=geojson&outSR=4326",
+              },
+          ]
+
+          # ==== Helpers ====
+          def fetch_geojson(url: str) -> dict:
+              r = requests.get(url, timeout=60)
+              r.raise_for_status()
+              return r.json()
+
+          def to_gdf(geojson_obj: dict) -> gpd.GeoDataFrame:
+              # ArcGIS GeoJSON sometimes lacks crs member; we'll assume EPSG:4326 (we forced outSR=4326)
+              gdf = gpd.GeoDataFrame.from_features(geojson_obj.get("features", []), crs="EPSG:4326")
+              # Some WFS responses include crs; geopandas may set it automatically, but ensure WGS84 for clipping
+              if gdf.crs is None:
+                  gdf.set_crs("EPSG:4326", inplace=True)
+              elif gdf.crs.to_string().lower() != "epsg:4326":
+                  gdf = gdf.to_crs("EPSG:4326")
+              return gdf
+
+          def clip_to_nb(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+              if gdf.empty:
+                  return gdf
+              # Ensure geometries are valid (buffer(0) trick for occasional invalids)
+              try:
+                  gdf = gdf.set_geometry(gdf.geometry.buffer(0))
+              except Exception:
+                  pass
+              return gpd.overlay(gdf, nb_gdf, how="intersection")
+
+          def consensus_download(url: str, label: str, max_rounds: int = 5, samples_per_round: int = 5) -> gpd.GeoDataFrame:
+              """
+              Grab N samples, check feature-count equality; retry up to max_rounds.
+              If no perfect consensus, pick the majority count from the final round.
+              """
+              for attempt in range(1, max_rounds + 1):
+                  counts = []
+                  frames = []
+                  for i in range(samples_per_round):
+                      gj = fetch_geojson(url)
+                      gdf = to_gdf(gj)
+                      gdf = clip_to_nb(gdf)
+                      counts.append(len(gdf))
+                      frames.append(gdf)
+                      # light pause to avoid hammering servers in the same millisecond
+                      time.sleep(0.5)
+                  if len(set(counts)) == 1:
+                      print(f"[OK] {label}: consensus reached (count={counts[0]}) on round {attempt}")
+                      return frames[0]
+                  else:
+                      print(f"[WARN] {label}: counts not equal on round {attempt} -> {counts}. Retrying...")
+                      time.sleep(2)
+
+              # No perfect consensus; choose majority count from last round
+              from collections import Counter
+              cnt = Counter(counts)
+              majority_count, _ = cnt.most_common(1)[0]
+              idx = counts.index(majority_count)
+              print(f"[WARN] {label}: no perfect consensus after {max_rounds} rounds. "
+                    f"Using majority sample with {majority_count} features.")
+              return frames[idx]
+
+          # ==== Main ====
+          failures = []
+          for ds in DATASETS:
+              label = f"{ds['group']}/{ds['key']}"
+              try:
+                  gdf = consensus_download(ds["url"], label)
+                  out_dir = FOLDERS[ds["group"]]
+                  out_path = os.path.join(out_dir, f"{ds['key']}_{today_str}.geojson")
+                  # overwrite if exists
+                  if os.path.exists(out_path):
+                      os.remove(out_path)
+                  gdf.to_file(out_path, driver="GeoJSON")
+                  print(f"[SAVED] {out_path} ({len(gdf)} features)")
+              except Exception as e:
+                  failures.append((label, str(e)))
+                  print(f"[ERROR] {label}: {e}", file=sys.stderr)
+
+          if failures:
+              print("\nSome datasets failed:", file=sys.stderr)
+              for lbl, err in failures:
+                  print(f" - {lbl}: {err}", file=sys.stderr)
+              # Exit non-zero so the workflow signals a problem
+              sys.exit(1)
+          PYCODE
+
+      # Optional: keep files in the repo history. Requires a token with write perms.
+      # - name: Commit and push changes
+      #   if: success()
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add archive/**/*.geojson || true
+      #     git commit -m "Daily fire archive for $(date -u +%Y-%m-%d)" || echo "Nothing to commit"
+      #     git push
