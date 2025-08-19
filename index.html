@@ -26,17 +26,12 @@
       --shadow:0 10px 30px rgba(2,8,20,.08); --shadow-soft:0 6px 16px rgba(2,8,20,.06);
       --btn-bg:#fff; --btn-border:#d9dee6; --btn-hover:#f2f4f7;
       --link:#2563eb; --focus:0 0 0 3px rgba(37,99,235,.28);
-      /* Fire status colors (updated order & hues)
-         Out of Control = red (unchanged)
-         Being Monitored = orange (moved up)
-         Contained = yellow (shifted down)
-         Under Control = green (shifted down)
-         Being Patrolled = blue (shifted down) */
+      /* Fire status colors (updated order & hues) */
       --oc:#ef4444; /* red */
       --mon:#fb923c; /* orange */
-      --cont:#facc15; /* yellow (was UC) */
-      --uc:#22c55e; /* green (was Patrolled) */
-      --pat:#3b82f6; /* blue (was Monitored) */
+      --cont:#facc15; /* yellow */
+      --uc:#22c55e; /* green */
+      --pat:#3b82f6; /* blue */
 
       --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
       --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
@@ -144,6 +139,24 @@
       backdrop-filter:blur(2px)
     }
 
+    /* County labels: big white text with black border */
+    .county-label-tooltip{
+      background:none!important; border:none!important; box-shadow:none!important; padding:0!important
+    }
+    .county-label{
+      font: 900 22px/1.1 Inter, system-ui, Segoe UI, Arial, sans-serif, bold;
+      color:#fff;
+      text-shadow:
+        0 0 4px rgba(0,0,0,.95),
+        0 0 10px rgba(0,0,0,.8),
+        2px 2px 2px rgba(0,0,0,.9); /* stronger glow/drop shadow */
+      letter-spacing: .3px;
+    }
+
+
+    /* Optional: ensure the invisible GPS click-catcher is tappable */
+    .user-loc-click-catcher{ pointer-events:auto; }
+
     /* Summary modal */
     .fire-summary-overlay{position:fixed;inset:0;display:none;align-items:start;justify-content:center;z-index:3000;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
     .fire-summary{margin-top:16px;background:var(--panel-strong);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:min(680px,calc(100% - 24px));color:var(--text);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
@@ -225,16 +238,11 @@
     .pie-legend{display:grid;gap:6px}
     .legend-item{display:flex;align-items:center;gap:10px;font-weight:700}
     .legend-item[role="button"]{cursor:pointer}
+    .legend-item[role="button"]{cursor:pointer}
     .legend-item[role="button"]:focus-visible{outline:none;box-shadow:var(--focus);border-radius:8px}
     .legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
     .legend-count{opacity:.85;font-weight:800;margin-left:auto}
     .muted-note{margin-top:8px;font-size:12px;color:var(--muted)}
-
-    .user-loc-click-catcher {
-  /* just ensures clicks are caught even if empty */
-  pointer-events: auto;
-}
-
   </style>
 </head>
 <body>
@@ -353,7 +361,6 @@
       };
 
       // --- Fire status helpers ----------------------------------------------
-      // Updated severity: OC > Monitored > Contained > Under Control > Patrolled > Out
       const STATUS = new Map([
         ['out of control', { color: COLORS.oc,  sev: 4 }],
         ['being monitored',{ color: COLORS.mon, sev: 3 }],
@@ -397,7 +404,6 @@
         } return null;
       };
 
-      // Containment % & retrieval info (robust parsing)
       const firstProp = (p, keys) => { for (const k of keys) { const v = p?.[k]; if (v !== undefined && v !== null && v !== '') return [k, v]; } return [null, null]; };
       const clamp01 = (n) => Math.max(0, Math.min(100, n));
       const parseMaybeNumber = (v) => { if (v == null) return null; const n = Number(v); if (Number.isFinite(n)) return n; const m = String(v).match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
@@ -422,7 +428,7 @@
         return { ms:null, bool:null, raw:v };
       };
 
-      // --- Title layout (guards to avoid overlap with buttons) ---------------
+      // --- Title layout ------------------------------------------------------
       const titleEl = $('#mapTitle');
       function layoutTitleBox(){
         const leftBtn  = $('#resetViewBtn');
@@ -455,6 +461,8 @@
         ['alwaysOnTopPopup',9999],
         ['sentinelPane',400],
         ['nbBoundaryPane',405],
+        ['crownPane',406],       // NEW: Crown land
+        ['countiesPane',407],    // NEW: Counties
         ['smokePane',410],
         ['perimetersPane',412],
         ['radarPane',413],
@@ -475,51 +483,27 @@
         }).addTo(map);
       }
 
-      // --- "Click GPS point to show nearby fires" -------------------------------
-      // A high-z overlay to catch taps on the GPS dot (works on top of plugin's marker)
+      /* --- "Click GPS point to show nearby fires" ------------------------- */
       const userLocationClickLayer = L.layerGroup({ pane: 'planesPane' }).addTo(map); // planesPane has pointer events
       let userLocationClickMarker = null;
 
-      // wrapper so we can reuse your city flow
-      function gpsToFires(latlng) {
-        // Reuse the existing city proximity logic
-        cityToFires('Your Location', latlng);
-      }
+      function gpsToFires(latlng) { cityToFires('Your Location', latlng); }
 
-      // Create or move the invisible click-catcher marker at the user's location
       function upsertUserLocationClickMarker(latlng) {
-        if (userLocationClickMarker) {
-          userLocationClickMarker.setLatLng(latlng);
-          return;
-        }
+        if (userLocationClickMarker) { userLocationClickMarker.setLatLng(latlng); return; }
         const icon = L.divIcon({
-          className: 'user-loc-click-catcher',
-          html: '',                      // nothing visible
-          iconSize: [44, 44],            // large enough to be easy to tap
-          iconAnchor: [22, 22]
+          className: 'user-loc-click-catcher', html: '',
+          iconSize: [44,44], iconAnchor: [22,22]
         });
         userLocationClickMarker = L.marker(latlng, {
-          icon,
-          pane: 'planesPane',
-          keyboard: false,
-          title: 'Your location — tap to see nearby fires'
+          icon, pane: 'planesPane', keyboard:false,
+          title:'Your location — tap to see nearby fires'
         })
         .on('click', () => gpsToFires(userLocationClickMarker.getLatLng()))
         .addTo(userLocationClickLayer);
       }
-
-      // When the locate control finds/updates your position, place the click-catcher
-      map.on('locationfound', (e) => {
-        if (!e || !e.latlng) return;
-        upsertUserLocationClickMarker(e.latlng);
-      });
-
-      // If geolocation errors out, remove the click-catcher
-      map.on('locationerror', () => {
-        userLocationClickLayer.clearLayers();
-        userLocationClickMarker = null;
-      });
-
+      map.on('locationfound', (e) => { if (e?.latlng) upsertUserLocationClickMarker(e.latlng); });
+      map.on('locationerror', () => { userLocationClickLayer.clearLayers(); userLocationClickMarker = null; });
 
       const fitProvinceToView = ({ animate=false } = {}) => {
         const padX = Math.round(innerWidth  * 0.04);
@@ -717,13 +701,148 @@
         interactive:false
       }).addTo(map);
 
+      // --- Crown Land: staged loader to avoid slamming the server -----------------
+      const CROWN_IMG_MIN_ZOOM = 5;   // start showing low-cost server image
+      const CROWN_VECT_MIN_ZOOM = 18;  // only at street-level do we pull vectors
+
+      const crownProxy = L.layerGroup({ pane: 'crownPane' }); // stays in legend
+      let crownImage = null;           // L.esri.dynamicMapLayer   (fast, images)
+      let crownVector = null;          // L.esri.featureLayer      (simplified)
+      let crownImgAttached = false;
+      let crownVecAttached = false;
+
+      // fast overview (server-rendered PNGs)
+      function getCrownImageLayer() {
+        if (crownImage) return crownImage;
+        crownImage = L.esri.dynamicMapLayer({
+          url: 'https://geonb.snb.ca/arcgis/rest/services/GeoNB_DNR_Crown_Land/MapServer',
+          layers: [3],                 // Crown Land sublayer
+          opacity: 0.45,
+          format: 'png32',
+          transparent: true,
+          pane: 'crownPane'
+        });
+        return crownImage;
+      }
+
+      // detailed but simplified vectors
+      function getCrownVectorLayer() {
+        if (crownVector) return crownVector;
+        crownVector = L.esri.featureLayer({
+          url: 'https://geonb.snb.ca/arcgis/rest/services/GeoNB_DNR_Crown_Land/MapServer/3',
+          pane: 'crownPane',
+
+          // Ask the server for MUCH less:
+          //  - only needed attributes
+          //  - geometry precision reduced (GeoJSON decimals)
+          //  - server-side generalization (maxAllowableOffset via simplifyFactor)
+          fields: ['OBJECTID'],       // we don’t need the full attribute table here
+          precision: 3,               // trim decimals in geometry sent to client
+          simplifyFactor: 1.2,        // larger = more generalization (per map size)
+
+          // Client render performance
+          renderer: L.canvas(),       // force Canvas
+          smoothFactor: 2,            // visually smooth/merge tiny vertices
+
+          style: () => ({
+            color: '#065f46',
+            weight: 1.8,
+            fillColor: '#86efac',
+            fillOpacity: 0.28
+          })
+        });
+
+        // Optional: if your service supports filters (e.g., only active parcels)
+        // crownVector.setWhere("1=1");
+
+        return crownVector;
+      }
+
+      function updateCrownStages() {
+        const proxyOn = map.hasLayer(crownProxy);
+        if (!proxyOn) {
+          // tear everything down to zero cost
+          if (crownImgAttached && crownImage) { crownProxy.removeLayer(crownImage); crownImgAttached = false; }
+          if (crownVecAttached && crownVector){ crownProxy.removeLayer(crownVector); crownVecAttached = false; }
+          return;
+        }
+
+        const z = map.getZoom();
+
+        // Stage 1: image tiles at z = 16–17 (cheap, responsive)
+        const needImage = z >= CROWN_IMG_MIN_ZOOM && z < CROWN_VECT_MIN_ZOOM;
+
+        // Stage 2: simplified vectors at z >= 18 (only when really close)
+        const needVector = z >= CROWN_VECT_MIN_ZOOM;
+
+        // Attach/detach image layer
+        if (needImage) {
+          if (!crownImage) getCrownImageLayer();
+          if (!crownImgAttached) { crownProxy.addLayer(crownImage); crownImgAttached = true; }
+        } else if (crownImgAttached) {
+          crownProxy.removeLayer(crownImage);
+          crownImgAttached = false;
+        }
+
+        // Attach/detach vector layer
+        if (needVector) {
+          if (!crownVector) getCrownVectorLayer();
+          if (!crownVecAttached) { crownProxy.addLayer(crownVector); crownVecAttached = true; }
+        } else if (crownVecAttached) {
+          crownProxy.removeLayer(crownVector);
+          crownVecAttached = false;
+        }
+      }
+
+      // Debounce to avoid rapid re-queries while the user is still zooming
+      let crownZoomTimer = null;
+      function debouncedUpdateCrown() {
+        if (crownZoomTimer) cancelAnimationFrame(crownZoomTimer);
+        crownZoomTimer = requestAnimationFrame(updateCrownStages);
+      }
+
+      map.on('zoomend', debouncedUpdateCrown);
+      map.on('moveend', debouncedUpdateCrown); // helps with bbox-based requests
+      map.on('overlayadd',   (e) => { if (e.layer === crownProxy) debouncedUpdateCrown(); });
+      map.on('overlayremove',(e) => { if (e.layer === crownProxy) debouncedUpdateCrown(); });
+
+
+
+      // --- NEW: Counties (own pane, with big labels, off by default) --------
+      const countyLabelLayers = new Set();
+      const counties = L.esri.featureLayer({
+        url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/County/MapServer/0',
+        pane: 'countiesPane',
+        style: () => ({
+          color: '#ffffff',        // bold white border
+          weight: 3.5,
+          fill: false
+        }),
+        onEachFeature: (feature, layer) => {
+          const p = feature?.properties || feature?.attributes || {};
+          const name = p.COUNTY_NAME_EN || p.COUNTY_NAME || p.NAME_EN || p.NAME || 'County';
+          layer.bindTooltip(
+            `<span class="county-label">${name}</span>`,
+            { permanent: true, direction: 'center', className: 'county-label-tooltip', opacity: 0 }
+          );
+          countyLabelLayers.add(layer);
+        }
+      }); // not added to map (off)
+
+      function setCountyLabels() {
+        const show = map.getZoom() >= 8;
+        countyLabelLayers.forEach((l) => l.getTooltip()?.setOpacity(show ? 1 : 0));
+      }
+      counties.on('load', setCountyLabels);
+      map.on('zoomend', setCountyLabels);
+
       // --- Sentinel imagery & burn bans -------------------------------------
       const sentinel2 = L.esri.imageMapLayer({ url:'https://sentinel.arcgis.com/arcgis/rest/services/Sentinel2/ImageServer', opacity:0.75, pane:'sentinelPane' });
       sentinel2.on('load', ()=> sentinel2.bringToFront());
       const nbBurnBans = L.esri.dynamicMapLayer({
         url:'https://gis-erd-der.gnb.ca/gisserver/rest/services/FireWeather/BurnCategories/MapServer',
         opacity:.7, pane:'perimetersPane'
-      }); // off
+      });
 
       // --- Weather (clustered), radar, lightning, AQHI ----------------------
       function stationPopupHTML(p) {
@@ -811,19 +930,19 @@
               </div>`,
             iconSize: [84, 92], iconAnchor: [42, 54], popupAnchor: [0, -44] });
         }
-      }); // off
+      });
 
       const noaaRadar = L.esri.imageMapLayer({
         url:'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer',
         opacity:.8, pane:'radarPane'
-      }); // off
+      });
 
       const lightningLayer = L.tileLayer.wms('https://geo.weather.gc.ca/geomet',{
         layers:'Lightning_2.5km_Density',version:'1.3.0',format:'image/png',transparent:true,opacity:1,pane:'lightningPane'
-      }); // off
+      });
 
       let lightningTimer=null;
-      const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, LIGHTNING_REFRESH_MS); } };
+      const startLightningRefresh=()=>{ if(!lightningTimer){ lightningTimer=setInterval(()=>{ lightningLayer.setParams({_ :Date.now()}); }, 120000); } };
       const stopLightningRefresh = ()=>{ if(lightningTimer){ clearInterval(lightningTimer); lightningTimer=null; } };
       map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
       map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
@@ -831,11 +950,11 @@
       const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
         layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
         opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
-      })); // on
+      }));
 
       // --- NOAA Smoke timeline ----------------------------------------------
       const smokeLayer = L.esri.imageMapLayer({ url: NOAA_SMOKE_URL, format:'png32', transparent:true, opacity:0.72, pane:'smokePane' });
-      smokeLayer.addTo(map); // on
+      smokeLayer.addTo(map);
 
       const smokeControls   = $('#smokeControls');
       const smokePlayBtn    = $('#smokePlay');
@@ -846,7 +965,6 @@
       let smokeIdx = 0;
       let smokeTimer = null;
 
-      // AUTO-PLAY tweak
       let smokeShouldAutoplayNextOn = false;
       let smokePendingAutoplay = false;
 
@@ -869,7 +987,7 @@
       function smokePlay(){
         if (smokeTimer || !smokeTimesMs.length) return;
         smokePlayBtn.textContent = '⏸';
-        smokeTimer = setInterval(() => smokeSetIndex((smokeIdx + 1) % smokeTimesMs.length), SMOKE_FRAME_MS);
+        smokeTimer = setInterval(() => smokeSetIndex((smokeIdx + 1) % smokeTimesMs.length), 1200);
       }
       function smokePause(){ smokePlayBtn.textContent = '▶'; if (smokeTimer){ clearInterval(smokeTimer); smokeTimer = null; } }
       smokePlayBtn.addEventListener('click', () => (smokeTimer ? smokePause() : smokePlay()));
@@ -1097,7 +1215,7 @@
           m.bindTooltip(`${loc?loc+' — ':''}AQHI ${val ?? '—'} • ${label}${when?' • '+when:''}`,{direction:'top',offset:[0,-20],opacity:0});
           return m;
         }
-      }); // off
+      });
 
       // --- Aircraft ----------------------------------------------------------
       const planesLayer = L.layerGroup();
@@ -1133,7 +1251,7 @@
         pruneMissing(seen);
       } catch(e){ console.warn('OpenSky fetch failed:', e); } }
       let planesTimer=null;
-      planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,PLANE_REFRESH_MS); });
+      planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky,250000); });
       planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
 
       // --- City labels (clustered label markers) -----------------------------
@@ -1256,12 +1374,13 @@ cityClusters.addTo(map); // on
         'Lightning Density': lightningLayer,
         'NB Burn Bans': nbBurnBans,
         'Fire Risk': fireRisk,
-        'Sentinel-2 Imagery': sentinel2
+        'Sentinel-2 Imagery': sentinel2,
+        'Crown Land': crownProxy,     // NEW (off by default)
+        'Counties': counties         // NEW (off by default)
       };
       L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
       // --- Fire-status filter panel (checkboxes) -----------------------------
-      // Order updated: OC, Monitored, Contained, Under Control, Patrolled, Extinguished
       const FIRE_STATUS = [
         ['Out of Control',  COLORS.oc,  true],
         ['Being Monitored', COLORS.mon, true],
@@ -1354,7 +1473,6 @@ cityClusters.addTo(map); // on
       const fireStoreMap = fireStore;
 
       function pieCSSSegments(counts){
-        // Order updated for pie: OC, Monitored, Contained, Under Control, Patrolled
         const order = [
           ['out of control', 'Out of Control'],
           ['being monitored','Being Monitored'],
@@ -1451,7 +1569,6 @@ cityClusters.addTo(map); // on
           byStatus.get(st).push(it);
         }
         for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
-        // Display detail sections in the same updated order
         const statusOrder = ['out of control','being monitored','contained','under control','being patrolled','extinguished','other'];
 
         const detailSections = statusOrder
@@ -1501,7 +1618,6 @@ cityClusters.addTo(map); // on
         if (changed) applyFireFilter();
       }
 
-      // NEW: ensure ALL active statuses are enabled (so all active points show)
       function enableAllActiveStatuses(){
         const set = new Set(['out of control','being monitored','contained','under control','being patrolled']);
         const cbs = $$('.fire-filter-block input[type="checkbox"]');
@@ -1593,7 +1709,9 @@ function buildHelpHTML(){
     'Lightning Density': 'Recent lightning strike density. Updates automatically.',
     'NB Burn Bans': 'Official New Brunswick burn restriction map from GNB.',
     'Fire Risk': 'Daily Fire Danger Rating from the Canadian Wildland Fire Information System.',
-    'Sentinel-2 Imagery': 'Recent high-resolution satellite imagery. Clouds may obscure view.'
+    'Sentinel-2 Imagery': 'Recent high-resolution satellite imagery. Clouds may obscure view.',
+    'Crown Land': 'Provincial Crown land parcels. Dark green outline with light green fill.',
+    'Counties': 'County boundaries with bold white borders and large labels.'
   };
 
   const list = Object.keys(overlays).map(name => {
@@ -1601,7 +1719,6 @@ function buildHelpHTML(){
     return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
   }).join('');
 
-  // helper to render a colored status row using your updated palette
   const statusRow = (label, key, text) => `
     <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
       <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
@@ -1613,15 +1730,11 @@ function buildHelpHTML(){
     <div style="margin-top:14px">
       <h3 style="margin:6px 0 2px;font-size:15px;font-weight:800">Fire Status Definitions</h3>
       <ul style="padding-left:0; margin:6px 0; list-style:none;">
-        ${statusRow('Out of Control', 'out of control', 'Any new start or fire not contained and still growing. Escape probable along established breaks. Requires a percent contained value.')}
-        ${statusRow('Being Monitored', 'being monitored', 'A known, out of control fire not immediately threatening life or infrastructure. Monitored by aircraft or satellite; no resources currently assigned.')}
-        ${statusRow('Contained', 'contained', 'Within a bulldozed break or wet line that should restrict growth with continued suppression. Fire may still be active on some flanks; jump/escape possible.')}
-        ${statusRow('Under Control', 'under control', 'Control line established; fire activity low with occasional flare-ups. Jump/escape unlikely. Sustained action and mop up underway.')}
-        ${statusRow('Being Patrolled', 'being patrolled', 'Fire secured within all breaks or wet lines. Activity nil with occasional smokes; jump/escape probability nil. Minimal staff needed; mop up mostly complete.')}
-        <li style="margin:10px 0 0; display:flex; gap:10px; align-items:flex-start;">
-          <span class="legend-swatch" style="background:#fff;"></span>
-          <div><b>Percent Contained</b> – Estimate of the perimeter secured by wet line, dozer break, or natural barriers (e.g., roads, lakes, rivers).</div>
-        </li>
+        ${statusRow('Out of Control', 'out of control', 'Any new start or fire not contained and still growing. Escape probable along established breaks.')}
+        ${statusRow('Being Monitored', 'being monitored', 'Known, out of control fire not immediately threatening; monitored by air or satellite.')}
+        ${statusRow('Contained', 'contained', 'Within a break/wet line that should restrict growth with continued suppression.')}
+        ${statusRow('Under Control', 'under control', 'Control line established; activity low.')}
+        ${statusRow('Being Patrolled', 'being patrolled', 'Secured within breaks; minimal activity.')}
       </ul>
     </div>
   `;
@@ -1654,7 +1767,6 @@ function closeHelp(){
 mhClose.addEventListener('click', closeHelp);
 mhOverlay.addEventListener('click', (e)=>{ if(e.target === mhOverlay) closeHelp(); });
 window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidden) closeHelp(); });
-
 
 
 
@@ -1692,12 +1804,10 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
       const CITY_RADIUS_M = 30_000;
       const cityProximityLayer = L.layerGroup({ pane: 'firesPane' }).addTo(map);
 
-      // keep a reference to the current city popup, so we can clear lines when it closes
       let cityProximityPopup = null;
 
       function kmStr(meters) { return (meters / 1000).toFixed(1); }
 
-      // clear proximity graphics when *that* city popup closes
       map.on('popupclose', (e) => {
         if (e.popup === cityProximityPopup) {
           cityProximityLayer.clearLayers();
@@ -1706,18 +1816,15 @@ window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !mhOverlay.hidd
       });
 
       function cityToFires(name, cityLatLng) {
-        // show all ACTIVE fire points
         enableAllActiveStatuses();
 
-        // Clear previous graphics
         cityProximityLayer.clearLayers();
         cityProximityPopup = null;
 
-        // Collect ONLY ACTIVE fires within radius
         const nearby = [];
         for (const rec of fireStore.values()) {
           const statusKey = norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '');
-          if (statusKey === 'extinguished') continue; // <- only active fires
+          if (statusKey === 'extinguished') continue;
           const d = map.distance(cityLatLng, rec.latlng);
           if (Number.isFinite(d) && d <= CITY_RADIUS_M) nearby.push({ rec, d });
         }
