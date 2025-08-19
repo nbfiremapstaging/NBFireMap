@@ -813,6 +813,7 @@
       const counties = L.esri.featureLayer({
         url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/County/MapServer/0',
         pane: 'countiesPane',
+        smoothFactor: 3,
         style: () => ({
           color: '#ffffff',        // bold white border
           weight: 3.5,
@@ -1373,10 +1374,10 @@ cityClusters.addTo(map); // on
         'Weather Radar': noaaRadar,
         'Lightning Density': lightningLayer,
         'NB Burn Bans': nbBurnBans,
-        'Fire Risk': fireRisk,
-        'Sentinel-2 Imagery': sentinel2,
         'Crown Land': crownProxy,     // NEW (off by default)
-        'Counties': counties         // NEW (off by default)
+        'Counties': counties,         // NEW (off by default)
+        'Fire Risk': fireRisk,
+        'Sentinel-2 Imagery': sentinel2
       };
       L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
@@ -1505,104 +1506,127 @@ cityClusters.addTo(map); // on
       }
 
       function buildBenchmarksHTML(){
-        if (!SUMS_BENCH) return '';
-        const fetched = SUMS_BENCH.fetchedAt ? ` <span style="opacity:.7">• fetched ${fmtDateTime(SUMS_BENCH.fetchedAt)}</span>` : '';
-        return `
-          <table class="pro-table compact" aria-label="Historic/season benchmarks">
-            <thead><tr><th>Historic</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td>10-year Avg YTD Fires</td><td>${toNum(SUMS_BENCH.avg10Fires,0)}</td></tr>
-              <tr><td>10-year Avg YTD Area Burned</td><td>${toNum(SUMS_BENCH.avg10Burn,1)} ha</td></tr>
-              <tr><td>Last Year YTD Fires</td><td>${toNum(SUMS_BENCH.lastCount,0)}</td></tr>
-              <tr><td>Last Year YTD Area Burned</td><td>${toNum(SUMS_BENCH.lastBurn,1)} ha</td></tr>
-              <tr><td>YTD Fires</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisCount,0)}</td></tr>
-              <tr><td>YTD Area Burned</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisBurn,1)} ha</td></tr>
-            </tbody>
-          </table>
-        `;
-      }
+  if (!SUMS_BENCH) return '';
+  const fetched = SUMS_BENCH.fetchedAt ? ` <span style="opacity:.7">• fetched ${fmtDateTime(SUMS_BENCH.fetchedAt)}</span>` : '';
+  return `
+    <table class="pro-table compact" aria-label="Historic/season benchmarks">
+      <thead><tr><th>Historic</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>10-year Avg YTD Fires</td><td>${toNum(SUMS_BENCH.avg10Fires,0)}</td></tr>
+        <tr><td>10-year Avg YTD Area Burned</td><td>${toNum(SUMS_BENCH.avg10Burn,1)} ha</td></tr>
+        <tr><td>Last Year YTD Fires</td><td>${toNum(SUMS_BENCH.lastCount,0)}</td></tr>
+        <tr><td>Last Year YTD Area Burned</td><td>${toNum(SUMS_BENCH.lastBurn,1)} ha</td></tr>
+        <tr><td>YTD Fires</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisCount,0)}</td></tr>
+        <tr><td>YTD Area Burned</td><td class="pro-kpi">${toNum(SUMS_BENCH.thisBurn,1)} ha</td></tr>
+      </tbody>
+    </table>
+  `;
+}
+
 
       function buildSummaryHTML(){
-        const items=[...fireStoreMap.values()]; const year = new Date().getFullYear();
-        let totalArea=0, counts={'out of control':0,'being monitored':0,contained:0,'under control':0,'being patrolled':0,extinguished:0,other:0};
-        let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
+  const items=[...fireStoreMap.values()]; const year = new Date().getFullYear();
+  let totalArea=0, counts={'out of control':0,'being monitored':0,contained:0,'under control':0,'being patrolled':0,extinguished:0,other:0};
+  let newToday=0, newYesterday=0, extToday=0, extYesterday=0, totalActive=0, totalExt=0;
 
-        for(const it of items){
-          const p=it.props||{};
-          totalArea += sizeOf(p);
-          const key=norm(it.statusKey || p.FIRE_STAT_DESC_E);
-          if (key in counts) counts[key]++; else counts.other++;
-          if (key === 'extinguished') totalExt++; else totalActive++;
+  for(const it of items){
+    const p=it.props||{};
+    totalArea += sizeOf(p);
+    const key=norm(it.statusKey || p.FIRE_STAT_DESC_E);
+    if (key in counts) counts[key]++; else counts.other++;
+    if (key === 'extinguished') totalExt++; else totalActive++;
 
-          const det = getDetectedMs(p);
-          if(det!=null){ if(isToday(det)) newToday++; else if(isYesterday(det)) newYesterday++; }
+    const det = getDetectedMs(p);
+    if(det!=null){ if(isToday(det)) newToday++; else if(isYesterday(det)) newYesterday++; }
 
-          if (key === 'extinguished') {
-            const outMs = getExtinguishedMs(p);
-            if (outMs!=null){ if (isToday(outMs)) extToday++; else if (isYesterday(outMs)) extYesterday++; }
-          }
-        }
+    if (key === 'extinguished') {
+      const outMs = getExtinguishedMs(p);
+      if (outMs!=null){ if (isToday(outMs)) extToday++; else if (isYesterday(outMs)) extYesterday++; }
+    }
+  }
 
-        const { css:pieCSS, legendHTML } = pieCSSSegments(counts);
-        const totalFiresYear = totalActive + totalExt;
+  const { css:pieCSS, legendHTML } = pieCSSSegments(counts);
+  const totalFiresYear = totalActive + totalExt;
 
-        const tableHTML = `
-          <table class="pro-table compact" aria-label="Fire summary table">
-            <thead><tr><th>Current</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td>Total (${year})</td><td class="pro-kpi">${toNum(totalFiresYear,0)}</td></tr>
-              <tr><td>Active</td><td class="pro-kpi">${toNum(totalActive,0)}</td></tr>
-              <tr><td>Out</td><td class="pro-kpi">${toNum(totalExt,0)}</td></tr>
-              <tr><td>New Today</td><td>${toNum(newToday,0)}</td></tr>
-              <tr><td>New Yesterday</td><td>${toNum(newYesterday,0)}</td></tr>
-              <tr><td>Out Today</td><td>${toNum(extToday,0)}</td></tr>
-              <tr><td>Out Yesterday</td><td>${toNum(extYesterday,0)}</td></tr>
-              <tr><td>Area Burned</td><td>${toNum(totalArea,0)} ha</td></tr>
-            </tbody>
-          </table>
-        `;
+  const tableHTML = `
+    <table class="pro-table compact" aria-label="Fire summary table">
+      <thead><tr><th>Current</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Total (${year})</td><td class="pro-kpi">${toNum(totalFiresYear,0)}</td></tr>
+        <tr><td>Active</td><td class="pro-kpi">${toNum(totalActive,0)}</td></tr>
+        <tr><td>Out</td><td class="pro-kpi">${toNum(totalExt,0)}</td></tr>
+        <tr><td>New Today</td><td>${toNum(newToday,0)}</td></tr>
+        <tr><td>New Yesterday</td><td>${toNum(newYesterday,0)}</td></tr>
+        <tr><td>Out Today</td><td>${toNum(extToday,0)}</td></tr>
+        <tr><td>Out Yesterday</td><td>${toNum(extYesterday,0)}</td></tr>
+        <tr><td>Area Burned</td><td>${toNum(totalArea,1)} ha</td></tr>
+      </tbody>
+    </table>
+  `;
 
-        const byStatus = new Map();
-        for (const it of items) {
-          const st = norm(it.statusKey || it.props?.FIRE_STAT_DESC_E || 'other');
-          if (!byStatus.has(st)) byStatus.set(st, []);
-          byStatus.get(st).push(it);
-        }
-        for (const arr of byStatus.values()) arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
-        const statusOrder = ['out of control','being monitored','contained','under control','being patrolled','extinguished','other'];
+  const byStatus = new Map();
+  for (const it of items) {
+    const st = norm(it.statusKey || it.props?.FIRE_STAT_DESC_E || 'other');
+    if (!byStatus.has(st)) byStatus.set(st, []);
+    byStatus.get(st).push(it);
+  }
 
-        const detailSections = statusOrder
-          .filter(k => byStatus.has(k))
-          .map(k => {
-            const label = k==='other' ? 'Other' : k.replace(/\b\w/g, c=>c.toUpperCase());
-            const list = byStatus.get(k).map((it) => {
-              const p=it.props||{};
-              const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
-              const size = toNum(sizeOf(p),0);
-              const det  = fmtDateTZ(getDetectedMs(p));
-              const extra = (k==='extinguished') ? ` • Out: ${fmtDateTZ(getExtinguishedMs(p))}` : '';
-              return `<li style="margin:4px 0;"><a href="#" data-fireid="${it.id}"><span style="font-weight:700">${name}</span>&nbsp;—&nbsp;${size} ha <span style="opacity:.8">• ${label}</span> <span style="opacity:.8">• Detected: ${det}${extra}</span></a></li>`;
-            }).join('') || '<li>None</li>';
-            return `<div style="margin:10px 0"><b>${label}</b><ol class="summary-list">${list}</ol></div>`;
-          }).join('');
+  for (const [k, arr] of byStatus.entries()){
+    if (k === 'extinguished'){
+      arr.sort((a,b) => (getExtinguishedMs(b.props)??-Infinity) - (getExtinguishedMs(a.props)??-Infinity));
+    } else {
+      arr.sort((a,b)=> sizeOf(b.props) - sizeOf(a.props));
+    }
+  }
 
-        return `
-          <div style="margin:10px 0"><b>Status (Active Only)</b></div>
-          <div class="pie-wrap" aria-label="Fires by status pie chart">
-            <div class="pie" style="background:${pieCSS}"></div>
-            <div class="pie-legend">${legendHTML}</div>
-          </div>
+  const statusOrder = ['out of control','being monitored','contained','under control','being patrolled','extinguished','other'];
 
-          <div style="margin:10px 0 2px"><b>Overview</b></div>
-          ${tableHTML}
+  const detailSections = statusOrder
+    .filter(k => byStatus.has(k))
+    .map(k => {
+      const label = k==='other' ? 'Other' : k.replace(/\b\w/g, c=>c.toUpperCase());
+      const list = byStatus.get(k).map((it) => {
+        const p=it.props||{};
+        const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
+        const size = toNum(sizeOf(p),1);
+        const det  = fmtDateTZ(getDetectedMs(p));
+        const extra = (k==='extinguished') ? ` • Out: ${fmtDateTZ(getExtinguishedMs(p))}` : '';
+        return `<li style="margin:4px 0;">
+          <a href="#" data-fireid="${it.id}">
+            <span style="font-weight:700">${name}</span>&nbsp;—&nbsp;${size} ha
+            <span style="opacity:.8">• ${label}</span>
+            <span style="opacity:.8">• Detected: ${det}${extra}</span>
+          </a>
+        </li>`;
+      }).join('') || '<li>None</li>';
 
-          ${buildBenchmarksHTML()}
+      const openAttr = (k === 'extinguished') ? '' : ' open';
+      return `
+        <details class="fs-section"${openAttr} style="margin:10px 0">
+          <summary style="cursor:pointer;font-weight:800">${label}</summary>
+          <ol class="summary-list">${list}</ol>
+        </details>`;
+    }).join('');
 
-          <div style="margin-top:10px"><b>Fires (largest → smallest)</b></div>
-          <div class="fs-scroll" id="fs-scroll">
-            ${detailSections}
-          </div>`;
-      }
+  return `
+    <div style="margin:10px 0"><b>Status (Active Only)</b></div>
+    <div class="pie-wrap" aria-label="Fires by status pie chart">
+      <div class="pie" style="background:${pieCSS}"></div>
+      <div class="pie-legend">${legendHTML}</div>
+    </div>
+
+    <div style="margin:10px 0 2px"><b>Overview</b></div>
+    ${tableHTML}
+
+    ${buildBenchmarksHTML()}
+
+    <div style="margin-top:10px"><b>Fires by status</b> <span style="opacity:.8">(active: largest first; extinguished: most recent first)</span></div>
+    <div class="fs-scroll" id="fs-scroll">
+      ${detailSections}
+    </div>`;
+}
+
+
 
       function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); wirePieLegendClicks(); }
 
