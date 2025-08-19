@@ -229,6 +229,12 @@
     .legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
     .legend-count{opacity:.85;font-weight:800;margin-left:auto}
     .muted-note{margin-top:8px;font-size:12px;color:var(--muted)}
+
+    .user-loc-click-catcher {
+  /* just ensures clicks are caught even if empty */
+  pointer-events: auto;
+}
+
   </style>
 </head>
 <body>
@@ -468,6 +474,52 @@
           icon: 'fa fa-location-crosshairs', strings: { title: 'Show me where I am' }
         }).addTo(map);
       }
+
+      // --- "Click GPS point to show nearby fires" -------------------------------
+      // A high-z overlay to catch taps on the GPS dot (works on top of plugin's marker)
+      const userLocationClickLayer = L.layerGroup({ pane: 'planesPane' }).addTo(map); // planesPane has pointer events
+      let userLocationClickMarker = null;
+
+      // wrapper so we can reuse your city flow
+      function gpsToFires(latlng) {
+        // Reuse the existing city proximity logic
+        cityToFires('Your Location', latlng);
+      }
+
+      // Create or move the invisible click-catcher marker at the user's location
+      function upsertUserLocationClickMarker(latlng) {
+        if (userLocationClickMarker) {
+          userLocationClickMarker.setLatLng(latlng);
+          return;
+        }
+        const icon = L.divIcon({
+          className: 'user-loc-click-catcher',
+          html: '',                      // nothing visible
+          iconSize: [44, 44],            // large enough to be easy to tap
+          iconAnchor: [22, 22]
+        });
+        userLocationClickMarker = L.marker(latlng, {
+          icon,
+          pane: 'planesPane',
+          keyboard: false,
+          title: 'Your location — tap to see nearby fires'
+        })
+        .on('click', () => gpsToFires(userLocationClickMarker.getLatLng()))
+        .addTo(userLocationClickLayer);
+      }
+
+      // When the locate control finds/updates your position, place the click-catcher
+      map.on('locationfound', (e) => {
+        if (!e || !e.latlng) return;
+        upsertUserLocationClickMarker(e.latlng);
+      });
+
+      // If geolocation errors out, remove the click-catcher
+      map.on('locationerror', () => {
+        userLocationClickLayer.clearLayers();
+        userLocationClickMarker = null;
+      });
+
 
       const fitProvinceToView = ({ animate=false } = {}) => {
         const padX = Math.round(innerWidth  * 0.04);
