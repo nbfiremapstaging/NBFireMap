@@ -91,6 +91,12 @@
       position:sticky;top:0;background:var(--panel);
       margin:-8px -40px 8px -14px;padding:8px 14px 10px;border-bottom:1px solid var(--border);z-index:1;backdrop-filter:blur(6px)
     }
+    
+/* Basemap toggle */
+.basemap-toggle{margin-left:auto;display:flex;align-items:center}
+.basemap-seg{display:inline-flex;gap:10px;margin:0;padding:4px 8px;border:1px solid var(--border);border-radius:999px}
+.basemap-seg label{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.basemap-seg input{accent-color:var(--accent,#0078ff)}
     .overview-footbar{
       position:sticky;bottom:0;background:var(--panel);
       margin:8px -40px -8px -14px;padding:10px 14px 8px;border-top:1px solid var(--border);z-index:1;backdrop-filter:blur(6px)
@@ -609,7 +615,28 @@
         ['planesPane',1000,true]
       ].forEach(([name, z, pe]) => { const p = map.createPane(name); p.style.zIndex = z; if (pe) p.style.pointerEvents = 'auto'; });
 
-      L.esri.basemapLayer('Imagery').addTo(map);
+// Basemaps: Esri Imagery (current) and OpenStreetMap
+ const basemaps = {
+   imagery: L.esri.basemapLayer('Imagery'),
+   osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+     maxZoom: 19,
+     attribution: '&copy; OpenStreetMap contributors'
+   })
+ };
+ // Restore preference or default to imagery
+ const savedBase = (localStorage.getItem('basemap') || 'imagery');
+ (savedBase === 'osm' ? basemaps.osm : basemaps.imagery).addTo(map);
+
+ function setBasemap(which){
+   if(which === 'osm'){
+     if(map.hasLayer(basemaps.imagery)) map.removeLayer(basemaps.imagery);
+     if(!map.hasLayer(basemaps.osm)) basemaps.osm.addTo(map);
+   }else{
+     if(map.hasLayer(basemaps.osm)) map.removeLayer(basemaps.osm);
+     if(!map.hasLayer(basemaps.imagery)) basemaps.imagery.addTo(map);
+   }
+   localStorage.setItem('basemap', which);
+ }
 
       L.control.locate({
         position: 'topleft',
@@ -1433,6 +1460,23 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         topbar.className = 'overview-topbar';
         fsBtn.classList.add('in-legend');
         topbar.append(fsBtn);
+        
+ // Basemap toggle (Imagery / OSM) lives in the Overview topbar
+ const baseCtl = D.createElement('div');
+ baseCtl.className = 'basemap-toggle';
+ const currentBase = localStorage.getItem('basemap') || 'imagery';
+ baseCtl.innerHTML = `
+   <fieldset class="basemap-seg" role="radiogroup" aria-label="Basemap">
+     <label><input type="radio" name="basemap" value="imagery" ${currentBase!=='osm'?'checked':''}> Imagery</label>
+     <label><input type="radio" name="basemap" value="osm" ${currentBase==='osm'?'checked':''}> OSM</label>
+   </fieldset>
+ `;
+ baseCtl.addEventListener('change', (e)=>{
+   const v = e.target?.value;
+   if(v==='imagery' || v==='osm') setBasemap(v);
+ });
+ topbar.append(baseCtl);
+
         layersBox.prepend(topbar);
         requestAnimationFrame(sizeLegend);
       }
