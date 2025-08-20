@@ -434,7 +434,17 @@
     <div class="fire-summary" role="dialog" aria-modal="true" aria-labelledby="fs-title">
       <header>
         <h2 id="fs-title">New Brunswick Fire Summary</h2>
-        <button id="fs-close" class="close-summary" type="button"><span class="icon"><i class="fa-solid fa-xmark"></i></span> Close</button>
+              <div style="display:flex; gap:8px; align-items:center">
+        <button id="fs-export-excel" class="close-summary" type="button" title="Download Excel (.xlsx)">
+          <span class="icon"><i class="fa-solid fa-file-excel"></i></span> Export Excel
+        </button>
+        <button id="fs-export-pdf" class="close-summary" type="button" title="Download PDF">
+          <span class="icon"><i class="fa-solid fa-file-pdf"></i></span> Export PDF
+        </button>
+        <button id="fs-close" class="close-summary" type="button">
+          <span class="icon"><i class="fa-solid fa-xmark"></i></span> Close
+        </button>
+      </div>
       </header>
       <div id="fs-body" class="body"></div>
     </div>
@@ -476,6 +486,9 @@
   <script defer src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
   <script defer src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script defer src="https://unpkg.com/esri-leaflet-cluster/dist/esri-leaflet-cluster.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
     /* =========================================================================
@@ -1795,6 +1808,188 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         legend.addEventListener('click', (e)=>{ const item = e.target.closest('.legend-item[data-status-key]'); if(item) handler(item); });
         legend.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' ') { const item = e.target.closest('.legend-item[data-status-key]'); if(item){ e.preventDefault(); handler(item); } } });
       }
+
+            // ==== Export helpers (Excel & PDF) ====================================
+      // Gather full dataset: all fires (active+extinguished), with XY and derived fields.
+      function collectFireRows() {
+        const rows = [];
+        for (const rec of fireStore.values()) {
+          const p = rec.props || {};
+          const lat = rec.latlng?.lat ?? null;
+          const lng = rec.latlng?.lng ?? null;
+          const statusKey = norm(rec.statusKey || p.FIRE_STAT_DESC_E || '—');
+          const sizeHa = (p.FIRE_SIZE ?? p.SIZE_HA ?? p.AREA);
+          const containPct = getContainPct(p);
+          const detMs = getDetectedMs(p);
+          const outMs = getExtinguishedMs(p);
+
+          // Flatten a subset of "nice" columns first, then spread all original props for completeness.
+          const base = {
+            FireName: p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire',
+            FireID: p.FIRE_ID ?? p.GlobalID ?? p.OBJECTID ?? null,
+            Status: statusKey.replace(/\b\w/g, c => c.toUpperCase()),
+            Size_ha: Number.isFinite(Number(sizeHa)) ? Number(sizeHa) : null,
+            Contained_pct: containPct != null ? containPct : null,
+            Detected_at: detMs != null ? new Date(detMs).toISOString() : null,
+            Extinguished_at: outMs != null ? new Date(outMs).toISOString() : null,
+            X: lng,  // "X" then "Y" (typical GIS order)
+            Y: lat
+          };
+          rows.push({ ...base, ...p });
+        }
+        return rows;
+      }
+
+      // Compute the key stats (keep it aligned with your summary UI)
+      function collectSummaryStats() {
+        // Rebuild the same "items" list that buildSummaryHTML uses
+        const items = Array.from(fireStore.values()).map(rec => ({
+          id: rec.id, props: rec.props || {}, statusKey: norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '—')
+        }));
+        const sizeOf = (p) => Number(p.FIRE_SIZE ?? p.SIZE_HA ?? p.AREA) || 0;
+        const active = items.filter(i => i.statusKey !== 'extinguished');
+        const extinct = items.filter(i => i.statusKey === 'extinguished');
+        const totalArea = items.reduce((s,i)=> s + sizeOf(i.props), 0);
+
+        const today = new Date();
+        const wasToday = (ms) => isToday(ms, ATLANTIC_TZ);
+        const wasYesterday = (ms) => isYesterday(ms, ATLANTIC_TZ);
+
+        const detToday = items.filter(i => wasToday(getDetectedMs(i.props))).length;
+        const detYesterday = items.filter(i => wasYesterday(getDetectedMs(i.props))).length;
+        const extToday = extinct.filter(i => wasToday(getExtinguishedMs(i.props))).length;
+        const extYesterday = extinct.filter(i => wasYesterday(getExtinguishedMs(i.props))).length;
+
+        const byStatus = {};
+        for (const it of items) {
+          const k = it.statusKey || 'other';
+          byStatus[k] = (byStatus[k] || 0) + 1;
+        }
+        return {
+          generatedAt: new Date().toISOString(),
+          totalFires: items.length,
+          activeFires: active.length,
+          extinguishedFires: extinct.length,
+          detectedToday: detToday,
+          detectedYesterday: detYesterday,
+          outToday: extToday,
+          outYesterday: extYesterday,
+          areaHaTotal: totalArea,
+          byStatus
+        };
+      }
+
+      // ---- Excel (.xlsx) export via SheetJS ----
+      async function exportSummaryExcel() {
+        const rows = collectFireRows();
+        const stats = collectSummaryStats();
+        // Sheet 1: Stats (K/V)
+        const statsRows = Object.entries({
+          'Generated At (UTC)': stats.generatedAt,
+          'Total Fires': stats.totalFires,
+          'Active Fires': stats.activeFires,
+          'Extinguished Fires': stats.extinguishedFires,
+          'Detected Today': stats.detectedToday,
+          'Detected Yesterday': stats.detectedYesterday,
+          'Out Today': stats.outToday,
+          'Out Yesterday': stats.outYesterday,
+          'Area Burned (ha)': stats.areaHaTotal
+        }).map(([k,v]) => ({ Metric: k, Value: v }));
+        // Add status breakdown
+        for (const [k,v] of Object.entries(stats.byStatus)) {
+          statsRows.push({ Metric: `Status — ${k}`, Value: v });
+        }
+
+        const wb = XLSX.utils.book_new();
+        const wsStats = XLSX.utils.json_to_sheet(statsRows);
+        const wsFires = XLSX.utils.json_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, wsStats, 'Stats');
+        XLSX.utils.book_append_sheet(wb, wsFires, 'Fires');
+        const filename = `NB_Fire_Summary_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(wb, filename);
+      }
+
+      // ---- PDF export via jsPDF + AutoTable ----
+      async function exportSummaryPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const stats = collectSummaryStats();
+        const rows = collectFireRows();
+
+        const marginX = 40;
+        let y = 42;
+        doc.setFont('helvetica','bold'); doc.setFontSize(15);
+        doc.text('New Brunswick Fire Summary', marginX, y); y += 18;
+        doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        doc.text(`Generated: ${new Date(stats.generatedAt).toLocaleString()}`, marginX, y); y += 18;
+
+        // Stats table
+        const statEntries = [
+          ['Total Fires', String(stats.totalFires)],
+          ['Active Fires', String(stats.activeFires)],
+          ['Extinguished Fires', String(stats.extinguishedFires)],
+          ['Detected Today', String(stats.detectedToday)],
+          ['Detected Yesterday', String(stats.detectedYesterday)],
+          ['Out Today', String(stats.outToday)],
+          ['Out Yesterday', String(stats.outYesterday)],
+          ['Area Burned (ha)', toNum(stats.areaHaTotal,1)]
+        ];
+        doc.autoTable({
+          startY: y,
+          head: [['Metric', 'Value']],
+          body: statEntries,
+          styles: { fontSize: 9, cellPadding: 4 }
+        });
+        y = doc.lastAutoTable.finalY + 18;
+
+        // Status breakdown
+        const statusBody = Object.entries(stats.byStatus)
+          .map(([k,v]) => [k.replace(/\b\w/g,c=>c.toUpperCase()), String(v)]);
+        doc.autoTable({
+          startY: y,
+          head: [['Status', 'Count']],
+          body: statusBody,
+          styles: { fontSize: 9, cellPadding: 4 }
+        });
+        y = doc.lastAutoTable.finalY + 18;
+
+        // Full fires list (key columns; keeps PDF reasonable). Excel has the complete property dump.
+        const fireBody = rows.map(r => ([
+          r.FireName,
+          r.Status,
+          Number.isFinite(r.Size_ha) ? r.Size_ha : '',
+          r.Detected_at ? r.Detected_at.slice(0,10) : '',
+          r.Extinguished_at ? r.Extinguished_at.slice(0,10) : '',
+          r.Contained_pct ?? '',
+          r.X ?? '',
+          r.Y ?? ''
+        ]));
+        doc.autoTable({
+          startY: y,
+          head: [['Fire', 'Status', 'ha', 'Detected', 'Out', '% Cont.', 'X', 'Y']],
+          body: fireBody,
+          styles: { fontSize: 8, cellPadding: 3 },
+          headStyles: { fontStyle:'bold' },
+          columnStyles: { 2: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
+          didDrawPage: (data) => {
+            // Simple footer
+            const pageSize = doc.internal.pageSize;
+            const str = `Page ${doc.internal.getNumberOfPages()}`;
+            doc.setFontSize(8);
+            doc.text(str, pageSize.getWidth() - marginX, pageSize.getHeight() - 14, { align: 'right' });
+          }
+        });
+
+        const filename = `NB_Fire_Summary_${new Date().toISOString().slice(0,10)}.pdf`;
+        doc.save(filename);
+      }
+
+      // Wire up buttons when modal exists
+      const fsExportExcelBtn = D.getElementById('fs-export-excel');
+      const fsExportPdfBtn   = D.getElementById('fs-export-pdf');
+      fsExportExcelBtn?.addEventListener('click', exportSummaryExcel);
+      fsExportPdfBtn?.addEventListener('click', exportSummaryPDF);
+
 
       const openSummary = () => { refreshSummary(); fsOverlay.hidden=false; fsOverlay.style.display='flex'; fsClose.focus(); };
       const closeSummary = () => { fsOverlay.style.display='none'; fsOverlay.hidden=true; fsBtn.focus(); };
