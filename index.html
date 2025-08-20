@@ -375,16 +375,36 @@
       const fmtDateTZ = (ms, tz=ATLANTIC_TZ) => ms == null ? '—' : new Date(+ms).toLocaleDateString(undefined, { year:'numeric', month:'2-digit', day:'2-digit', timeZone: tz });
 
       // Date comparisons (in a TZ)
-      const ymdInTz = (ms, tz=ATLANTIC_TZ) => {
-        const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
-        const parts = fmt.formatToParts(new Date(ms));
-        const val = (k) => +parts.find(p => p.type===k)?.value;
-        return { y: val('year'), m: val('month'), d: val('day') };
-      };
-      const sameYMD = (a,b,tz) => { if (a==null || b==null) return false; const A=ymdInTz(a,tz), B=ymdInTz(b,tz); return A.y===B.y && A.m===B.m && A.d===B.d; };
-      const yesterdayUTCms = (tz=ATLANTIC_TZ) => { const t = ymdInTz(Date.now(), tz); return Date.UTC(t.y, t.m-1, t.d) - 86_400_000; };
-      const isToday = (ms) => sameYMD(ms, Date.now(), ATLANTIC_TZ);
-      const isYesterday = (ms) => sameYMD(ms, yesterdayUTCms(ATLANTIC_TZ), ATLANTIC_TZ);
+const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
+  const parts = fmt.formatToParts(new Date(ms));
+  const get = (k) => +parts.find(p => p.type === k)?.value;
+  return { y: get('year'), m: get('month'), d: get('day') };
+};
+
+const sameYMD = (a, b, tz = ATLANTIC_TZ) => {
+  if (a == null || b == null) return false;
+  const A = ymdInTz(a, tz), B = ymdInTz(b, tz);
+  return A.y === B.y && A.m === B.m && A.d === B.d;
+};
+
+const startOfTodayUTCfromTz = (tz = ATLANTIC_TZ) => {
+  const t = ymdInTz(Date.now(), tz);
+  return Date.UTC(t.y, t.m - 1, t.d); // UTC timestamp corresponding to local (tz) start of today
+};
+
+const isToday = (ms, tz = ATLANTIC_TZ) => sameYMD(ms, Date.now(), tz);
+
+// Crucial fix: compare whole-day buckets derived from y/m/d in the target TZ.
+// This avoids the off-by-one that happens when mixing UTC midnights with local time.
+const isYesterday = (ms, tz = ATLANTIC_TZ) => {
+  if (ms == null) return false;
+  const a = ymdInTz(ms, tz);
+  const aUTC = Date.UTC(a.y, a.m - 1, a.d);
+  const todayUTC = startOfTodayUTCfromTz(tz);
+  return aUTC === (todayUTC - 86_400_000);
+};
+
 
       // Property extraction helpers
       const firstProp = (p, keys) => { for (const k of keys) { const v = p?.[k]; if (v !== undefined && v !== null && v !== '') return [k, v]; } return [null, null]; };
@@ -402,15 +422,21 @@
         const num = parseMaybeNumber(v); return num == null ? null : clamp01(num);
       };
       const getDetectedMs = (p) => {
-        for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) {
-          const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t;
-        } return null;
-      };
-      const getExtinguishedMs = (p) => {
-        for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) {
-          const v=p?.[k]; if(v==null) continue; const n=+v; if(Number.isFinite(n)) return n; const t=Date.parse(v); if(!Number.isNaN(t)) return t;
-        } return null;
-      };
+  for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) {
+    const ms = parseDateFlexible(p?.[k]);
+    if (ms != null) return ms;
+  }
+  return null;
+};
+
+const getExtinguishedMs = (p) => {
+  for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) {
+    const ms = parseDateFlexible(p?.[k]);
+    if (ms != null) return ms;
+  }
+  return null;
+};
+
       const getRetrievedInfo = (p) => {
         const [, v] = firstProp(p, ['FETCHED_FROM_ERD','FETCHED_FROM_GNB','GNB_FETCHED','GNB_RETRIEVED_AT','RETRIEVED_FROM_GNB','FETCHED_AT','FETCH_TIMESTAMP','SOURCE_FETCHED_AT','ERD_FETCHED_AT']);
         if (v == null) return { ms:null, bool:null, raw:null };
