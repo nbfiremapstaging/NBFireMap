@@ -187,12 +187,70 @@
     .ws-speed{font-weight:800;font-size:14px}
     .ws-small{font-weight:700;font-size:10px;opacity:.95}
 
-    /* Smoke timeline */
+    /* Smoke timeline (absolute-bottom default) */
     #smokeControls{
       position:absolute;left:12px;right:12px;z-index:2100;display:none;flex-direction:column;gap:6px;
       background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px;box-shadow:var(--shadow);backdrop-filter:blur(6px);
       font-size:var(--fs-14);max-width:min(96vw,680px);bottom:calc(var(--smoke-bottom, 28px) + env(safe-area-inset-bottom))
     }
+    /* NEW: Inline version (used inside the Overview) */
+    #smokeControls.inline{
+      position: static;
+      left: auto; right: auto; bottom: auto; z-index: auto;
+      max-width: none; width: 100%;
+      margin: 6px 0 0;
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* === CWFIS inline controls (match Smoke inline look) === */
+  .cwfis-controls{
+    position: static; display:none; z-index:auto; max-width:none; width:100%; margin:6px 0 0;
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:8px 10px; box-shadow:var(--shadow-soft);
+    font-size:var(--fs-14);
+  }
+  .cwfis-row{ display:flex; align-items:center; gap:8px; }
+  .cwfis-top{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:6px; }
+  .cwfis-top .cwfis-stamp{ flex:0 0 auto; white-space:nowrap; }
+.cwfis-top label{ flex:0 0 auto; }
+.cwfis-select{ max-width: 220px; }
+
+/* Play button to match smoke controls */
+.cwfis-play{
+  background:var(--btn-bg);border:1px solid var(--btn-border);
+  border-radius:8px;padding:4px 10px;cursor:pointer;
+  font-weight:800;height:28px;display:inline-grid;place-items:center;
+  line-height:1;min-width:38px;text-align:center
+}
+.cwfis-play:focus-visible{outline:none;box-shadow:var(--focus)}
+
+/* Small screens: prevent overflow & FWI “Component” label overlap */
+@media (max-width:560px){
+  .cwfis-top{ gap:8px; }
+  .cwfis-select{ width:100%; max-width:none; }
+}
+/* On very small screens, hide the FWI 'Component' label text (keeps aria-label) */
+@media (max-width:480px){
+  label[for="fwiComp"]{ display:none; }
+  label[for="fbpMetric"]{ display:none; } /* hide 'Metric' label on phones */
+}
+  .cwfis-top label{ font-weight:800; }
+  .cwfis-spacer{ flex:1 1 auto; }
+  .cwfis-time{ -webkit-appearance:none; appearance:none; flex:1 1 auto; min-width:160px; height:22px; background:transparent; outline:none; margin:0; }
+  .cwfis-time:focus-visible{ outline:none; box-shadow:var(--focus); border-radius:10px; }
+  .cwfis-time::-webkit-slider-runnable-track{ height:2px; border-radius:999px; background:var(--border); }
+  .cwfis-time::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:12px; height:12px; border-radius:50%; background:var(--text); border:2px solid #fff; margin-top:-5px; box-shadow:0 1px 2px rgba(0,0,0,.18); }
+  .cwfis-time::-moz-range-track{ height:2px; border-radius:999px; background:var(--border); }
+  .cwfis-time::-moz-range-thumb{ width:12px; height:12px; border-radius:50%; background:var(--text); border:2px solid #fff; box-shadow:0 1px 2px rgba(0,0,0,.18); }
+  .cwfis-time::-moz-range-progress{ height:2px; background:color-mix(in srgb, var(--text) 35%, transparent); border-radius:999px; }
+  .cwfis-legend{ display:flex; align-items:center; gap:8px; font-size:var(--fs-12); opacity:.95; margin-top:6px; }
+  .cwfis-legend img{ max-height:80px; border:1px solid var(--border); border-radius:6px; background:#fff; }
+  .cwfis-select{ font-weight:800; border:1px solid var(--btn-border); background:var(--btn-bg); border-radius:8px; padding:6px 8px; }
+  .cwfis-stamp{ font-weight:700; white-space:nowrap; }
+  .cwfis-err{ color:#a00; font-size:12px; display:none; margin-top:4px; }
+  @media (max-width:560px){
+    .cwfis-legend img{ max-height:68px; }
+  }
+
     .sc-top{display:flex;align-items:center;gap:10px}
     .sc-bottom{display:flex;align-items:center;gap:8px;font-size:var(--fs-12);opacity:.95}
     #smokePlay{background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:800;height:28px;display:inline-grid;place-items:center;line-height:1;min-width:38px;text-align:center}
@@ -232,18 +290,8 @@
     .legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
     .legend-count{opacity:.85;font-weight:800;margin-left:auto}
     .muted-note{margin-top:8px;font-size:12px;color:var(--muted)}
-    /* Make pie legend items look clickable */
-.pie-legend .legend-item {
-  cursor: pointer;
-  border-radius: 6px;
-  padding: 2px 4px;
-  transition: background 0.15s ease-in-out;
-}
-
-.pie-legend .legend-item:hover {
-  background: rgba(0, 0, 0, 0.05); /* light hover feedback */
-}
-
+    .pie-legend .legend-item { cursor: pointer; border-radius: 6px; padding: 2px 4px; transition: background 0.15s ease-in-out; }
+    .pie-legend .legend-item:hover { background: rgba(0, 0, 0, 0.05); }
   </style>
 </head>
 <body>
@@ -258,6 +306,84 @@
     <div class="sc-bottom">
       <span id="smokeLabel">Wildfire Smoke</span><span class="dot-sep">•</span><span id="smokeTimestamp">Loading…</span>
     </div>
+  </div>
+
+  
+  <!-- CWFIS: Fire Risk controls (inline under “Fire Risk”) -->
+  <div id="riskControls" class="cwfis-controls" aria-live="polite">
+    <div class="cwfis-top">
+      <label for="riskTime">Date</label>
+      <span class="cwfis-spacer"></span>
+      <span class="cwfis-stamp" id="riskStamp">Loading…</span>
+    </div>
+
+  <div class="cwfis-row">
+    <button id="riskPlay" class="cwfis-play" type="button" title="Play/Pause" aria-label="Play Fire Risk animation">▶</button>
+    <input id="riskTime" class="cwfis-time" type="range" min="0" max="0" value="0" step="1" aria-label="Fire Risk date slider" />
+  </div>
+
+    <div class="cwfis-legend">
+      <span>Legend:</span><img id="riskLegend" alt="Fire Danger legend" />
+    </div>
+    <div id="riskErr" class="cwfis-err">Layer for this date may be unavailable.</div>
+  </div>
+
+  <!-- CWFIS: Fire Weather controls (inline under “Fire Weather”) -->
+  <div id="fwiControls" class="cwfis-controls" aria-live="polite">
+    <div class="cwfis-top">
+      <label for="fwiComp">Component</label>
+      <select id="fwiComp" class="cwfis-select" aria-label="FWI component">
+          <option value="fwi"  data-short="FWI"  data-long="Fire Weather Index (FWI)">Fire Weather Index (FWI)</option>
+  <option value="ffmc" data-short="FFMC" data-long="Fine Fuel Moisture Code (FFMC)">Fine Fuel Moisture Code (FFMC)</option>
+  <option value="dmc"  data-short="DMC"  data-long="Duff Moisture Code (DMC)">Duff Moisture Code (DMC)</option>
+  <option value="dc"   data-short="DC"   data-long="Drought Code (DC)">Drought Code (DC)</option>
+  <option value="isi"  data-short="ISI"  data-long="Initial Spread Index (ISI)">Initial Spread Index (ISI)</option>
+  <option value="bui"  data-short="BUI"  data-long="Buildup Index (BUI)">Buildup Index (BUI)</option>
+  <option value="dsr"  data-short="DSR"  data-long="Daily Severity Rating (DSR)">Daily Severity Rating (DSR)</option>
+      </select>
+      <span class="cwfis-spacer"></span>
+      <label for="fwiTime">Date</label>
+      <span class="cwfis-stamp" id="fwiStamp">Loading…</span>
+    </div>
+
+  <div class="cwfis-row">
+    <button id="fwiPlay" class="cwfis-play" type="button" title="Play/Pause" aria-label="Play FWI animation">▶</button>
+    <input id="fwiTime" class="cwfis-time" type="range" min="0" max="0" value="0" step="1" aria-label="FWI date slider" />
+  </div>
+
+    <div class="cwfis-legend">
+      <span>Legend:</span><img id="fwiLegend" alt="FWI legend" />
+    </div>
+    <div id="fwiErr" class="cwfis-err">Layer for this date/component may be unavailable.</div>
+  </div>
+
+  <!-- CWFIS: Fire Behavior controls (inline under “Fire Behavior”) -->
+  <div id="fbpControls" class="cwfis-controls" aria-live="polite">
+    <div class="cwfis-top">
+      <label for="fbpMetric">Metric</label>
+      <select id="fbpMetric" class="cwfis-select" aria-label="FBP metric">
+            <option value="hfi" data-short="HFI" data-long="Head Fire Intensity (HFI)">Head Fire Intensity (HFI)</option>
+  <option value="ros" data-short="ROS" data-long="Rate of Spread (ROS)">Rate of Spread (ROS)</option>
+  <option value="sfc" data-short="SFC" data-long="Surface Fuel Consumption (SFC)">Surface Fuel Consumption (SFC)</option>
+  <option value="tfc" data-short="TFC" data-long="Total Fuel Consumption (TFC)">Total Fuel Consumption (TFC)</option>
+  <option value="cfb" data-short="CFB" data-long="Crown Fraction Burned (CFB)">Crown Fraction Burned (CFB)</option>
+  <option value="fmc" data-short="FMC" data-long="Fine Fuel Moisture Content (FMC)">Fine Fuel Moisture Content (FMC)</option>
+  <option value="ft"  data-short="FT"  data-long="Fire Type (FT)">Fire Type (FT)</option>
+      </select>
+      <span class="cwfis-spacer"></span>
+      <label for="fbpTime">Date</label>
+      <span class="cwfis-stamp" id="fbpStamp">Loading…</span>
+    </div>
+
+  <div class="cwfis-row">
+    <button id="fbpPlay" class="cwfis-play" type="button" title="Play/Pause" aria-label="Play FBP animation">▶</button>
+    <input id="fbpTime" class="cwfis-time" type="range" min="0" max="0" value="0" step="1" aria-label="FBP date slider" />
+  </div>
+
+    <div class="cwfis-legend">
+      <span>Legend:</span><img id="fbpLegend" alt="FBP legend" />
+    </div>
+    <div id="fbpErr" class="cwfis-err">Layer for this date/metric may be unavailable.</div>
   </div>
 
   <!-- Title -->
@@ -375,36 +501,29 @@
       const fmtDateTZ = (ms, tz=ATLANTIC_TZ) => ms == null ? '—' : new Date(+ms).toLocaleDateString(undefined, { year:'numeric', month:'2-digit', day:'2-digit', timeZone: tz });
 
       // Date comparisons (in a TZ)
-const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
-  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
-  const parts = fmt.formatToParts(new Date(ms));
-  const get = (k) => +parts.find(p => p.type === k)?.value;
-  return { y: get('year'), m: get('month'), d: get('day') };
-};
-
-const sameYMD = (a, b, tz = ATLANTIC_TZ) => {
-  if (a == null || b == null) return false;
-  const A = ymdInTz(a, tz), B = ymdInTz(b, tz);
-  return A.y === B.y && A.m === B.m && A.d === B.d;
-};
-
-const startOfTodayUTCfromTz = (tz = ATLANTIC_TZ) => {
-  const t = ymdInTz(Date.now(), tz);
-  return Date.UTC(t.y, t.m - 1, t.d); // UTC timestamp corresponding to local (tz) start of today
-};
-
-const isToday = (ms, tz = ATLANTIC_TZ) => sameYMD(ms, Date.now(), tz);
-
-// Crucial fix: compare whole-day buckets derived from y/m/d in the target TZ.
-// This avoids the off-by-one that happens when mixing UTC midnights with local time.
-const isYesterday = (ms, tz = ATLANTIC_TZ) => {
-  if (ms == null) return false;
-  const a = ymdInTz(ms, tz);
-  const aUTC = Date.UTC(a.y, a.m - 1, a.d);
-  const todayUTC = startOfTodayUTCfromTz(tz);
-  return aUTC === (todayUTC - 86_400_000);
-};
-
+      const ymdInTz = (ms, tz = ATLANTIC_TZ) => {
+        const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
+        const parts = fmt.formatToParts(new Date(ms));
+        const get = (k) => +parts.find(p => p.type === k)?.value;
+        return { y: get('year'), m: get('month'), d: get('day') };
+      };
+      const sameYMD = (a, b, tz = ATLANTIC_TZ) => {
+        if (a == null || b == null) return false;
+        const A = ymdInTz(a, tz), B = ymdInTz(b, tz);
+        return A.y === B.y && A.m === B.m && A.d === B.d;
+      };
+      const startOfTodayUTCfromTz = (tz = ATLANTIC_TZ) => {
+        const t = ymdInTz(Date.now(), tz);
+        return Date.UTC(t.y, t.m - 1, t.d);
+      };
+      const isToday = (ms, tz = ATLANTIC_TZ) => sameYMD(ms, Date.now(), tz);
+      const isYesterday = (ms, tz = ATLANTIC_TZ) => {
+        if (ms == null) return false;
+        const a = ymdInTz(ms, tz);
+        const aUTC = Date.UTC(a.y, a.m - 1, a.d);
+        const todayUTC = startOfTodayUTCfromTz(tz);
+        return aUTC === (todayUTC - 86_400_000);
+      };
 
       // Property extraction helpers
       const firstProp = (p, keys) => { for (const k of keys) { const v = p?.[k]; if (v !== undefined && v !== null && v !== '') return [k, v]; } return [null, null]; };
@@ -422,21 +541,19 @@ const isYesterday = (ms, tz = ATLANTIC_TZ) => {
         const num = parseMaybeNumber(v); return num == null ? null : clamp01(num);
       };
       const getDetectedMs = (p) => {
-  for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) {
-    const ms = parseDateFlexible(p?.[k]);
-    if (ms != null) return ms;
-  }
-  return null;
-};
-
-const getExtinguishedMs = (p) => {
-  for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) {
-    const ms = parseDateFlexible(p?.[k]);
-    if (ms != null) return ms;
-  }
-  return null;
-};
-
+        for (const k of ['TIME_DETECTED','DATE_DETECTED','DETECTED','FIRE_START_DATE','START_DATE']) {
+          const ms = parseDateFlexible(p?.[k]);
+          if (ms != null) return ms;
+        }
+        return null;
+      };
+      const getExtinguishedMs = (p) => {
+        for (const k of ['FIRE_OUT_DATE','OUT_DATE','DATE_OUT','DATE_EXTINGUISHED','OUT_TIME','EXTINGUISHED','FIRE_STAT_DATE']) {
+          const ms = parseDateFlexible(p?.[k]);
+          if (ms != null) return ms;
+        }
+        return null;
+      };
       const getRetrievedInfo = (p) => {
         const [, v] = firstProp(p, ['FETCHED_FROM_ERD','FETCHED_FROM_GNB','GNB_FETCHED','GNB_RETRIEVED_AT','RETRIEVED_FROM_GNB','FETCHED_AT','FETCH_TIMESTAMP','SOURCE_FETCHED_AT','ERD_FETCHED_AT']);
         if (v == null) return { ms:null, bool:null, raw:null };
@@ -495,13 +612,13 @@ const getExtinguishedMs = (p) => {
       L.esri.basemapLayer('Imagery').addTo(map);
 
       L.control.locate({
-  position: 'topleft',
-  flyTo: true,
-  showPopup: false,
-  keepCurrentZoomLevel: true,
-  icon: 'fa-solid fa-location-crosshairs',   // FA6 class names
-  strings: { title: 'Show me where I am' }
-}).addTo(map);
+        position: 'topleft',
+        flyTo: true,
+        showPopup: false,
+        keepCurrentZoomLevel: true,
+        icon: 'fa-solid fa-location-crosshairs',
+        strings: { title: 'Show me where I am' }
+      }).addTo(map);
 
       // ---- Quick location click-catcher → nearby fires ----------------------
       const userLocLayer = L.layerGroup({ pane: 'planesPane' }).addTo(map);
@@ -668,69 +785,56 @@ const getExtinguishedMs = (p) => {
 
       map.whenReady(() => { fitProvinceToView({ animate:false }); loadLocalFires(); });
 
-      // ---- CWFIS Hotspots (WFS) — 24h & 7d, refresh on pan/zoom -----------------
-const CWFIS_WFS = 'https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows';
+      // ---- CWFIS Hotspots (WFS) ---------------------------------------------
+      const CWFIS_WFS = 'https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows';
+      function cwfisWfsUrl(typeName, bounds) {
+        const b = bounds || map.getBounds();
+        const minx = b.getWest(), miny = b.getSouth(), maxx = b.getEast(), maxy = b.getNorth();
+        const params = new URLSearchParams({
+          service: 'WFS', version: '1.0.0', request: 'GetFeature',
+          typeName, srsName: 'EPSG:4326',
+          bbox: `${minx},${miny},${maxx},${maxy},EPSG:4326`,
+          outputFormat: 'application/json'
+        });
+        return `${CWFIS_WFS}?${params.toString()}`;
+      }
+      const cwfis24 = L.geoJSON(null, {
+        pane: 'viirsPane',
+        pointToLayer: (_f, latlng) =>
+          L.circleMarker(latlng, { radius: 5, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.9 })
+      }).addTo(map);
 
-// Helper to build a WFS GeoJSON request bounded to current view
-function cwfisWfsUrl(typeName, bounds) {
-  // Leaflet bounds → "minx,miny,maxx,maxy" in EPSG:4326
-  const b = bounds || map.getBounds();
-  const minx = b.getWest(), miny = b.getSouth(), maxx = b.getEast(), maxy = b.getNorth();
-  const params = new URLSearchParams({
-    service: 'WFS',
-    version: '1.0.0',
-    request: 'GetFeature',
-    typeName,
-    srsName: 'EPSG:4326',
-    bbox: `${minx},${miny},${maxx},${maxy},EPSG:4326`,
-    outputFormat: 'application/json'
-  });
-  return `${CWFIS_WFS}?${params.toString()}`;
-}
+      const cwfis7 = L.geoJSON(null, {
+        pane: 'viirsPane',
+        pointToLayer: (_f, latlng) =>
+          L.circleMarker(latlng, { radius: 4, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.65 })
+      });
 
-// Same visual styling as your MODIS markers
-const cwfis24 = L.geoJSON(null, {
-  pane: 'viirsPane',
-  pointToLayer: (_f, latlng) =>
-    L.circleMarker(latlng, { radius: 5, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.9 })
-}).addTo(map);
+      async function loadCwfis(layer, typeName) {
+        try {
+          const url = cwfisWfsUrl(typeName, map.getBounds());
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) throw new Error(r.statusText);
+          const gj = await r.json();
+          layer.clearLayers();
+          layer.addData(gj);
+        } catch (err) {
+          console.warn('CWFIS WFS load failed:', err);
+        }
+      }
+      let cwfisPanTimer = null;
+      function refreshVisibleCwfis() {
+        if (cwfisPanTimer) cancelAnimationFrame(cwfisPanTimer);
+        cwfisPanTimer = requestAnimationFrame(() => {
+          if (map.hasLayer(cwfis24)) loadCwfis(cwfis24, 'public:hotspots_last24hrs');
+          if (map.hasLayer(cwfis7))  loadCwfis(cwfis7,  'public:hotspots_last7days');
+        });
+      }
+      map.whenReady(() => refreshVisibleCwfis());
+      map.on('moveend', refreshVisibleCwfis);
+      map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) refreshVisibleCwfis(); });
 
-const cwfis7 = L.geoJSON(null, {
-  pane: 'viirsPane',
-  pointToLayer: (_f, latlng) =>
-    L.circleMarker(latlng, { radius: 4, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.65 })
-});
-
-// Lightweight loader
-async function loadCwfis(layer, typeName) {
-  try {
-    const url = cwfisWfsUrl(typeName, map.getBounds());
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(r.statusText);
-    const gj = await r.json();
-    layer.clearLayers();
-    layer.addData(gj);
-  } catch (err) {
-    console.warn('CWFIS WFS load failed:', err);
-  }
-}
-
-// Debounced refresh on pan/zoom; only refresh if layer is on the map
-let cwfisPanTimer = null;
-function refreshVisibleCwfis() {
-  if (cwfisPanTimer) cancelAnimationFrame(cwfisPanTimer);
-  cwfisPanTimer = requestAnimationFrame(() => {
-    if (map.hasLayer(cwfis24)) loadCwfis(cwfis24, 'public:hotspots_last24hrs');
-    if (map.hasLayer(cwfis7))  loadCwfis(cwfis7,  'public:hotspots_last7days');
-  });
-}
-
-// Initial + on layer toggle + on pan/zoom
-map.whenReady(() => refreshVisibleCwfis());
-map.on('moveend', refreshVisibleCwfis);
-map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) refreshVisibleCwfis(); });
-
-
+      // ---- Perimeters / Boundary -------------------------------------------
       const perimeterLabelLayers = new Set();
       const activePerimeters = L.esri.featureLayer({
         url:'https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/Active_Wildfire_Perimeters_in_Canada_View/FeatureServer/0',
@@ -743,7 +847,6 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
           perimeterLabelLayers.add(layer);
         }
       }).addTo(map);
-
       const setPerimeterLabels = ()=> {
         const show = map.getZoom() >= 11;
         perimeterLabelLayers.forEach((l)=>l.getTooltip()?.setOpacity(show?1:0));
@@ -759,7 +862,7 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         interactive:false
       }).addTo(map);
 
-      // ---- Crown Land staged loader (image at mid zoom, vector at high zoom) -
+      // ---- Crown Land staged loader ----------------------------------------
       const CROWN_IMG_MIN_ZOOM = 5;
       const CROWN_VECT_MIN_ZOOM = 18;
 
@@ -931,10 +1034,50 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       map.on('overlayadd',(e)=>{ if(e.layer===lightningLayer) startLightningRefresh(); if(e.layer===sentinel2) sentinel2.bringToFront(); });
       map.on('overlayremove',(e)=>{ if(e.layer===lightningLayer) stopLightningRefresh(); });
 
-      const fireRisk = L.layerGroup().addLayer(L.tileLayer.wms('https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms', {
-        layers:'public:fdr_current', format:'image/png', transparent:true, version:'1.1.1',
-        opacity:.4, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
-      }));
+        /* ===================== CWFIS (Fire Risk / Weather / Behavior) ===================== */
+  // Window for sliders: past 30 days … next 14 days (local midnight steps)
+  const CWFIS_PAST = 30, CWFIS_FUT = 14;
+  const zeroTime = (d)=>{const c=new Date(d); c.setHours(0,0,0,0); return c;};
+  const T0 = zeroTime(new Date());
+  const addDays = (base, n)=>{ const d=new Date(base); d.setDate(d.getDate()+n); d.setHours(0,0,0,0); return d; };
+  const yyyymmdd = (d)=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const niceDate = (d)=> d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
+  const dayDelta = (d)=> Math.round((zeroTime(d)-T0)/86400000);
+  const dates = []; for(let i=-CWFIS_PAST;i<=CWFIS_FUT;i++) dates.push(addDays(T0,i));
+  const cwfisLayerName = (baseCode, d) => {
+    const delta = dayDelta(d), ymd = yyyymmdd(d);
+    if (delta === 0) return `public:${baseCode}_current`;
+    if (delta < 0)   return `public:${baseCode}${ymd}`;
+    return `public:${baseCode}${ymd}${delta <= 2 ? 'sf' : 'xf'}`;
+  };
+  const annotate = (d)=> dayDelta(d)===0 ? 'Today' : (dayDelta(d)<0 ? `${niceDate(d)} · history` : `${niceDate(d)} · forecast ${dayDelta(d)<=2?'sf':'xf'}`);
+  const CWFIS_WMS = 'https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wms';
+  const legendScaleForZoom = (z)=>{
+    const mpp = 156543.03392804097/Math.pow(2,z);
+    return Math.round(mpp*96*39.3701);
+  };
+  const legendURL = (baseCode)=>{
+    const u = new URL(CWFIS_WMS);
+    u.search = new URLSearchParams({
+      service:'WMS', request:'GetLegendGraphic', format:'image/png', transparent:'true',
+      layer:`public:${baseCode}`, width:'12', height:'9', sld_version:'1.1.0',
+      LEGEND_OPTIONS:'forceLabels:on;fontSize:11', scale:String(legendScaleForZoom(map.getZoom()))
+    }).toString();
+    return u.toString();
+  };
+  // Create the three WMS layers (not added by default)
+  const riskLayer = L.tileLayer.wms(CWFIS_WMS, {
+    layers: cwfisLayerName('fdr', T0), format:'image/png', transparent:true, version:'1.3.0',
+    opacity:.6, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
+  });
+  const fwiLayer = L.tileLayer.wms(CWFIS_WMS, {
+    layers: cwfisLayerName('fwi', T0), format:'image/png', transparent:true, version:'1.3.0',
+    opacity:.65, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
+  });
+  const fbpLayer = L.tileLayer.wms(CWFIS_WMS, {
+    layers: cwfisLayerName('hfi', T0), format:'image/png', transparent:true, version:'1.3.0',
+    opacity:.7, pane:'perimetersPane', attribution:'CWFIS © Natural Resources Canada'
+  });
 
       // ---- NOAA Smoke timeline ----------------------------------------------
       const smokeLayer = L.esri.imageMapLayer({ url: NOAA_SMOKE_URL, format:'png32', transparent:true, opacity:0.72, pane:'smokePane' }).addTo(map);
@@ -1050,7 +1193,8 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         const footer = $('.nb-footer');
         const footerH = footer?.getBoundingClientRect().height || 0;
 
-        const smokeVisible = getComputedStyle(smokeControls).display !== 'none';
+        // OPTIONAL #4: treat smoke as "external" only if not inline
+        const smokeVisible = (getComputedStyle(smokeControls).display !== 'none') && !smokeControls.classList.contains('inline');
         const smokeH = smokeVisible ? (smokeControls.getBoundingClientRect().height || 0) : 0;
 
         const safeB = getSafeBottom();
@@ -1065,8 +1209,14 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       const sizeLegend = () => { sizeLegendWidth(); sizeLegendHeight(); };
       const rAF = (fn)=>requestAnimationFrame(()=>requestAnimationFrame(fn));
 
-      // Initial layout
-      function onGlobalReflow(){ requestAnimationFrame(() => { sizeLegend(); layoutTitleBox(); const t = smokeTimesMs[smokeIdx]; if (smokeTimesMs.length && t != null) smokeTsLabel.textContent = smokeFmt(t); }); }
+      function onGlobalReflow(){
+        requestAnimationFrame(() => {
+          sizeLegend();
+          layoutTitleBox();
+          const t = smokeTimesMs[smokeIdx];
+          if (smokeTimesMs.length && t != null) smokeTsLabel.textContent = smokeFmt(t);
+        });
+      }
       const updateBottomStackAndLegend = ()=>{
         const mobile = isMobile();
         const root = D.documentElement;
@@ -1078,7 +1228,9 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         }
         const footer = $('.nb-footer');
         const footerH = footer?.getBoundingClientRect().height || 0;
-        const smokeVisible = getComputedStyle(smokeControls).display !== 'none';
+
+        // OPTIONAL #4: ignore inline smoke when reserving bottom
+        const smokeVisible = (getComputedStyle(smokeControls).display !== 'none') && !smokeControls.classList.contains('inline');
         const smokeH = smokeVisible ? (smokeControls.getBoundingClientRect().height || 0) : 0;
         const safeB = getSafeBottom();
 
@@ -1104,32 +1256,8 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       }
       if (document.fonts && document.fonts.ready) { document.fonts.ready.then(() => rAF(onGlobalReflow)); }
 
-      map.on('overlayadd', (e) => {
-        if (e.layer === smokeLayer) {
-          smokeControls.style.display = 'flex';
-          smokeTimesMs.length ? smokeSetIndex(smokeIdx) : (smokeTsLabel.textContent = 'Loading…');
-          smokeLayer.bringToBack();
-          rAF(onGlobalReflow);
-          if (smokeShouldAutoplayNextOn) {
-            if (smokeTimesMs.length) { smokePlay(); smokeShouldAutoplayNextOn = false; } else { smokePendingAutoplay = true; }
-          }
-        }
-      });
-      map.on('overlayremove', (e) => {
-        if (e.layer === smokeLayer) {
-          smokePause();
-          smokeControls.style.display = 'none';
-          rAF(onGlobalReflow);
-          smokeShouldAutoplayNextOn = true;
-          smokePendingAutoplay = false;
-        }
-      });
-      if (map.hasLayer(smokeLayer)) {
-        smokeControls.style.display = 'flex';
-        smokeLayer.bringToBack();
-        smokeTsLabel.textContent = smokeTimesMs.length ? smokeFmt(smokeTimesMs[smokeIdx]) : 'Loading…';
-        rAF(onGlobalReflow);
-      }
+      // NOTE: We will replace the original smoke overlayadd/overlayremove handlers
+      // with inline-mount versions AFTER the Layers control is built.
 
       const ro = ('ResizeObserver' in window) ? new ResizeObserver(() => rAF(onGlobalReflow)) : null;
       ro?.observe(smokeControls);
@@ -1197,7 +1325,7 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       planesLayer.on('add',()=>{ fetchOpenSky(); if(!planesTimer) planesTimer=setInterval(fetchOpenSky, PLANES_REFRESH_MS); });
       planesLayer.on('remove',()=>{ if(planesTimer){ clearInterval(planesTimer); planesTimer=null; } });
 
-      // ---- City labels (clustered labels) -----------------------------------
+      // ---- City labels ------------------------------------------------------
       const CITY_DATA = [
         ['Moncton',46.0878,-64.7782,79000],['Saint John',45.2733,-66.0633,69000],['Fredericton',45.9636,-66.6431,63000],
         ['Dieppe',46.0842,-64.6877,28500],['Riverview',46.0617,-64.8052,20500],['Miramichi',47.0281,-65.5019,17500],
@@ -1242,6 +1370,9 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       // ---- Overlays & control ----------------------------------------------
       const overlays = {
         Smoke: smokeLayer,
+            'Fire Risk': riskLayer,
+    'Fire Weather': fwiLayer,
+    'Fire Behavior': fbpLayer,
         'CWFIS Hotspots — Last 24 hours': cwfis24,
         'CWFIS Hotspots — Last 7 days': cwfis7,
         'Fire Perimeters': activePerimeters,
@@ -1254,7 +1385,6 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         'NB Burn Bans': nbBurnBans,
         'Crown Land': crownProxy,
         'Counties': counties,
-        'Fire Risk': fireRisk,
         'Sentinel-2 Imagery': sentinel2
       };
       L.control.layers(null, overlays, { collapsed: false }).addTo(map);
@@ -1572,61 +1702,117 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
       const mhClose = $('#mh-close');
 
       function buildHelpHTML(){
-        const desc = {
-          'Smoke': 'Forecast surface smoke (from NOAA). Use the timeline control at the bottom to scrub or play an animation.',
-          'MODIS Hotspots — Last 48 hours': 'Thermal hotspots detected by NASA MODIS within the last 2 days.',
-          'MODIS Hotspots — Last 7 days': 'MODIS hotspots detected in the last week.',
-          'Fire Perimeters': 'Current wildfire perimeter polygons, with area labels visible when zoomed in.',
-          'Cities & Towns': 'Labels for NB communities. Click a town name to see nearby fires (within 30 km).',
-          'Aircraft': 'Aircraft in NB airspace from the OpenSky network.',
-          'Weather Stations': 'Environment Canada stations showing live wind, temperature and humidity.',
-          'AQHI Risk': 'Air Quality Health Index (AQHI) observations.',
-          'Weather Radar': 'NOAA radar reflectivity mosaic.',
-          'Lightning Density': 'Recent lightning strike density. Updates automatically.',
-          'NB Burn Bans': 'Official New Brunswick burn restriction map.',
-          'Fire Risk': 'Daily Fire Danger Rating from CWFIS.',
-          'Sentinel-2 Imagery': 'Recent high-resolution satellite imagery.',
-          'Crown Land': 'Provincial Crown land parcels.',
-          'Counties': 'County boundaries with bold white borders and large labels.'
-        };
-        const list = Object.keys(overlays).map(name => {
-          const d = desc[name] || 'No description available.';
-          return `<li style="margin:6px 0;"><b>${name}</b><br><span style="opacity:.9">${d}</span></li>`;
-        }).join('');
+  // Helper to render an NB status row using the same colors as the Overview
+  const st = (label, key, text, abbr='') => `
+    <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
+      <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
+      <div><b>${label}${abbr ? ` (${abbr})` : ''}</b> — ${text}</div>
+    </li>`;
 
-        const statusRow = (label, key, text) => `
-          <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
-            <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
-            <div><b>${label}</b> – ${text}</div>
-          </li>
-        `;
-        const statusDefs = `
-          <div style="margin-top:14px">
-            <h3 style="margin:6px 0 2px;font-size:15px;font-weight:800">Fire Status Definitions</h3>
-            <ul style="padding-left:0; margin:6px 0; list-style:none;">
-              ${statusRow('Out of Control', 'out of control', 'New start or not contained and still growing.')}
-              ${statusRow('Being Monitored', 'being monitored', 'Known fire not immediately threatening; monitored by air/satellite.')}
-              ${statusRow('Contained', 'contained', 'Within a break/wet line that should restrict growth with suppression.')}
-              ${statusRow('Under Control', 'under control', 'Control line established; activity low.')}
-              ${statusRow('Being Patrolled', 'being patrolled', 'Secured within breaks; minimal activity.')}
-            </ul>
-          </div>
-        `;
+  // Layers list (match your actual overlays + source links)
+  const layersHTML = `
+    <ul>
+      <li><b>Smoke (Surface)</b> — NOAA surface smoke forecast. When enabled, a timeline appears under the layer to scrub/play. Source:
+        <a href="https://www.weather.gov/sti/smoke" target="_blank" rel="noopener">NOAA</a>.
+      </li>
+      <li><b>CWFIS Hotspots — Last 24 hours</b> — Thermal anomalies (VIIRS/MODIS). Source:
+        <a href="https://cwfis.cfs.nrcan.gc.ca/ha/hotspots" target="_blank" rel="noopener">CWFIS</a>,
+        <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">NASA FIRMS</a>.
+      </li>
+      <li><b>CWFIS Hotspots — Last 7 days</b> — Same as above but a longer window.</li>
+      <li><b>Fire Perimeters</b> — Current wildfire polygons with area labels at higher zooms. Source:
+        <a href="https://cwfis.cfs.nrcan.gc.ca/maps/fires" target="_blank" rel="noopener">CWFIS</a>.
+      </li>
+      <li><b>Fire Risk (FDR)</b> — Daily Fire Danger Rating (history & forecast). Source:
+        <a href="https://cwfis.cfs.nrcan.gc.ca/maps/fdr" target="_blank" rel="noopener">CWFIS</a>.
+      </li>
+      <li><b>Fire Weather</b> — FWI components (choose component + date). Source:
+        <a href="https://cwfis.cfs.nrcan.gc.ca/background/summary/fwi" target="_blank" rel="noopener">FWI @ CWFIS</a>.
+      </li>
+      <li><b>Fire Behavior</b> — FBP metrics (choose metric + date). Source:
+        <a href="https://cwfis.cfs.nrcan.gc.ca/background/summary/fbp" target="_blank" rel="noopener">FBP @ CWFIS</a>.
+      </li>
+      <li><b>Cities &amp; Towns</b> — Click a name to see <i>Nearby Fires</i> within 30 km with distance lines.</li>
+      <li><b>Aircraft</b> — Aircraft positions from the OpenSky network. Source:
+        <a href="https://opensky-network.org/" target="_blank" rel="noopener">OpenSky</a>.
+      </li>
+      <li><b>Weather Stations</b> — Environment Canada stations (wind/temp/humidity). Source:
+        <a href="https://weather.gc.ca/" target="_blank" rel="noopener">ECCC</a>.
+      </li>
+      <li><b>AQHI Risk</b> — Air Quality Health Index observations. Source:
+        <a href="https://www.canada.ca/en/environment-climate-change/services/air-quality-health-index.html" target="_blank" rel="noopener">ECCC</a>.
+      </li>
+      <li><b>Weather Radar</b> — Base reflectivity mosaic. Source:
+        <a href="https://www.weather.gov/radar" target="_blank" rel="noopener">NOAA</a>.
+      </li>
+      <li><b>Lightning Density</b> — Recent lightning strike density. Source:
+        <a href="https://weather.gc.ca/lighting/index_e.html" target="_blank" rel="noopener">ECCC</a>.
+      </li>
+      <li><b>NB Burn Bans</b> — Official burn restriction map. Source:
+        <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html" target="_blank" rel="noopener">GNB ERD</a>.
+      </li>
+      <li><b>Crown Land</b> — Provincial Crown land parcels. Source:
+        <a href="https://www2.gnb.ca/content/gnb/en/departments/erd.html" target="_blank" rel="noopener">GNB ERD</a>.
+      </li>
+      <li><b>Counties</b> — County boundaries (large labels when zoomed in).</li>
+      <li><b>Sentinel-2 Imagery</b> — Recent hi-res satellite imagery. Source:
+        <a href="https://www.esri.com/arcgis-blog/products/arcgis-living-atlas/imagery/sentinel-2-landsat/" target="_blank" rel="noopener">Esri Living Atlas</a>.
+      </li>
+    </ul>`;
 
-        return `
-          <p><b>Navigation:</b> Drag to move, scroll or use <b>+</b>/<b>−</b> to zoom. <b>Reset Map View</b> fits back to New Brunswick.</p>
-          <p><b>Overview Panel:</b> Toggle layers on/off. Top: fire summary. Bottom: help.</p>
-          <p><b>Fires:</b> Click fire icons for details (size, status, dates). Hover to preview. Use filters to show/hide statuses.</p>
-          <p><b>Smoke:</b> When active, the timeline appears at the bottom. ▶ to play or drag to scrub.</p>
-          <p><b>Cities:</b> Click labels to see active fires within 30 km, with distance lines and quick-jump list.</p>
-          <p><b>Layers:</b></p>
-          <ul style="padding-left:16px; margin:8px 0 0;">${list}</ul>
-          ${statusDefs}
-          <p style="margin-top:10px; font-size:12px; color:var(--muted);">
-            Unofficial tool. Sources: GNB ERD, Esri, NOAA, Environment Canada, CWFIS, OpenSky.
-          </p>
-        `;
-      }
+  // NB Fire States (exactly what your Overview uses)
+  const fireStatesHTML = `
+    <ul style="list-style:none; padding-left:0; margin:6px 0;">
+      ${st('Out of Control',   'out of control',  'Not contained and still growing.')}
+      ${st('Being Monitored',  'being monitored', 'Known fire being watched; not immediately threatening.')}
+      ${st('Contained',        'contained',       'Within a break/wet line that should restrict growth.')}
+      ${st('Under Control',    'under control',   'Control line established; not spreading.')}
+      ${st('Being Patrolled',  'being patrolled', 'Secured within breaks; minimal activity.')}
+      ${st('Extinguished',     'extinguished',    'Fire is out.')}
+    </ul>`;
+
+  // FDR / FWI / FBP glossary with links
+  const glossaryHTML = `
+    <h3>Fire Risk (FDR)</h3>
+    <p>A general daily danger rating based on expected fire behaviour. See
+      <a href="https://cwfis.cfs.nrcan.gc.ca/maps/fdr" target="_blank" rel="noopener">CWFIS Fire Danger Rating</a>.
+    </p>
+    <h3><a href="https://cwfis.cfs.nrcan.gc.ca/background/summary/fwi" target="_blank" rel="noopener">Fire Weather Index (FWI) Components</a></h3>
+    <ul>
+      <li><b>FWI</b> — Fire Weather Index (overall intensity)</li>
+      <li><b>FFMC</b> — Fine Fuel Moisture Code</li>
+      <li><b>DMC</b> — Duff Moisture Code</li>
+      <li><b>DC</b> — Drought Code</li>
+      <li><b>ISI</b> — Initial Spread Index</li>
+      <li><b>BUI</b> — Buildup Index</li>
+      <li><b>DSR</b> — Daily Severity Rating</li>
+    </ul>
+    <h3><a href="https://cwfis.cfs.nrcan.gc.ca/background/summary/fbp" target="_blank" rel="noopener">Fire Behaviour Prediction (FBP) Metrics</a></h3>
+    <ul>
+      <li><b>HFI</b> — Head Fire Intensity</li>
+      <li><b>ROS</b> — Rate of Spread</li>
+      <li><b>SFC</b> — Surface Fuel Consumption</li>
+      <li><b>TFC</b> — Total Fuel Consumption</li>
+      <li><b>CFB</b> — Crown Fraction Burned</li>
+      <li><b>FMC</b> — Fine Fuel Moisture Content</li>
+      <li><b>FT</b> — Fire Type</li>
+    </ul>`;
+
+  // Final composed help HTML
+  return `
+    <h2>How to Use This Map</h2>
+    <p>Drag to move, scroll or use <b>+</b>/<b>−</b> to zoom. The <b>Overview</b> panel lets you toggle layers. Time-series layers (Smoke, Fire Risk, Fire Weather, Fire Behavior) show inline controls under their row: use ▶ play, the slider, or drag the handle to change the date.</p>
+    <p><b>Nearby Fires:</b> Click a city/town label or your location to list active fires within 30&nbsp;km, with distance lines; click any entry to zoom to that fire.</p>
+    <h3>Layers Available</h3>
+    ${layersHTML}
+    <h3>Fire States</h3>
+    ${fireStatesHTML}
+    ${glossaryHTML}
+    <h3>Sources</h3>
+    <p>Data: <a href="https://cwfis.cfs.nrcan.gc.ca" target="_blank" rel="noopener">CWFIS (NRCan)</a>, <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">NASA FIRMS</a>, <a href="https://weather.gc.ca/" target="_blank" rel="noopener">ECCC</a>, <a href="https://www.weather.gov/" target="_blank" rel="noopener">NOAA</a>, <a href="https://opensky-network.org/" target="_blank" rel="noopener">OpenSky</a>, GNB ERD, and Esri services. This is an unofficial viewer.</p>
+  `;
+}
+
       function openHelp(){ mhBody.innerHTML = buildHelpHTML(); mhOverlay.hidden=false; mhOverlay.style.display='flex'; mhClose.focus(); }
       function closeHelp(){ mhOverlay.style.display='none'; mhOverlay.hidden=true; }
       mhClose.addEventListener('click', closeHelp);
@@ -1656,7 +1842,7 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         }
       }
 
-      // ---- City → Fires proximity (30 km, active only) ----------------------
+      // ---- City → Fires proximity ------------------------------------------
       const CITY_RADIUS_M = 30_000;
       const cityProximityLayer = L.layerGroup({ pane: 'firesPane' }).addTo(map);
       let cityProximityPopup = null;
@@ -1746,11 +1932,219 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         map.fitBounds(bounds, { padding: [pad, pad], animate: true });
       }
 
+      // ---- Inline smoke controls mount (NEW) --------------------------------
+      function findOverlayLabelRow(name){
+        const rows = document.querySelectorAll('.leaflet-control-layers-overlays label');
+        for (const row of rows){
+          const t = row.querySelector('.text') || row;
+          if (t && t.textContent.trim() === name) return row;
+        }
+        return null;
+      }
+      function mountSmokeControlsInline(){
+        const row = findOverlayLabelRow('Smoke');
+        if (!row) return;
+        smokeControls.classList.add('inline');
+        if (smokeControls.parentElement !== row.parentElement || smokeControls.previousElementSibling !== row){
+          row.after(smokeControls);
+        }
+      }
+
+      // NEW handlers that show/hide the inline controls under the layer row
+      map.on('overlayadd', (e) => {
+        if (e.layer === smokeLayer) {
+          mountSmokeControlsInline();
+          smokeControls.style.display = 'flex';
+          smokeTimesMs.length ? smokeSetIndex(smokeIdx) : (smokeTsLabel.textContent = 'Loading…');
+          smokeLayer.bringToBack();
+          if (smokeShouldAutoplayNextOn) {
+            if (smokeTimesMs.length) { smokePlay(); smokeShouldAutoplayNextOn = false; }
+            else { smokePendingAutoplay = true; }
+          }
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+      map.on('overlayremove', (e) => {
+        if (e.layer === smokeLayer) {
+          smokePause();
+          smokeControls.style.display = 'none';
+          smokeShouldAutoplayNextOn = true;
+          smokePendingAutoplay = false;
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+
+      // If Smoke starts enabled, mount & show inline now
+      if (map.hasLayer(smokeLayer)) {
+        mountSmokeControlsInline();
+        smokeControls.style.display = 'flex';
+        smokeTsLabel.textContent = smokeTimesMs.length ? smokeFmt(smokeTimesMs[smokeIdx]) : 'Loading…';
+        requestAnimationFrame(sizeLegend);
+      }
+
+      
+  /* ===================== Inline mount + logic for CWFIS controls ===================== */
+  const riskControls = $('#riskControls'), riskTime = $('#riskTime'), riskStamp = $('#riskStamp'), riskLegend = $('#riskLegend'), riskErr = $('#riskErr');
+  const fwiControls  = $('#fwiControls'),  fwiTime  = $('#fwiTime'),  fwiStamp  = $('#fwiStamp'),  fwiLegend  = $('#fwiLegend'), fwiErr  = $('#fwiErr'),  fwiComp = $('#fwiComp');
+  const fbpControls  = $('#fbpControls'),  fbpTime  = $('#fbpTime'),  fbpStamp  = $('#fbpStamp'),  fbpLegend  = $('#fbpLegend'), fbpErr  = $('#fbpErr'),  fbpMetric = $('#fbpMetric');
+
+
+// === Responsive option labels: full names on desktop, codes on mobile ===
+function setSelectOptionLabels(selectEl, useShort){
+  if (!selectEl) return;
+  for (const opt of selectEl.options){
+    const longTxt = opt.dataset.long || opt.textContent;
+    const shortTxt = opt.dataset.short || (opt.value || '').toUpperCase();
+    opt.textContent = useShort ? shortTxt : longTxt;
+    // Keep full name as tooltip even when short is shown
+    opt.title = longTxt;
+  }
+}
+function applyResponsiveOptionLabels(){
+  const isMobile = window.matchMedia('(max-width: 480px)').matches;
+  setSelectOptionLabels(fwiComp,  isMobile);
+  setSelectOptionLabels(fbpMetric, isMobile);
+}
+// Run now and on viewport changes
+applyResponsiveOptionLabels();
+window.addEventListener('resize', applyResponsiveOptionLabels, { passive:true });
+window.addEventListener('orientationchange', applyResponsiveOptionLabels, { passive:true });
+if (window.visualViewport){
+  visualViewport.addEventListener('resize', applyResponsiveOptionLabels, { passive:true });
+  visualViewport.addEventListener('scroll', applyResponsiveOptionLabels, { passive:true });
+}
+
+  // Initialize slider ranges
+  [riskTime, fwiTime, fbpTime].forEach(sl => { sl.min = 0; sl.max = String(dates.length - 1); sl.value = String(CWFIS_PAST); });
+
+  function findOverlayLabelRow(name){
+    const rows = document.querySelectorAll('.leaflet-control-layers-overlays label');
+    for (const row of rows){ const t=row.querySelector('.text')||row; if (t && t.textContent.trim()===name) return row; }
+    return null;
+  }
+  function mountControlsInline(layerName, el){
+    const row = findOverlayLabelRow(layerName);
+    if (!row || !el) return;
+    if (el.parentElement !== row.parentElement || el.previousElementSibling !== row) row.after(el);
+  }
+  // Update on zoom (legend SCALE)
+  map.on('zoomend', ()=>{
+    riskLegend.src = legendURL('fdr');
+    fwiLegend.src  = legendURL(fwiComp.value);
+    fbpLegend.src  = legendURL(fbpMetric.value);
+  });
+
+  // --- Fire Risk handlers ---
+  function updateRisk(){
+    const d = dates[parseInt(riskTime.value,10)];
+    riskStamp.textContent = annotate(d);
+    try{
+      riskLayer.setParams({ layers: cwfisLayerName('fdr', d) });
+      riskLegend.src = legendURL('fdr');
+      riskErr.style.display = 'none';
+    }catch{ riskErr.style.display = 'block'; }
+  }
+  riskTime.addEventListener('input', ()=>{ updateRisk(); });
+
+  // --- FWI handlers ---
+  function updateFWI(){
+    const d = dates[parseInt(fwiTime.value,10)], comp = fwiComp.value;
+    fwiStamp.textContent = annotate(d);
+    try{
+      fwiLayer.setParams({ layers: cwfisLayerName(comp, d) });
+      fwiLegend.src = legendURL(comp);
+      fwiErr.style.display = 'none';
+    }catch{ fwiErr.style.display = 'block'; }
+  }
+  fwiTime.addEventListener('input', updateFWI);
+  fwiComp.addEventListener('change', updateFWI);
+
+  // --- FBP handlers ---
+  function updateFBP(){
+    const d = dates[parseInt(fbpTime.value,10)], metric = fbpMetric.value;
+    fbpStamp.textContent = annotate(d);
+    try{
+      fbpLayer.setParams({ layers: cwfisLayerName(metric, d) });
+      fbpLegend.src = legendURL(metric);
+      fbpErr.style.display = 'none';
+    }catch{ fbpErr.style.display = 'block'; }
+  }
+  fbpTime.addEventListener('input', updateFBP);
+  fbpMetric.addEventListener('change', updateFBP);
+
+  
+// ---------- Simple player helper (mirrors smoke play/pause) ----------
+const CWFIS_FRAME_MS = 3000;
+function setupCwfisPlayer(playBtn, slider, onTick){
+  let timer=null;
+  const play = () => {
+    if (timer) return;
+    playBtn.textContent='⏸';
+    timer = setInterval(() => {
+      const max = parseInt(slider.max,10);
+      let i = parseInt(slider.value,10);
+      i = (i + 1) % (max + 1);
+      slider.value = String(i);
+      onTick();
+    }, CWFIS_FRAME_MS);
+  };
+  const pause = () => {
+    if (!timer) return;
+    clearInterval(timer);
+    timer = null;
+    playBtn.textContent='▶';
+  };
+  playBtn.addEventListener('click', () => (timer ? pause() : play()));
+  slider.addEventListener('input', pause); // scrubbing pauses playback
+  return { play, pause, isPlaying:()=>!!timer };
+}
+
+// Grab play buttons & create players
+const riskPlay = $('#riskPlay');
+const fwiPlay  = $('#fwiPlay');
+const fbpPlay  = $('#fbpPlay');
+const riskPlayer = setupCwfisPlayer(riskPlay, riskTime, updateRisk);
+const fwiPlayer  = setupCwfisPlayer(fwiPlay,  fwiTime, updateFWI);
+const fbpPlayer  = setupCwfisPlayer(fbpPlay,  fbpTime, updateFBP);
+
+  // Mount + show/hide just like Smoke
+  map.on('overlayadd', (e)=>{
+    if (e.layer === riskLayer){
+      mountControlsInline('Fire Risk', riskControls);
+      riskControls.style.display = 'block';
+      updateRisk();
+      requestAnimationFrame(sizeLegend);
+    }
+    if (e.layer === fwiLayer){
+      mountControlsInline('Fire Weather', fwiControls);
+      fwiControls.style.display = 'block';
+      updateFWI();
+      requestAnimationFrame(sizeLegend);
+    }
+    if (e.layer === fbpLayer){
+      mountControlsInline('Fire Behavior', fbpControls);
+      fbpControls.style.display = 'block';
+      updateFBP();
+      requestAnimationFrame(sizeLegend);
+    }
+  });
+  map.on('overlayremove', (e)=>{
+    if (e.layer === riskLayer){ riskControls.style.display = 'none'; riskPlayer.pause(); requestAnimationFrame(sizeLegend); }
+    if (e.layer === fwiLayer){  fwiControls.style.display  = 'none'; fwiPlayer.pause(); requestAnimationFrame(sizeLegend); }
+    if (e.layer === fbpLayer){  fbpControls.style.display  = 'none'; fbpPlayer.pause(); requestAnimationFrame(sizeLegend); }
+  });
+
+  // If any start enabled (unlikely), show inline immediately
+  if (map.hasLayer(riskLayer)){ mountControlsInline('Fire Risk', riskControls); riskControls.style.display='block'; updateRisk(); }
+  if (map.hasLayer(fwiLayer)){  mountControlsInline('Fire Weather', fwiControls); fwiControls.style.display='block'; updateFWI(); }
+  if (map.hasLayer(fbpLayer)){  mountControlsInline('Fire Behavior', fbpControls); fbpControls.style.display='block'; updateFBP(); }
+
+  // Let ResizeObserver size the Overview when legends change
+  ro?.observe(riskControls); ro?.observe(fwiControls); ro?.observe(fbpControls);
+
       // Final sizing after legend mount
       requestAnimationFrame(() => { sizeLegend(); layoutTitleBox(); });
     });
   </script>
 </body>
 </html>
-
-
