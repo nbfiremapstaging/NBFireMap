@@ -175,6 +175,14 @@
     .summary-list a{color:var(--link);text-decoration:none;font-weight:700}
     .summary-list a:hover{text-decoration:underline}
     .fs-scroll{margin-top:8px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--panel)}
+        /* Mini trend chart (weekly new/out + active line) */
+    .fs-mini-chart{margin:6px 0 10px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:var(--shadow-soft);overflow:hidden}
+    .fs-mini-chart svg{display:block;width:100%;height:100px}
+    .fs-mini-chart .axis{stroke:#e5e7eb;stroke-width:1}
+    .fs-mini-chart .bar-new{fill:var(--oc)}            /* red up */
+    .fs-mini-chart .bar-out{fill:var(--pat)}           /* green down */
+        .fs-mini-chart .line-active{fill:none;stroke:orange;stroke-width:1.75;opacity:.9}
+    .fs-mini-chart .cap{stroke:#111827;stroke-width:.75;opacity:.25}
     .fs-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
     .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;box-shadow:var(--shadow-soft)}
     .stat .h{font:800 13px/1.2 Inter,system-ui,Arial;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
@@ -1598,6 +1606,124 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
       const sizeOf=(p)=> Number((p?.FIRE_SIZE ?? p?.SIZE_HA ?? p?.AREA) ?? 0) || 0;
       const fireStoreMap = fireStore;
 
+            // --- field getters aligned to your GeoJSONs ---
+      // active & out files both carry TIME_DETECTED
+      function getDetectedMss(props){
+        const v = props?.TIME_DETECTED;
+        return Number.isFinite(v) ? Number(v) : (v!=null ? Number(v) : null);
+      }
+      // out fires carry FIRE_STAT_DATE when FIRE_STAT_DESC_E === 'Out'
+      function getExtinguishedMss(props){
+        if (props?.FIRE_STAT_DESC_E !== 'Out') return null;
+        const v = props?.FIRE_STAT_DATE;
+        return Number.isFinite(v) ? Number(v) : (v!=null ? Number(v) : null);
+      }
+
+
+      
+      // ---- Weekly trend (new/out/active) -----------------------------------
+      // Helpers: start of week (Mon) in UTC; week label (mm/dd)
+      function startOfWeekUTC(ms){
+                // normalize to 00:00 UTC of that date, then shift to Monday
+        const d = new Date(ms);
+        const z = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+        const day = new Date(z).getUTCDay();             // 0..6 (Sun..Sat)
+        const diff = (day === 0 ? -6 : 1 - day);         // to Monday
+        return z + diff * 86400000;
+      }
+      function weekLabel(ms){
+        const d = new Date(ms);
+        return d.toLocaleDateString(undefined,{month:'short',day:'2-digit'});
+      }
+      function sameWeek(a,b){ return startOfWeekUTC(a)===startOfWeekUTC(b); }
+          function computeWeeklyTrend(){
+        // Combine: detections from active + out; extinctions from out only
+        const all = Array.from(fireStoreMap.values());
+        const dets = all.map(it=>getDetectedMss(it.props||{})).filter(v=>v!=null);
+        const outs = all.map(it=>getExtinguishedMss(it.props||{})).filter(v=>v!=null);
+        if (!dets.length && !outs.length) return {weeks:[], newBy:[], outBy:[], actBy:[]};
+        const minMs = Math.min(...dets, ...(outs.length ? [Math.min(...outs)] : [Infinity]));
+        const maxMs = Math.max(Date.now(),
+                               ...(dets.length ? [Math.max(...dets)] : [-Infinity]),
+                               ...(outs.length ? [Math.max(...outs)] : [-Infinity]));
+        // ✅ Start at the Monday of the earliest event (not the raw min timestamp)
+        let w = startOfWeekUTC(minMs);
+        const lastW = startOfWeekUTC(maxMs);
+        const weeks=[]; const newBy=[]; const outBy=[]; const actBy=[];
+        // Pre-bucket detections/extinctions by week start
+        const nMap=new Map(), oMap=new Map();
+        for(const ms of dets){ const k=startOfWeekUTC(ms); nMap.set(k,(nMap.get(k)||0)+1); }
+        for(const ms of outs){ const k=startOfWeekUTC(ms); oMap.set(k,(oMap.get(k)||0)+1); }
+        let active=0;
+        while(w<=lastW){
+          const n = nMap.get(w)||0;
+          const o = oMap.get(w)||0;
+          active = Math.max(0, active + n - o);
+          weeks.push(w); newBy.push(n); outBy.push(o); actBy.push(active);
+          w += 7*86400000;
+        }
+        return {weeks,newBy,outBy,actBy};
+      }
+      function buildWeeklyChartSVG(){
+        const {weeks,newBy,outBy,actBy} = computeWeeklyTrend();
+        if(!weeks.length) return '';
+        const W = 640, H = 100, padL=10, padR=10, padT=8, padB=14;
+        const innerW = W - padL - padR, innerH = H - padT - padB;
+        const maxBar = Math.max(1, ...newBy, ...outBy);
+        const maxAct = Math.max(1, ...actBy);
+        const xStep = innerW / weeks.length;
+        const cx = i => Math.round(padL + i*xStep + xStep/2);
+        const y0 = Math.round(padT + innerH/2);                              // baseline
+        const yUp = v => Math.round(y0 - (v/maxBar) * (innerH/2 - 4));       // bars up
+        const yDn = v => Math.round(y0 + (v/maxBar) * (innerH/2 - 4));       // bars down
+        const yAct= v => Math.round(padT + innerH - (v/maxAct)*(innerH - 4));// line (0..maxAct)
+        // Bars
+        const bw = Math.max(2, Math.floor(xStep*0.55));
+        let bars='';
+        for(let i=0;i<weeks.length;i++){
+          const x = cx(i) - Math.floor(bw/2);
+          const n = newBy[i], o = outBy[i];
+          if(n>0) bars += `<rect class="bar-new" x="${x}" width="${bw}" y="${yUp(n)}" height="${y0 - yUp(n)}" rx="1"/>`;
+          if(o>0) bars += `<rect class="bar-out" x="${x}" width="${bw}" y="${y0}" height="${yDn(o) - y0}" rx="1"/>`;
+        }
+        // Active line
+        const path = actBy.map((v,i)=>`${i?'L':'M'}${cx(i)},${yAct(v)}`).join('');
+        // Baseline + end caps
+        const caps = `<line class="axis" x1="${padL}" y1="${y0}" x2="${W-padR}" y2="${y0}"/>`;
+                // Sparse labels at ~every 4th tick + last
+        let labels=''; const last=weeks.length-1;
+        for(let i=0;i<weeks.length;i++){
+          if(i%4===0 || i===last){
+            labels += `<text x="${cx(i)}" y="${H-4}" font-size="10" text-anchor="middle" fill="#6b7280">${weekLabel(weeks[i])}</text>`;
+          }
+        }
+        // Transparent hover bands with SVG-native <title> tooltips
+        let hovers='';
+        for(let i=0;i<weeks.length;i++){
+          const x = padL + i*xStep;
+          const lbl = weekLabel(weeks[i]);
+          const tip = `Week: ${lbl}\nNew: ${newBy[i]}\nOut: ${outBy[i]}\nActive: ${actBy[i]}`;
+          hovers += `
+            <g class="hover-zone" aria-label="${lbl}">
+              <rect x="${x}" y="0" width="${xStep}" height="${H}" fill="transparent"/>
+              <title>${tip}</title>
+            </g>`;
+        }
+                return `
+          <div class="fs-mini-chart" aria-label="Weekly new/out and active fires">
+            <div style="font-size:12px;font-weight:600;padding:4px 8px 0;color:#374151">
+              Weekly Fires (New / Out / Active)
+            </div>
+            <svg viewBox="0 0 ${W} ${H}" role="img">
+              ${caps}
+              ${bars}
+              <path class="line-active" d="${path}"/>
+              ${labels}
+              ${hovers}
+            </svg>
+          </div>`;
+      }
+
       function pieCSSSegments(counts){
         const order = [
           ['out of control', 'Out of Control'],
@@ -1723,7 +1849,9 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
               </details>`;
           }).join('');
 
+                const trendSVG = buildWeeklyChartSVG();
         return `
+          ${trendSVG}
           <div style="margin:10px 0"><b>Status (Active Only)</b></div>
           <div class="pie-wrap" aria-label="Fires by status pie chart">
             <div class="pie" style="background:${pieCSS}"></div>
@@ -1741,7 +1869,11 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
           </div>`;
       }
 
-      function refreshSummary(){ fsBody.innerHTML = buildSummaryHTML(); wireSummaryClicks(); wirePieLegendClicks(); }
+                  function refreshSummary(){
+        fsBody.innerHTML = buildSummaryHTML();
+        wireSummaryClicks();
+        wirePieLegendClicks();
+      }
 
       function ensureStatusEnabled(statusKey){
         const target = norm(statusKey);
