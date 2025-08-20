@@ -28,10 +28,10 @@
 
       /* Fire status colors */
       --oc:#ef4444;   /* Out of control */
-      --mon:#fb923c;  /* Being monitored */
-      --cont:#facc15; /* Contained */
-      --uc:#22c55e;   /* Under control */
-      --pat:#3b82f6;  /* Being patrolled */
+      --mon:#9D00FF;  /* Being monitored */
+      --cont:#FFA500; /* Contained */
+      --uc:#FFFF00;   /* Under control */
+      --pat:#00FF00;  /* Being patrolled */
 
       /* Other colors */
       --modis:#f59e0b; --perimeter:#ef4444; --boundary:#0b0f19;
@@ -170,8 +170,8 @@
     @media (max-width: 520px){ .fs-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 
     /* Legend icons */
-    .marker-badge{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;background:var(--panel-strong);border:2.5px solid var(--ring,#9aa0a6);box-shadow:0 2px 10px rgba(0,0,0,.18)}
-    .marker-badge i{font-size:18px;color:var(--ring,#9aa0a6)}
+    .marker-badge{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;background:var(--panel-strong);border:2.5px solid var(--ring,#0000FF);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+    .marker-badge i{font-size:18px;color:var(--ring,#0000FF)}
     .legend-icon{width:18px;height:18px;display:inline-grid;place-items:center}
     .icons-pack{display:inline-flex;gap:6px;vertical-align:middle;justify-content:center;width:26px}
     .legend-badge{width:18px;height:18px;border-radius:999px;display:grid;place-items:center;background:#fff;border:2.5px solid var(--ring)}
@@ -362,10 +362,10 @@
         ['contained',      { color: COLORS.cont, sev: 2 }],
         ['under control',  { color: COLORS.uc,   sev: 1 }],
         ['being patrolled',{ color: COLORS.pat,  sev: 0 }],
-        ['extinguished',   { color: '#9aa0a6',   sev: -1 }],
+        ['extinguished',   { color: '#0000FF',   sev: -1 }],
       ]);
       const norm = (s) => (s || '').toString().trim().toLowerCase();
-      const statusColor   = (s) => STATUS.get(norm(s))?.color ?? '#9aa0a6';
+      const statusColor   = (s) => STATUS.get(norm(s))?.color ?? '#0000FF';
       const severityRank  = (s) => STATUS.get(norm(s))?.sev   ?? -1;
 
       // Formatting helpers
@@ -1266,7 +1266,7 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
         ['Contained',       COLORS.cont,true],
         ['Under Control',   COLORS.uc,  true],
         ['Being Patrolled', COLORS.pat, true],
-        ['Extinguished',    '#9aa0a6',  false]
+        ['Extinguished',    '#0000FF',  false]
       ];
       function injectFireStatusPanel(){
         const overlaysList = D.querySelector('.leaflet-control-layers-overlays');
@@ -1752,3 +1752,4 @@ map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) r
   </script>
 </body>
 </html>
+
