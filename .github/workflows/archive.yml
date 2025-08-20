@@ -31,21 +31,22 @@ jobs:
         run: |
           set -xeuo pipefail
           python -m pip install --upgrade pip
-          pip install geopandas requests
+          pip install geopandas requests shapely
 
-      - name: Download and write files (verbose, no client-side clip)
+      - name: Download and write files (verbose, preserve all ERD fields)
         env:
-          PYTHONUNBUFFERED: "1"
+          PYTHONUNBUFFERED: "1"        # unbuffered logs
         shell: bash
         run: |
           set -xeuo pipefail
           python -u <<'PYCODE'
-          import os, sys, time
+          import os, sys, time, json
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
           import requests
           import geopandas as gpd
+          from shapely.geometry import shape, Point, LineString, Polygon, MultiLineString, MultiPolygon
 
           def log(msg): print(msg, flush=True)
 
@@ -66,12 +67,69 @@ jobs:
           # --- HTTP session ---
           S = requests.Session()
           S.headers.update({
-              "User-Agent": "nb-fire-archive/1.1 (github actions)",
+              "User-Agent": "nb-fire-archive/1.2 (github actions)",
               "Accept": "application/json, application/geo+json;q=0.9, */*;q=0.8",
           })
           TIMEOUT=90
 
+          # ---------- Helpers ----------
+          def fetch_once(label, base, params):
+              req = S.prepare_request(requests.Request("GET", base, params=params))
+              log(f"[REQ] {label}: {req.method} {req.url}")
+              r = S.send(req, timeout=TIMEOUT)
+              log(f"[RES] {label}: status={r.status_code} type={r.headers.get('content-type')} bytes={len(r.content)}")
+              r.raise_for_status()
+              ctype = (r.headers.get('content-type') or '').lower()
+              if "json" not in ctype:
+                  log(f"[WARN] {label}: non-JSON response head:\n{r.text[:300]}")
+              return r.json()
+
+          # Convert an ArcGIS REST "FeatureSet" (f=json) into a GeoJSON FeatureCollection
+          # This preserves ALL fields ("attributes") exactly as delivered.
+          def esri_feature_to_geojson_feature(f):
+              attrs = f.get("attributes", {}) or {}
+
+              geom = f.get("geometry")
+              if geom is None:
+                  gj_geom = None
+              else:
+                  # Handle common geometry types from ArcGIS JSON
+                  if "x" in geom and "y" in geom:  # Point
+                      gj_geom = {"type": "Point", "coordinates": [geom["x"], geom["y"]]}
+                  elif "points" in geom:  # Multipoint (rare here)
+                      gj_geom = {"type": "MultiPoint", "coordinates": geom["points"]}
+                  elif "paths" in geom:  # Polyline
+                      # paths: list of line parts -> MultiLineString if multiple
+                      paths = geom["paths"] or []
+                      if len(paths) == 1:
+                          gj_geom = {"type": "LineString", "coordinates": paths[0]}
+                      else:
+                          gj_geom = {"type": "MultiLineString", "coordinates": paths}
+                  elif "rings" in geom:  # Polygon
+                      rings = geom["rings"] or []
+                      # ArcGIS uses "unoriented" rings; treat multiple rings as MultiPolygon when needed
+                      # Simplest robust mapping: each ring -> its own Polygon shell (no holes inference)
+                      if len(rings) == 1:
+                          gj_geom = {"type": "Polygon", "coordinates": [rings[0]]}
+                      else:
+                          gj_geom = {"type": "MultiPolygon", "coordinates": [[r] for r in rings]}
+                  else:
+                      # Unknown geometry structure; store raw for debugging but set None
+                      gj_geom = None
+
+              return {"type": "Feature", "geometry": gj_geom, "properties": attrs}
+
+          def esri_to_geojson(esri_obj):
+              features = esri_obj.get("features", []) or []
+              gj_feats = [esri_feature_to_geojson_feature(f) for f in features]
+              return {"type": "FeatureCollection", "features": gj_feats}
+
+          def to_gdf_from_geojson_obj(gj_obj):
+              feats = gj_obj.get("features", []) or []
+              return gpd.GeoDataFrame.from_features(feats, crs="EPSG:4326")
+
           # ---------- Builders (server-side NB filter) ----------
+          # CWFIS — WFS with bbox filter; fallback to CQL if needed.
           def cwfis_builder(type_name: str):
               base = "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
               bbox = f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]},EPSG:4326"
@@ -88,29 +146,30 @@ jobs:
               }
               return ("CWFIS", base, [params_bbox, params_cql])
 
-          # ERD — ArcGIS REST with envelope (inSR=4326); use wildcard fields to ensure fire_size is included.
+          # ERD — ArcGIS REST using f=json to PRESERVE ALL FIELDS; envelope filter with pagination fallback.
           def erd_builder(layer_idx: int):
               base = f"https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/{layer_idx}/query"
-              out_fields = "*,fire_*"  # <-- wildcard includes fire_size and related fields
               params_env = {
                   "where": "1=1",
                   "geometryType": "esriGeometryEnvelope",
                   "geometry": f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]}",
                   "inSR": 4326,
                   "spatialRel": "esriSpatialRelIntersects",
-                  "outFields": out_fields,
+                  "outFields": "*",                 # <— ALL attributes
                   "returnGeometry": "true",
                   "outSR": 4326,
-                  "f": "geojson",
-                  "resultRecordCount": 20000,
+                  "f": "json",                      # <— IMPORTANT: keep ArcGIS JSON (not GeoJSON) to avoid field loss
+                  "resultRecordCount": 2000,
                   "returnExceededLimitFeatures": "true",
               }
               params_all = {
                   "where": "1=1",
-                  "outFields": out_fields,
+                  "outFields": "*",
                   "returnGeometry": "true",
                   "outSR": 4326,
-                  "f": "geojson",
+                  "f": "json",
+                  "resultRecordCount": 2000,
+                  "returnExceededLimitFeatures": "true",
               }
               return ("ERD", base, [params_env, params_all])
 
@@ -121,22 +180,34 @@ jobs:
               {"key": "out_fires",       "group": "erd",   "builder": lambda: erd_builder(1)},
           ]
 
-          # ---------- Fetch helpers ----------
-          def fetch_once(label, base, params):
-              req = S.prepare_request(requests.Request("GET", base, params=params))
-              log(f"[REQ] {label}: {req.method} {req.url}")
-              r = S.send(req, timeout=TIMEOUT)
-              log(f"[RES] {label}: status={r.status_code} type={r.headers.get('content-type')} bytes={len(r.content)}")
-              r.raise_for_status()
-              ctype = (r.headers.get('content-type') or '').lower()
-              if "json" not in ctype:
-                  log(f"[WARN] {label}: non-JSON response head:\n{r.text[:300]}")
-              obj = r.json()
-              if isinstance(obj, dict) and obj.get("error"):
-                  raise RuntimeError(f"Server error for {label}: {obj['error']}")
-              return obj
+          # ---------- Fetch with fallbacks & pagination for ERD ----------
+          def fetch_esri_with_paging(base, params):
+              # Try to fetch everything in one go; if server enforces maxRecordCount, walk resultOffset.
+              all_feats = []
+              offset = 0
+              attempts = 0
+              while True:
+                  attempts += 1
+                  params_page = dict(params)
+                  params_page["resultOffset"] = offset
+                  obj = fetch_once(f"ERD page offset={offset}", base, params_page)
+                  if isinstance(obj, dict) and obj.get("error"):
+                      raise RuntimeError(f"Server error: {obj['error']}")
+                  feats = obj.get("features", []) or []
+                  all_feats.extend(feats)
+                  log(f"[INFO] ERD page offset={offset}: +{len(feats)} (total={len(all_feats)})")
+                  if len(feats) < int(params.get("resultRecordCount", 2000)):
+                      # last page
+                      obj["features"] = all_feats
+                      return obj
+                  offset += len(feats)
+                  if attempts > 50:
+                      log("[WARN] paging attempts exceeded safeguard; stopping.")
+                      obj["features"] = all_feats
+                      return obj
 
           def fetch_geojson_with_fallbacks(source_label, base, params_list):
+              # For CWFIS (already GeoJSON)
               last_obj = None
               for idx, params in enumerate(params_list, 1):
                   obj = fetch_once(f"{source_label} try{idx}", base, params)
@@ -147,27 +218,40 @@ jobs:
                       return obj
               return last_obj
 
-          def to_gdf(obj):
-              feats = obj.get("features", [])
-              return gpd.GeoDataFrame.from_features(feats, crs="EPSG:4326")
-
-          def consensus_download(builder, label, max_rounds=5, samples=5):
+          def consensus_download(builder, label, max_rounds=5, samples=3):
               for attempt in range(1, max_rounds + 1):
                   counts, frames = [], []
                   log(f"[ROUND] {label}: attempt {attempt}/{max_rounds}")
                   src_label, base, variants = builder()
+
                   for i in range(samples):
-                      obj = fetch_geojson_with_fallbacks(f"{label} copy{i+1}/{samples}", base, variants)
-                      gdf = to_gdf(obj)
+                      if src_label == "ERD":
+                          # Preserve all fields: fetch ArcGIS JSON -> convert to GeoJSON in-process
+                          # Try variant 1 then 2 with paging on each
+                          esri_obj = None
+                          for vidx, p in enumerate(variants, 1):
+                              esri_obj = fetch_esri_with_paging(base, p)
+                              n_try = len(esri_obj.get("features", []))
+                              log(f"[INFO] {label} ERD var{vidx}: features={n_try}")
+                              if n_try > 0:
+                                  break
+                          gj_obj = esri_to_geojson(esri_obj)
+                          gdf = to_gdf_from_geojson_obj(gj_obj)
+                      else:
+                          # CWFIS: already GeoJSON
+                          obj = fetch_geojson_with_fallbacks(f"{label} copy{i+1}/{samples}", base, variants)
+                          gdf = gpd.GeoDataFrame.from_features(obj.get("features", []), crs="EPSG:4326")
+
                       counts.append(len(gdf))
                       frames.append(gdf)
-                      log(f"[INFO] {label}: received_features={len(gdf)} (no client-side clip)")
-                      time.sleep(0.3)
+                      log(f"[INFO] {label}: received_features={len(gdf)}")
+                      time.sleep(0.25)
+
                   if len(set(counts)) == 1:
                       log(f"[OK] {label}: consensus n={counts[0]}")
                       return frames[0]
                   log(f"[WARN] {label}: mismatch counts {counts}, retrying…")
-                  time.sleep(1.2)
+                  time.sleep(1.0)
 
               from collections import Counter
               c = Counter(counts)
