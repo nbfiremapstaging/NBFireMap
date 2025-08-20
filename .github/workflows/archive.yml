@@ -29,16 +29,16 @@ jobs:
 
       - name: Install Python deps
         run: |
-          set -xeu -o pipefail
+          set -xeuo pipefail
           python -m pip install --upgrade pip
           pip install geopandas requests
 
       - name: Download, validate (5× copies), clip, and write files (verbose)
         env:
-          PYTHONUNBUFFERED: "1"   # unbuffered stdout/stderr
+          PYTHONUNBUFFERED: "1"        # unbuffered logs
         shell: bash
         run: |
-          set -xeu -o pipefail
+          set -xeuo pipefail
           python -u <<'PYCODE'
           import os, sys, time, json
           from datetime import datetime
@@ -48,138 +48,150 @@ jobs:
           import geopandas as gpd
           from shapely.geometry import box
 
-          # ---------- Verbose helpers ----------
-          def log(msg):
-              print(msg, flush=True)
+          def log(msg): print(msg, flush=True)
 
-          # ---------- Config ----------
+          # --- Date / output ---
           TZ = ZoneInfo("America/Toronto")
           today_str = datetime.now(TZ).strftime("%Y%m%d")
 
           ROOT = "archive"
-          FOLDERS = {
-              "cwfis": os.path.join(ROOT, "cwfis"),
-              "erd": os.path.join(ROOT, "erd"),
-          }
+          FOLDERS = {"cwfis": os.path.join(ROOT, "cwfis"),
+                     "erd":   os.path.join(ROOT, "erd")}
           for p in FOLDERS.values():
               os.makedirs(p, exist_ok=True)
 
-          # New Brunswick bbox (WGS84): (minx, miny, maxx, maxy)
-          NB_BBOX = (-69.05, 44.56, -63.70, 48.07)
-          log(f"NB_BBOX={NB_BBOX}")
-
+          # --- New Brunswick bbox (WGS84) ---
+          NB_BBOX = (-69.05, 44.56, -63.70, 48.07)  # minx, miny, maxx, maxy
+          log(f"[CFG] NB_BBOX={NB_BBOX}")
           nb_poly = box(*NB_BBOX)
           nb_gdf = gpd.GeoDataFrame(geometry=[nb_poly], crs="EPSG:4326")
 
-          # ---------- HTTP session ----------
+          # --- HTTP session ---
           S = requests.Session()
           S.headers.update({
-              "User-Agent": "nb-fire-archive/1.0 (+github actions)",
+              "User-Agent": "nb-fire-archive/1.1 (github actions)",
               "Accept": "application/json, application/geo+json;q=0.9, */*;q=0.8",
           })
-          TIMEOUT = 90
+          TIMEOUT=90
 
-          # ---------- Sources with SERVER-SIDE NB filters ----------
-          # CWFIS via GeoServer WFS + bbox filter
-          def cwfis_wfs_url(type_name: str):
+          # ---------- Builders (server-side NB filter) ----------
+          # CWFIS — WFS with bbox filter; fallback to CQL if needed.
+          def cwfis_builder(type_name: str):
               base = "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
-              params = {
-                  "service": "WFS",
-                  "version": "1.0.0",
-                  "request": "GetFeature",
-                  "typeName": type_name,
-                  "srsName": "EPSG:4326",
-                  "bbox": f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]},EPSG:4326",
+              bbox = f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]},EPSG:4326"
+              params_bbox = {
+                  "service": "WFS", "version": "1.0.0", "request": "GetFeature",
+                  "typeName": type_name, "srsName": "EPSG:4326",
+                  "bbox": bbox, "outputFormat": "application/json",
+              }
+              # Fallback using CQL_FILTER=BBOX(the_geom,...) (some GeoServer setups prefer this)
+              params_cql = {
+                  "service": "WFS", "version": "1.0.0", "request": "GetFeature",
+                  "typeName": type_name, "srsName": "EPSG:4326",
+                  "CQL_FILTER": f"BBOX(the_geom,{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]})",
                   "outputFormat": "application/json",
               }
-              return base, params
+              return ("CWFIS", base, [params_bbox, params_cql])
 
-          # ERD (ArcGIS REST) with geometry=envelope (NB bbox)
-          def erd_query_url(layer_index: int):
-              base = f"https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/{layer_index}/query"
-              envelope = {
-                  "xmin": NB_BBOX[0], "ymin": NB_BBOX[1],
-                  "xmax": NB_BBOX[2], "ymax": NB_BBOX[3],
-                  "spatialReference": {"wkid": 4326}
-              }
-              params = {
+          # ERD — ArcGIS REST with envelope (inSR=4326); fallback to no-geometry.
+          def erd_builder(layer_idx: int):
+              base = f"https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/{layer_idx}/query"
+              params_env = {
                   "where": "1=1",
-                  "geometry": json.dumps(envelope),
                   "geometryType": "esriGeometryEnvelope",
+                  "geometry": f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]}",
                   "inSR": 4326,
                   "spatialRel": "esriSpatialRelIntersects",
                   "outFields": "*",
                   "returnGeometry": "true",
                   "outSR": 4326,
                   "f": "geojson",
-                  # try to avoid server-side truncation
+                  # pagination-friendly (just in case)
                   "resultRecordCount": 20000,
                   "returnExceededLimitFeatures": "true",
               }
-              return base, params
+              params_all = {
+                  "where": "1=1",
+                  "outFields": "*",
+                  "returnGeometry": "true",
+                  "outSR": 4326,
+                  "f": "geojson",
+              }
+              return ("ERD", base, [params_env, params_all])
 
           DATASETS = [
-              # CWFIS
-              {"key": "24_hour_spots",   "group": "cwfis", "builder": lambda: cwfis_wfs_url("public:hotspots_last24hrs")},
-              {"key": "fire_perimeters", "group": "cwfis", "builder": lambda: cwfis_wfs_url("public:m3_polygons_current")},
-              # ERD
-              {"key": "active_fires",    "group": "erd",   "builder": lambda: erd_query_url(0)},
-              {"key": "out_fires",       "group": "erd",   "builder": lambda: erd_query_url(1)},
+              {"key": "24_hour_spots",   "group": "cwfis", "builder": lambda: cwfis_builder("public:hotspots_last24hrs")},
+              {"key": "fire_perimeters", "group": "cwfis", "builder": lambda: cwfis_builder("public:m3_polygons_current")},
+              {"key": "active_fires",    "group": "erd",   "builder": lambda: erd_builder(0)},
+              {"key": "out_fires",       "group": "erd",   "builder": lambda: erd_builder(1)},
           ]
 
-          # ---------- Functions ----------
-          def fetch_geojson(url, params, label):
-              # show the full request URL GitHub-side for debug
-              req = S.prepare_request(requests.Request("GET", url, params=params))
+          # ---------- Fetch helpers ----------
+          def fetch_once(label, base, params):
+              req = S.prepare_request(requests.Request("GET", base, params=params))
               log(f"[REQ] {label}: {req.method} {req.url}")
               r = S.send(req, timeout=TIMEOUT)
-              log(f"[RES] {label}: status={r.status_code} content-length={r.headers.get('content-length')} bytes={len(r.content)}")
+              log(f"[RES] {label}: status={r.status_code} type={r.headers.get('content-type')} bytes={len(r.content)}")
               r.raise_for_status()
-              # ArcGIS can return JSON error object even with 200 OK
+              # If not JSON, dump head of body for diagnostics
+              ctype = (r.headers.get('content-type') or '').lower()
+              if "json" not in ctype:
+                  log(f"[WARN] {label}: non-JSON response head:\n{r.text[:300]}")
               obj = r.json()
               if isinstance(obj, dict) and obj.get("error"):
                   raise RuntimeError(f"Server error for {label}: {obj['error']}")
               return obj
 
+          def fetch_geojson_with_fallbacks(source_label, base, params_list):
+              """
+              Try each params variant until we get features; if all return 0,
+              return the last object anyway (so '0 features' is explicit).
+              """
+              last_obj = None
+              for idx, params in enumerate(params_list, 1):
+                  obj = fetch_once(f"{source_label} try{idx}", base, params)
+                  n = len(obj.get("features", []))
+                  log(f"[INFO] {source_label} try{idx}: features={n}")
+                  last_obj = obj
+                  if n > 0:
+                      return obj
+              return last_obj
+
           def to_gdf(obj):
-              # from_features works for both GeoJSON & ArcGIS GeoJSON
-              features = obj.get("features", [])
-              gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+              feats = obj.get("features", [])
+              gdf = gpd.GeoDataFrame.from_features(feats, crs="EPSG:4326")
               return gdf
 
           def clip_to_nb(gdf):
               if gdf.empty:
                   return gdf
               try:
-                  # Make invalid geoms valid if needed
                   gdf = gdf.set_geometry(gdf.geometry.buffer(0))
               except Exception:
                   pass
-              # geopandas.clip uses an overlay; we keep it explicit
               return gpd.clip(gdf, nb_gdf)
 
           def consensus_download(builder, label, max_rounds=5, samples=5):
               for attempt in range(1, max_rounds + 1):
                   counts, frames = [], []
                   log(f"[ROUND] {label}: attempt {attempt}/{max_rounds}")
+                  src_label, base, variants = builder()
                   for i in range(samples):
-                      url, params = builder()
-                      obj = fetch_geojson(url, params, f"{label} copy {i+1}/{samples}")
+                      obj = fetch_geojson_with_fallbacks(f"{label} copy{i+1}/{samples}", base, variants)
                       gdf = to_gdf(obj)
                       before = len(gdf)
                       gdf = clip_to_nb(gdf)
                       after = len(gdf)
                       counts.append(after)
                       frames.append(gdf)
-                      log(f"[INFO] {label}: features before-clip={before}, after-clip={after}")
-                      time.sleep(0.4)
+                      log(f"[INFO] {label}: before_clip={before}, after_clip={after}")
+                      time.sleep(0.3)
                   if len(set(counts)) == 1:
                       log(f"[OK] {label}: consensus n={counts[0]}")
                       return frames[0]
                   log(f"[WARN] {label}: mismatch counts {counts}, retrying…")
-                  time.sleep(1.5)
+                  time.sleep(1.2)
 
-              # choose majority from last attempt
               from collections import Counter
               c = Counter(counts)
               n, _ = c.most_common(1)[0]
@@ -187,7 +199,7 @@ jobs:
               log(f"[WARN] {label}: using majority sample n={n}")
               return frames[idx]
 
-          # ---------- Main ----------
+          # ---------- Run ----------
           failures = []
           for ds in DATASETS:
               label = f"{ds['group']}/{ds['key']}"
@@ -195,8 +207,7 @@ jobs:
                   gdf = consensus_download(ds["builder"], label)
                   out_dir = FOLDERS[ds["group"]]
                   out_path = os.path.join(out_dir, f"{ds['key']}_{today_str}.geojson")
-                  if os.path.exists(out_path):
-                      os.remove(out_path)
+                  if os.path.exists(out_path): os.remove(out_path)
                   gdf.to_file(out_path, driver="GeoJSON")
                   log(f"[SAVED] {out_path} ({len(gdf)} features)")
               except Exception as e:
@@ -215,7 +226,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          set -xeu -o pipefail
+          set -xeuo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config pull.rebase true
