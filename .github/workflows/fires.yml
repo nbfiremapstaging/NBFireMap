@@ -11,12 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONUNBUFFERED: "1"
+
+      # --- ERD (ArcGIS) ---
       ACTIVE_FIRES_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query"
       OUT_FIRES_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query"
       SUMS_TABLE_URL: "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/2/query"
       ACTIVE_FIRES_FILE: "active_fires.geojson"
       OUT_FIRES_FILE: "out_fires.geojson"
       SUMS_TABLE_FILE: "sums_table.json"
+
+      # --- CWFIS (Geoserver WFS) ---
+      CWFIS_WFS_ENDPOINT: "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
+      CWFIS_HOTSPOTS_TYPENAME_24H: "public:hotspots_last24hrs"
+      CWFIS_HOTSPOTS_24_FILE: "hotspots_last24hrs.geojson"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +43,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           python -u - << 'PYCODE'
           import os, time, json, hashlib
           import requests
@@ -61,7 +68,7 @@ jobs:
 
           # ---------- Schema helpers ----------
           def fetch_layer_meta(url):
-              """Fetch layer metadata (fields, objectIdField, etc.)."""
+              """Fetch layer metadata (fields, objectIdField, maxRecordCount, etc.)."""
               meta_url = url.rsplit("/query", 1)[0]
               r = arcgis_get(meta_url, {"f": "json"})
               meta = r.json()
@@ -70,7 +77,6 @@ jobs:
               return meta
 
           def get_oid_field(meta):
-              # Prefer 'objectIdField', else find the field with type esriFieldTypeOID, else common fallbacks
               if isinstance(meta.get("objectIdField"), str):
                   return meta["objectIdField"]
               for f in meta.get("fields", []):
@@ -79,7 +85,6 @@ jobs:
               for cand in ("OBJECTID","ObjectID","objectid"):
                   if any(cand == f.get("name") for f in meta.get("fields", [])):
                       return cand
-              # last resort
               return "OBJECTID"
 
           def get_all_field_names(meta):
@@ -89,20 +94,21 @@ jobs:
           def features_to_signature(feature_collection):
               feats = feature_collection.get("features", [])
               def feature_key(f):
-                  props = f.get("properties", {})
-                  if isinstance(props, dict):
-                      for key in ("OBJECTID","ObjectID","objectid"):
-                          if key in props:
-                              return (0, props[key])
+                  props = f.get("properties", {}) or {}
+                  for key in ("OBJECTID","ObjectID","objectid"):
+                      if key in props:
+                          return (0, props[key])
+                  # fallback to Feature.id
+                  if "id" in f:
+                      return (0, f["id"])
                   return (1, hashlib.sha256(json.dumps(props, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest())
               norm = []
               for f in feats:
                   props = f.get("properties", {}) or {}
                   strings = []
-                  for k, v in props.items():
+                  for _, v in sorted(props.items()):
                       if isinstance(v, str):
                           strings.append(v)
-                  strings.sort()
                   norm.append(("".join(strings), feature_key(f)))
               norm.sort(key=lambda t: t[1])
               concat = "|".join(s for s, _ in norm)
@@ -114,10 +120,9 @@ jobs:
               for f in feats:
                   attrs = f.get("attributes", {}) or {}
                   strings = []
-                  for k, v in attrs.items():
+                  for _, v in sorted(attrs.items()):
                       if isinstance(v, str):
                           strings.append(v)
-                  strings.sort()
                   rows.append("".join(strings))
               rows.sort()
               concat = "|".join(rows)
@@ -125,7 +130,7 @@ jobs:
 
           # ---------- Fetchers ----------
           def fetch_geojson(url):
-              """Get ArcGIS's own GeoJSON (keeps geometry shape identical to before)."""
+              """Get ArcGIS-provided GeoJSON for geometry; attributes may be partial."""
               params = {
                   "where": "1=1",
                   "outFields": "*",
@@ -142,7 +147,7 @@ jobs:
               return data
 
           def fetch_attributes(url):
-              """Get full attributes via f=json (no geometry) so nothing is dropped."""
+              """Get full attributes via f=json (no geometry)."""
               params = {
                   "where": "1=1",
                   "outFields": "*",
@@ -153,8 +158,7 @@ jobs:
               data = r.json()
               if isinstance(data, dict) and data.get("error"):
                   raise RuntimeError(f"ArcGIS error (json attrs): {data['error']}")
-              feats = data.get("features", [])
-              return data, { (f.get("attributes") or {}).get: None }  # placeholder (replaced below)
+              return data
 
           def attributes_index_by_oid(attrs_json, oid_field):
               index = {}
@@ -164,41 +168,45 @@ jobs:
                       index[attrs[oid_field]] = attrs
               return index
 
-          # ---------- Merge ----------
+          # ---------- Merge (FIXED: safe OID join, no blanket None fills) ----------
           def merge_geojson_with_attrs(geojson_obj, attrs_by_oid, all_fields, oid_field):
               for f in geojson_obj.get("features", []):
                   props = f.get("properties")
-                  if props is None or not isinstance(props, dict):
+                  if not isinstance(props, dict):
                       props = {}
                       f["properties"] = props
-                  oid_val = props.get(oid_field)
-                  source = attrs_by_oid.get(oid_val, {})
-                  # Ensure all fields exist; fill if missing or None
+                  # Try several ways to locate the join key
+                  oid_val = (
+                      props.get(oid_field)
+                      or props.get(oid_field.upper())
+                      or props.get(oid_field.lower())
+                      or f.get("id")  # ArcGIS GeoJSON often places OBJECTID here
+                  )
+                  source = attrs_by_oid.get(oid_val)
+                  if not source:
+                      # No match -> leave existing props as-is
+                      continue
+                  # Copy only missing keys from source (avoid overwriting existing values)
                   for name in all_fields:
-                      if name not in props or props[name] is None:
-                          if name in source:
-                              props[name] = source[name]
-                          else:
-                              # still ensure the key exists for consistency
-                              if name not in props:
-                                  props[name] = None
+                      if name not in props and name in source:
+                          props[name] = source[name]
               return geojson_obj
 
           def add_timestamp_to_geojson(data, timestamp):
-              feats = data.get("features", [])
-              for f in feats:
-                  if "properties" not in f or not isinstance(f["properties"], dict):
-                      f["properties"] = {}
-                  f["properties"]["FETCHED_FROM_ERD"] = int(timestamp)
+              for f in data.get("features", []):
+                  props = f.get("properties")
+                  if not isinstance(props, dict):
+                      props = {}
+                      f["properties"] = props
+                  props["FETCHED_FROM_ERD"] = int(timestamp)
               return data
 
           def add_timestamp_to_table(data, timestamp):
-              feats = data.get("features", [])
-              for f in feats:
+              for f in data.get("features", []):
                   attrs = f.get("attributes")
-                  if attrs is None or not isinstance(attrs, dict):
-                      f["attributes"] = {}
-                      attrs = f["attributes"]
+                  if not isinstance(attrs, dict):
+                      attrs = {}
+                      f["attributes"] = attrs
                   attrs["FETCHED_FROM_ERD"] = int(timestamp)
               return data
 
@@ -214,13 +222,8 @@ jobs:
                   payloads = []
                   sigs = []
                   for i in range(copies):
-                      base_geo = fetch_geojson(url)                     # geometry + some attrs
-                      attrs_json_resp = arcgis_get(url, {
-                          "where": "1=1",
-                          "outFields": "*",
-                          "returnGeometry": "false",
-                          "f": "json",
-                      }).json()                                         # full attrs only
+                      base_geo = fetch_geojson(url)                     # geometry + some attrs (may omit OID)
+                      attrs_json_resp = fetch_attributes(url)           # full attrs only
                       attrs_by_oid = attributes_index_by_oid(attrs_json_resp, oid_field)
 
                       merged = merge_geojson_with_attrs(base_geo, attrs_by_oid, all_fields, oid_field)
@@ -301,11 +304,46 @@ jobs:
           )
 
           if not success_all:
-              log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
+              log("One or more ERD datasets failed to stabilize; commit will include only successful files (if any).")
           else:
-              log("All datasets fetched and validated successfully.")
-
+              log("All ERD datasets fetched and validated successfully.")
           PYCODE
+
+      - name: Fetch CWFIS hotspots (WFS, last 24 hours)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -u - << 'PY'
+          import os, json, time, requests
+
+          S = requests.Session()
+          S.headers.update({"User-Agent":"github-actions cwfis fetcher"})
+
+          params = {
+            "service":"WFS",
+            "version":"1.0.0",
+            "request":"GetFeature",
+            "typeName": os.environ["CWFIS_HOTSPOTS_TYPENAME_24H"],
+            "maxFeatures":"100000",
+            "outputFormat":"application/json"
+          }
+
+          r = S.get(os.environ["CWFIS_WFS_ENDPOINT"], params=params, timeout=120)
+          r.raise_for_status()
+          data = r.json()
+          ts = int(time.time())
+          for f in data.get("features", []):
+              props = f.get("properties")
+              if not isinstance(props, dict):
+                  props = {}
+                  f["properties"] = props
+              props["FETCHED_FROM_CWFIS"] = ts
+
+          with open(os.environ["CWFIS_HOTSPOTS_24_FILE"], "w", encoding="utf-8") as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+
+          print(f"Wrote {os.environ['CWFIS_HOTSPOTS_24_FILE']} with {len(data.get('features',[]))} features.")
+          PY
 
       - name: Commit and push (if changed)
         shell: bash
@@ -317,8 +355,8 @@ jobs:
             echo "Changes detected; committing…"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" || true
-            git commit -m "Update ERD fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" "${CWFIS_HOTSPOTS_24_FILE}" || true
+            git commit -m "Update ERD & CWFIS fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             git push
             echo "Pushed updates."
           else
