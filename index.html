@@ -642,18 +642,68 @@
 
       map.whenReady(() => { fitProvinceToView({ animate:false }); loadLocalFires(); });
 
-      // ---- MODIS, perimeters, boundary -------------------------------------
-      const modis48 = L.esri.featureLayer({
-        url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/0',
-        pane:'viirsPane',
-        pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:5,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.9})
-      }).addTo(map);
+      // ---- CWFIS Hotspots (WFS) — 24h & 7d, refresh on pan/zoom -----------------
+const CWFIS_WFS = 'https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows';
 
-      const modis7d = L.esri.featureLayer({
-        url:'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/MODIS_Thermal_v1/FeatureServer/1',
-        pane:'viirsPane',
-        pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:4,color:'var(--modis)',fillColor:'var(--modis)',fillOpacity:.65})
-      });
+// Helper to build a WFS GeoJSON request bounded to current view
+function cwfisWfsUrl(typeName, bounds) {
+  // Leaflet bounds → "minx,miny,maxx,maxy" in EPSG:4326
+  const b = bounds || map.getBounds();
+  const minx = b.getWest(), miny = b.getSouth(), maxx = b.getEast(), maxy = b.getNorth();
+  const params = new URLSearchParams({
+    service: 'WFS',
+    version: '1.0.0',
+    request: 'GetFeature',
+    typeName,
+    srsName: 'EPSG:4326',
+    bbox: `${minx},${miny},${maxx},${maxy},EPSG:4326`,
+    outputFormat: 'application/json'
+  });
+  return `${CWFIS_WFS}?${params.toString()}`;
+}
+
+// Same visual styling as your MODIS markers
+const cwfis24 = L.geoJSON(null, {
+  pane: 'viirsPane',
+  pointToLayer: (_f, latlng) =>
+    L.circleMarker(latlng, { radius: 5, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.9 })
+}).addTo(map);
+
+const cwfis7 = L.geoJSON(null, {
+  pane: 'viirsPane',
+  pointToLayer: (_f, latlng) =>
+    L.circleMarker(latlng, { radius: 4, color: 'var(--modis)', fillColor: 'var(--modis)', fillOpacity: 0.65 })
+});
+
+// Lightweight loader
+async function loadCwfis(layer, typeName) {
+  try {
+    const url = cwfisWfsUrl(typeName, map.getBounds());
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.statusText);
+    const gj = await r.json();
+    layer.clearLayers();
+    layer.addData(gj);
+  } catch (err) {
+    console.warn('CWFIS WFS load failed:', err);
+  }
+}
+
+// Debounced refresh on pan/zoom; only refresh if layer is on the map
+let cwfisPanTimer = null;
+function refreshVisibleCwfis() {
+  if (cwfisPanTimer) cancelAnimationFrame(cwfisPanTimer);
+  cwfisPanTimer = requestAnimationFrame(() => {
+    if (map.hasLayer(cwfis24)) loadCwfis(cwfis24, 'public:hotspots_last24hrs');
+    if (map.hasLayer(cwfis7))  loadCwfis(cwfis7,  'public:hotspots_last7days');
+  });
+}
+
+// Initial + on layer toggle + on pan/zoom
+map.whenReady(() => refreshVisibleCwfis());
+map.on('moveend', refreshVisibleCwfis);
+map.on('overlayadd',   (e) => { if (e.layer === cwfis24 || e.layer === cwfis7) refreshVisibleCwfis(); });
+
 
       const perimeterLabelLayers = new Set();
       const activePerimeters = L.esri.featureLayer({
@@ -1166,8 +1216,8 @@
       // ---- Overlays & control ----------------------------------------------
       const overlays = {
         Smoke: smokeLayer,
-        'MODIS Hotspots — Last 48 hours': modis48,
-        'MODIS Hotspots — Last 7 days': modis7d,
+        'CWFIS Hotspots — Last 24 hours': cwfis24,
+        'CWFIS Hotspots — Last 7 days': cwfis7,
         'Fire Perimeters': activePerimeters,
         'Cities & Towns': cityClusters,
         Aircraft: planesLayer,
