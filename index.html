@@ -1020,13 +1020,13 @@
       // ---- Counties (off by default) ---------------------------------------
       const countyLabelLayers = new Set();
       const counties = L.esri.featureLayer({
-        url: 'https://gis-erd-der.gnb.ca/server/rest/services/OpenData/County/MapServer/0',
+        url: 'https://geonb.snb.ca/arcgis/rest/services/GeoNB_SNB_Counties/MapServer/0',
         pane: 'countiesPane',
         smoothFactor: 3,
         style: () => ({ color: '#ffffff', weight: 3.5, fill: false }),
         onEachFeature: (feature, layer) => {
           const p = feature?.properties || feature?.attributes || {};
-          const name = p.COUNTY_NAME_EN || p.COUNTY_NAME || p.NAME_EN || p.NAME || 'County';
+          const name = p.ENG_NAME;
           layer.bindTooltip(`<span class="county-label">${name}</span>`, { permanent: true, direction: 'center', className: 'county-label-tooltip', opacity: 0 });
           countyLabelLayers.add(layer);
         }
