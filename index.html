@@ -284,6 +284,23 @@
     /* Safe-area probe (for iOS) */
     #sai-probe{position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom);pointer-events:none;opacity:0}
 
+        /* Nearby fires bottom sheet */
+    .nearby-panel{
+      position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));
+      z-index:2100; display:none; background:var(--panel);
+      border:1px solid var(--border); border-radius:12px; padding:10px 12px;
+      box-shadow:var(--shadow); backdrop-filter:blur(6px); max-height:40vh; overflow:auto;
+      font-size:var(--fs-14);
+    }
+    .nearby-panel[hidden]{ display:none; }
+    .nearby-panel header{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+    .nearby-title{ font-weight:800; }
+    .nearby-close{ background:var(--btn-bg); border:1px solid var(--btn-border); border-radius:8px; padding:6px 10px; font-weight:800; cursor:pointer; }
+    .nearby-close:focus-visible{ outline:none; box-shadow:var(--focus); }
+    .nearby-list{ list-style:decimal; padding-left:12px; margin:6px 0 0; }
+    .nearby-list a{ color:var(--link); text-decoration:none; font-weight:700; }
+    .nearby-list a:hover{ text-decoration:underline; }
+
     /* Summary table + pie */
     .pro-table{width:100%;border-collapse:separate;border-spacing:0;margin:10px 0 4px;background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-soft)}
     .pro-table th,.pro-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
@@ -434,6 +451,15 @@
     </div>
   </div>
 
+    <!-- Nearby Fires bottom sheet -->
+  <div id="nearbyPanel" class="nearby-panel" hidden>
+    <header>
+      <div class="nearby-title" id="nearbyTitle">Nearby Fires</div>
+      <button id="nearbyClose" class="nearby-close" type="button" aria-label="Close nearby fires panel">Close</button>
+    </header>
+    <div id="nearbyBody"></div>
+  </div>
+
   <div class="nb-footer">
     <a href="https://www.gnb.ca/en/topic/laws-safety/emergency-preparedness-alerts/fire-watch.html" target="_blank" rel="noopener">
       <i class="fa-solid fa-up-right-from-square"></i> NB Fire Watch &amp; Burn Restrictions
@@ -467,6 +493,34 @@
       const D = document;
       const $  = (sel, root=D) => root.querySelector(sel);
       const $$ = (sel, root=D) => root.querySelectorAll(sel);
+
+        // Nearby panel elements
+  const nearbyPanel = $('#nearbyPanel');
+  const nearbyTitle = $('#nearbyTitle');
+  const nearbyBody  = $('#nearbyBody');
+  const nearbyCloseBtn = $('#nearbyClose');
+
+  function nearbyPanelHeight(){
+    if (!nearbyPanel || nearbyPanel.hidden) return 0;
+    const r = nearbyPanel.getBoundingClientRect();
+    return Math.ceil(r.height + 12); // include gap to map edge
+  }
+
+  function openNearbyPanel(title, html){
+    nearbyTitle.textContent = title || 'Nearby Fires';
+    nearbyBody.innerHTML = html || '';
+    nearbyPanel.hidden = false;
+    nearbyPanel.style.display = 'block';
+  }
+  function closeNearbyPanel(){
+    nearbyPanel.style.display = 'none';
+    nearbyPanel.hidden = true;
+    // also clear any proximity lines/labels
+    cityProximityLayer.clearLayers?.();
+  }
+  nearbyCloseBtn?.addEventListener('click', closeNearbyPanel);
+  // Close on ESC
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !nearbyPanel.hidden){ closeNearbyPanel(); }});
 
       // ---- Constants --------------------------------------------------------
       const LS_KEY = 'nbMapView';
@@ -1901,7 +1955,6 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
       let cityProximityPopup = null;
 
       const kmStr = (meters) => (meters / 1000).toFixed(1);
-      map.on('popupclose', (e) => { if (e.popup === cityProximityPopup) { cityProximityLayer.clearLayers(); cityProximityPopup = null; } });
 
       function cityToFires(name, cityLatLng) {
         enableAllActiveStatuses();
@@ -1916,19 +1969,27 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
           if (Number.isFinite(d) && d <= CITY_RADIUS_M) nearby.push({ rec, d });
         }
 
+        // Build the list (or empty state) for the bottom sheet
+        const listItems = [];
+        const bounds = L.latLngBounds([cityLatLng]);
         if (!nearby.length) {
-          const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 360 })
-            .setLatLng(cityLatLng)
-            .setContent(`<b>${name}</b><br>No active fires within 30&nbsp;km.`)
-            .openOn(map);
-          cityProximityPopup = p;
+          openNearbyPanel(name, `<div><b>${name}</b><br>No active fires within 30&nbsp;km.</div>`);
           hideOverviewPanel();
+          // Keep the city above the panel
+          const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
+          const pb = nearbyPanelHeight();
           map.flyTo(cityLatLng, Math.max(map.getZoom(), 9), { duration: 0.5 });
+          map.once('moveend', () => {
+            map.fitBounds(L.latLngBounds([cityLatLng]), {
+              paddingTopLeft: [pad, pad],
+              paddingBottomRight: [pad, pad + pb],
+              animate: true
+            });
+          });
           return;
         }
 
         nearby.sort((a, b) => a.d - b.d);
-        const bounds = L.latLngBounds([cityLatLng]);
         const listHTML = nearby.map(({ rec, d }) => {
           const km = kmStr(d);
 
@@ -1957,32 +2018,37 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
           </li>`;
         }).join('');
 
-        const html = `
-          <div style="min-width:260px">
-            <div style="font-weight:800;margin-bottom:6px">${name}</div>
-            <div><b>Active fires within 30&nbsp;km:</b></div>
-            <ol class="summary-list">${listHTML}</ol>
-          </div>`;
+                const html = `
+          <div><b>${name}</b></div>
+          <div><b>Active fires within 30&nbsp;km:</b></div>
+          <ol class="nearby-list">${listHTML}</ol>`;
+        openNearbyPanel('Nearby Fires', html);
+        // Click handling for list items (delegate)
+                nearbyBody.addEventListener('click', (evt) => {
+          const a = evt.target.closest('a[data-fireid]'); 
+          if (!a) return;
+          evt.preventDefault();
+          const rec = fireStore.get(a.getAttribute('data-fireid')); 
+          if (!rec) return;
+          ensureStatusEnabled(rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || ''));
+          hideOverviewPanel();
+          // close the sheet + clear the lines immediately
+          closeNearbyPanel();
+          map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
+          map.once('moveend', () => {
+            rec.layer?.openPopup?.();
+          });
+        }, { passive: false, once: true });
 
-        const p = L.popup({ pane: 'alwaysOnTopPopup', maxWidth: 420 }).setLatLng(cityLatLng).setContent(html);
-        p.once('add', () => {
-          const el = p.getElement();
-          el?.addEventListener('click', (evt) => {
-            const a = evt.target.closest('a[data-fireid]'); if (!a) return;
-            evt.preventDefault();
-            const rec = fireStore.get(a.getAttribute('data-fireid')); if (!rec) return;
-            ensureStatusEnabled(rec.statusKey || norm(rec.props?.FIRE_STAT_DESC_E || ''));
-            hideOverviewPanel();
-            map.flyTo(rec.latlng, Math.max(map.getZoom(), 12), { duration: 0.6 });
-            map.once('moveend', () => { rec.layer?.openPopup?.(); });
-          }, { passive: false });
-        });
-        p.openOn(map);
-        cityProximityPopup = p;
-
+                // Fit all lines above the panel
         const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
+        const pb = nearbyPanelHeight();
         hideOverviewPanel();
-        map.fitBounds(bounds, { padding: [pad, pad], animate: true });
+        map.fitBounds(bounds, {
+          paddingTopLeft: [pad, pad],
+          paddingBottomRight: [pad, pad + pb],
+          animate: true
+        });
       }
 
       // ---- Inline smoke controls mount (NEW) --------------------------------
