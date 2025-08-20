@@ -35,7 +35,7 @@ jobs:
 
       - name: Download and write files (verbose, no client-side clip)
         env:
-          PYTHONUNBUFFERED: "1"        # unbuffered logs
+          PYTHONUNBUFFERED: "1"
         shell: bash
         run: |
           set -xeuo pipefail
@@ -72,7 +72,6 @@ jobs:
           TIMEOUT=90
 
           # ---------- Builders (server-side NB filter) ----------
-          # CWFIS — WFS with bbox filter; fallback to CQL if needed.
           def cwfis_builder(type_name: str):
               base = "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
               bbox = f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]},EPSG:4326"
@@ -89,16 +88,17 @@ jobs:
               }
               return ("CWFIS", base, [params_bbox, params_cql])
 
-          # ERD — ArcGIS REST with envelope (inSR=4326); fallback to no-geometry.
+          # ERD — ArcGIS REST with envelope (inSR=4326); use wildcard fields to ensure fire_size is included.
           def erd_builder(layer_idx: int):
               base = f"https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/{layer_idx}/query"
+              out_fields = "*,fire_*"  # <-- wildcard includes fire_size and related fields
               params_env = {
                   "where": "1=1",
                   "geometryType": "esriGeometryEnvelope",
                   "geometry": f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]}",
                   "inSR": 4326,
                   "spatialRel": "esriSpatialRelIntersects",
-                  "outFields": "*",
+                  "outFields": out_fields,
                   "returnGeometry": "true",
                   "outSR": 4326,
                   "f": "geojson",
@@ -107,7 +107,7 @@ jobs:
               }
               params_all = {
                   "where": "1=1",
-                  "outFields": "*",
+                  "outFields": out_fields,
                   "returnGeometry": "true",
                   "outSR": 4326,
                   "f": "geojson",
