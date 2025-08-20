@@ -2,12 +2,15 @@ name: Daily Fire Data Archive
 
 on:
   schedule:
-    - cron: "5 * * * *"  # daily ~05:10 America/Toronto
+    - cron: "10 9 * * *"   # daily
   workflow_dispatch: {}
 
-# Allow the workflow to push back to the repo
 permissions:
   contents: write
+
+concurrency:
+  group: fire-archive-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   fetch-and-archive:
@@ -17,7 +20,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # ensure we can commit and push cleanly
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,15 +29,18 @@ jobs:
 
       - name: Install Python deps
         run: |
+          set -xeu -o pipefail
           python -m pip install --upgrade pip
           pip install geopandas requests
 
-      - name: Download, validate (5× copies), clip, and write files
+      - name: Download, validate (5× copies), clip, and write files (verbose)
+        env:
+          PYTHONUNBUFFERED: "1"   # unbuffered stdout/stderr
         shell: bash
         run: |
-          set -euo pipefail
-          python <<'PYCODE'
-          import json, os, sys, time
+          set -xeu -o pipefail
+          python -u <<'PYCODE'
+          import os, sys, time, json
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
@@ -42,6 +48,11 @@ jobs:
           import geopandas as gpd
           from shapely.geometry import box
 
+          # ---------- Verbose helpers ----------
+          def log(msg):
+              print(msg, flush=True)
+
+          # ---------- Config ----------
           TZ = ZoneInfo("America/Toronto")
           today_str = datetime.now(TZ).strftime("%Y%m%d")
 
@@ -53,132 +64,189 @@ jobs:
           for p in FOLDERS.values():
               os.makedirs(p, exist_ok=True)
 
-          # New Brunswick bounding box (WGS84): lon_min, lat_min, lon_max, lat_max
+          # New Brunswick bbox (WGS84): (minx, miny, maxx, maxy)
           NB_BBOX = (-69.05, 44.56, -63.70, 48.07)
+          log(f"NB_BBOX={NB_BBOX}")
+
           nb_poly = box(*NB_BBOX)
           nb_gdf = gpd.GeoDataFrame(geometry=[nb_poly], crs="EPSG:4326")
 
+          # ---------- HTTP session ----------
+          S = requests.Session()
+          S.headers.update({
+              "User-Agent": "nb-fire-archive/1.0 (+github actions)",
+              "Accept": "application/json, application/geo+json;q=0.9, */*;q=0.8",
+          })
+          TIMEOUT = 90
+
+          # ---------- Sources with SERVER-SIDE NB filters ----------
+          # CWFIS via GeoServer WFS + bbox filter
+          def cwfis_wfs_url(type_name: str):
+              base = "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
+              params = {
+                  "service": "WFS",
+                  "version": "1.0.0",
+                  "request": "GetFeature",
+                  "typeName": type_name,
+                  "srsName": "EPSG:4326",
+                  "bbox": f"{NB_BBOX[0]},{NB_BBOX[1]},{NB_BBOX[2]},{NB_BBOX[3]},EPSG:4326",
+                  "outputFormat": "application/json",
+              }
+              return base, params
+
+          # ERD (ArcGIS REST) with geometry=envelope (NB bbox)
+          def erd_query_url(layer_index: int):
+              base = f"https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/{layer_index}/query"
+              envelope = {
+                  "xmin": NB_BBOX[0], "ymin": NB_BBOX[1],
+                  "xmax": NB_BBOX[2], "ymax": NB_BBOX[3],
+                  "spatialReference": {"wkid": 4326}
+              }
+              params = {
+                  "where": "1=1",
+                  "geometry": json.dumps(envelope),
+                  "geometryType": "esriGeometryEnvelope",
+                  "inSR": 4326,
+                  "spatialRel": "esriSpatialRelIntersects",
+                  "outFields": "*",
+                  "returnGeometry": "true",
+                  "outSR": 4326,
+                  "f": "geojson",
+                  # try to avoid server-side truncation
+                  "resultRecordCount": 20000,
+                  "returnExceededLimitFeatures": "true",
+              }
+              return base, params
+
           DATASETS = [
-              # CWFIS via WFS
-              {
-                  "key": "24_hour_spots",
-                  "group": "cwfis",
-                  "url": "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
-                         "?service=WFS&version=1.0.0&request=GetFeature"
-                         "&typeName=public:hotspots_last24hrs&outputFormat=application/json",
-              },
-              {
-                  "key": "fire_perimeters",
-                  "group": "cwfis",
-                  "url": "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/ows"
-                         "?service=WFS&version=1.0.0&request=GetFeature"
-                         "&typeName=public:m3_polygons_current&outputFormat=application/json",
-              },
-              # ERD (ArcGIS REST → GeoJSON, all fields, WGS84)
-              {
-                  "key": "active_fires",
-                  "group": "erd",
-                  "url": "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/0/query"
-                         "?where=1%3D1&outFields=%2A&f=geojson&outSR=4326",
-              },
-              {
-                  "key": "out_fires",
-                  "group": "erd",
-                  "url": "https://gis-erd-der.gnb.ca/arcgis/rest/services/Fire_Dashboards/Public_Fires/MapServer/1/query"
-                         "?where=1%3D1&outFields=%2A&f=geojson&outSR=4326",
-              },
+              # CWFIS
+              {"key": "24_hour_spots",   "group": "cwfis", "builder": lambda: cwfis_wfs_url("public:hotspots_last24hrs")},
+              {"key": "fire_perimeters", "group": "cwfis", "builder": lambda: cwfis_wfs_url("public:m3_polygons_current")},
+              # ERD
+              {"key": "active_fires",    "group": "erd",   "builder": lambda: erd_query_url(0)},
+              {"key": "out_fires",       "group": "erd",   "builder": lambda: erd_query_url(1)},
           ]
 
-          def fetch_geojson(url: str) -> dict:
-              r = requests.get(url, timeout=60)
+          # ---------- Functions ----------
+          def fetch_geojson(url, params, label):
+              # show the full request URL GitHub-side for debug
+              req = S.prepare_request(requests.Request("GET", url, params=params))
+              log(f"[REQ] {label}: {req.method} {req.url}")
+              r = S.send(req, timeout=TIMEOUT)
+              log(f"[RES] {label}: status={r.status_code} content-length={r.headers.get('content-length')} bytes={len(r.content)}")
               r.raise_for_status()
-              return r.json()
+              # ArcGIS can return JSON error object even with 200 OK
+              obj = r.json()
+              if isinstance(obj, dict) and obj.get("error"):
+                  raise RuntimeError(f"Server error for {label}: {obj['error']}")
+              return obj
 
-          def to_gdf(gj: dict) -> gpd.GeoDataFrame:
-              gdf = gpd.GeoDataFrame.from_features(gj.get("features", []), crs="EPSG:4326")
-              if gdf.crs is None:
-                  gdf.set_crs("EPSG:4326", inplace=True)
-              elif gdf.crs.to_string().lower() != "epsg:4326":
-                  gdf = gdf.to_crs("EPSG:4326")
+          def to_gdf(obj):
+              # from_features works for both GeoJSON & ArcGIS GeoJSON
+              features = obj.get("features", [])
+              gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
               return gdf
 
-          def clip_to_nb(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+          def clip_to_nb(gdf):
               if gdf.empty:
                   return gdf
               try:
+                  # Make invalid geoms valid if needed
                   gdf = gdf.set_geometry(gdf.geometry.buffer(0))
               except Exception:
                   pass
-              return gpd.overlay(gdf, nb_gdf, how="intersection")
+              # geopandas.clip uses an overlay; we keep it explicit
+              return gpd.clip(gdf, nb_gdf)
 
-          def consensus_download(url: str, label: str, max_rounds=5, samples=5) -> gpd.GeoDataFrame:
+          def consensus_download(builder, label, max_rounds=5, samples=5):
               for attempt in range(1, max_rounds + 1):
                   counts, frames = [], []
-                  for _ in range(samples):
-                      gj = fetch_geojson(url)
-                      gdf = clip_to_nb(to_gdf(gj))
-                      counts.append(len(gdf))
+                  log(f"[ROUND] {label}: attempt {attempt}/{max_rounds}")
+                  for i in range(samples):
+                      url, params = builder()
+                      obj = fetch_geojson(url, params, f"{label} copy {i+1}/{samples}")
+                      gdf = to_gdf(obj)
+                      before = len(gdf)
+                      gdf = clip_to_nb(gdf)
+                      after = len(gdf)
+                      counts.append(after)
                       frames.append(gdf)
-                      time.sleep(0.5)
+                      log(f"[INFO] {label}: features before-clip={before}, after-clip={after}")
+                      time.sleep(0.4)
                   if len(set(counts)) == 1:
-                      print(f"[OK] {label}: consensus (n={counts[0]}) on round {attempt}")
+                      log(f"[OK] {label}: consensus n={counts[0]}")
                       return frames[0]
-                  print(f"[WARN] {label}: mismatch {counts} on round {attempt}, retrying…")
-                  time.sleep(2)
+                  log(f"[WARN] {label}: mismatch counts {counts}, retrying…")
+                  time.sleep(1.5)
 
+              # choose majority from last attempt
               from collections import Counter
-              cnt = Counter(counts)
-              majority = cnt.most_common(1)[0][0]
-              idx = counts.index(majority)
-              print(f"[WARN] {label}: using majority sample (n={majority}) after {max_rounds} rounds.")
+              c = Counter(counts)
+              n, _ = c.most_common(1)[0]
+              idx = counts.index(n)
+              log(f"[WARN] {label}: using majority sample n={n}")
               return frames[idx]
 
+          # ---------- Main ----------
           failures = []
           for ds in DATASETS:
               label = f"{ds['group']}/{ds['key']}"
               try:
-                  gdf = consensus_download(ds["url"], label)
+                  gdf = consensus_download(ds["builder"], label)
                   out_dir = FOLDERS[ds["group"]]
                   out_path = os.path.join(out_dir, f"{ds['key']}_{today_str}.geojson")
                   if os.path.exists(out_path):
                       os.remove(out_path)
                   gdf.to_file(out_path, driver="GeoJSON")
-                  print(f"[SAVED] {out_path} ({len(gdf)} features)")
+                  log(f"[SAVED] {out_path} ({len(gdf)} features)")
               except Exception as e:
                   failures.append((label, str(e)))
-                  print(f"[ERROR] {label}: {e}", file=sys.stderr)
+                  log(f"[ERROR] {label}: {e}")
 
           if failures:
-              print("\nFailures:", file=sys.stderr)
+              log("---- FAILURES ----")
               for lbl, err in failures:
-                  print(f" - {lbl}: {err}", file=sys.stderr)
+                  log(f" - {lbl}: {err}")
               sys.exit(1)
           PYCODE
 
-      - name: Commit and push changes
+      - name: Commit and push changes (rebase & retry)
         if: success()
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          set -euo pipefail
-          # Configure bot identity
+          set -xeu -o pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase true
+          git config rebase.autoStash true
 
-          # Stage only the archive tree (create if empty to avoid failures)
+          git fetch origin "$BRANCH_NAME"
+          git checkout "$BRANCH_NAME"
+          git pull --rebase origin "$BRANCH_NAME"
+
           mkdir -p archive/cwfis archive/erd
-          # Add a .gitkeep so empty dirs are tracked (optional)
           touch archive/.gitkeep
           git add -A archive
 
-          # Commit if there are changes
           if ! git diff --cached --quiet; then
             git commit -m "Daily fire archive for $(date -u +%Y-%m-%d)"
-            git push
+            for i in 1 2 3 4 5; do
+              if git push origin "HEAD:$BRANCH_NAME"; then
+                exit 0
+              fi
+              echo "Push failed (attempt $i). Rebasing & retrying…"
+              git fetch origin "$BRANCH_NAME"
+              git pull --rebase origin "$BRANCH_NAME" || true
+              sleep 2
+            done
+            echo "Giving up after 5 attempts."
+            exit 1
           else
             echo "No changes to commit."
           fi
 
-      # Optional: also upload as a run artifact for convenience
-      - name: Upload archive artifact
+      - name: Upload archive artifact (optional)
         if: always()
         uses: actions/upload-artifact@v4
         with:
