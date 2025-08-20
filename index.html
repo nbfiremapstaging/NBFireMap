@@ -93,7 +93,13 @@
     }
     
 /* Basemap toggle */
-.basemap-toggle{margin-left:auto;display:flex;align-items:center}
+.basemap-toggle {
+   display: flex;
+   align-items: center;
+   justify-content: center; /* center horizontally */
+   margin: 0 auto 8px auto; /* center block & add bottom spacing */
+   width: fit-content;      /* shrink to content */
+ }
 .basemap-seg{display:inline-flex;gap:10px;margin:0;padding:4px 8px;border:1px solid var(--border);border-radius:999px}
 .basemap-seg label{display:inline-flex;align-items:center;gap:6px;font-weight:700}
 .basemap-seg input{accent-color:var(--accent,#0078ff)}
@@ -1468,7 +1474,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
  baseCtl.innerHTML = `
    <fieldset class="basemap-seg" role="radiogroup" aria-label="Basemap">
      <label><input type="radio" name="basemap" value="imagery" ${currentBase!=='osm'?'checked':''}> Imagery</label>
-     <label><input type="radio" name="basemap" value="osm" ${currentBase==='osm'?'checked':''}> OSM</label>
+     <label><input type="radio" name="basemap" value="osm" ${currentBase==='osm'?'checked':''}> Street Map</label>
    </fieldset>
  `;
  baseCtl.addEventListener('change', (e)=>{
