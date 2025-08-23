@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 30,
         "FIRE_SIZE": 238.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -97,38 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68683,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.06299862619747,
-          46.86900962663136
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68683,
-        "FIRE_NUMBER": "2025278",
-        "FIRE_NUMBER_SHORT": "278",
-        "FIRE_NAME": "278",
-        "DEGREES_LAT": 46.869,
-        "DEGREES_LONG": 65.063,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755356580000,
-        "FIRE_STAT_DATE": 1755854040000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -159,69 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68562,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.74544887398154,
-          47.05652964292348
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68562,
-        "FIRE_NUMBER": "2025252",
-        "FIRE_NUMBER_SHORT": "252",
-        "FIRE_NAME": "Maple Glen",
-        "DEGREES_LAT": 47.05652,
-        "DEGREES_LONG": 65.74544999999999,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755104400000,
-        "FIRE_STAT_DATE": 1755853740000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 5.5,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68428,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.7507684860412,
-          46.167529512378984
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68428,
-        "FIRE_NUMBER": "2025230",
-        "FIRE_NUMBER_SHORT": "230",
-        "FIRE_NAME": "115 Pit",
-        "DEGREES_LAT": 46.167519999999996,
-        "DEGREES_LONG": 64.75077,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1754835300000,
-        "FIRE_STAT_DATE": 1755854400000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 45.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -252,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -283,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -314,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -345,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -376,7 +283,100 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68683,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.06299862619747,
+          46.86900962663136
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68683,
+        "FIRE_NUMBER": "2025278",
+        "FIRE_NUMBER_SHORT": "278",
+        "FIRE_NAME": "278",
+        "DEGREES_LAT": 46.869,
+        "DEGREES_LONG": 65.063,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755356580000,
+        "FIRE_STAT_DATE": 1755936000000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755948508
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68562,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.74544887398154,
+          47.05652964292348
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68562,
+        "FIRE_NUMBER": "2025252",
+        "FIRE_NUMBER_SHORT": "252",
+        "FIRE_NAME": "Maple Glen",
+        "DEGREES_LAT": 47.05652,
+        "DEGREES_LONG": 65.74544999999999,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755104400000,
+        "FIRE_STAT_DATE": 1755936060000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 5.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755948508
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68428,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.7507684860412,
+          46.167529512378984
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68428,
+        "FIRE_NUMBER": "2025230",
+        "FIRE_NUMBER_SHORT": "230",
+        "FIRE_NAME": "115 Pit",
+        "DEGREES_LAT": 46.167519999999996,
+        "DEGREES_LONG": 64.75077,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1754835300000,
+        "FIRE_STAT_DATE": 1755936120000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 45.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -407,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -438,7 +438,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 184.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -469,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -500,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.4,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     },
     {
@@ -531,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1755945790
+        "FETCHED_FROM_ERD": 1755948508
       }
     }
   ]
