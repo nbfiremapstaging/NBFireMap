@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 184.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -314,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -345,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -376,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -407,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -438,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -469,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -486,7 +486,7 @@
         "OBJECTID": 68943,
         "FIRE_NUMBER": "2025300",
         "FIRE_NUMBER_SHORT": "300",
-        "FIRE_NAME": "Black River",
+        "FIRE_NAME": "Black River Bridge",
         "DEGREES_LAT": 46.992169999999994,
         "DEGREES_LONG": 65.24483,
         "FIRE_STAT_ID": 1,
@@ -500,7 +500,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -520,18 +520,80 @@
         "FIRE_NAME": "Peatmoss Piles",
         "DEGREES_LAT": 46.96142,
         "DEGREES_LONG": 64.85463,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
         "TIME_DETECTED": 1755994500000,
-        "FIRE_STAT_DATE": 1755994500000,
+        "FIRE_STAT_DATE": 1756053000000,
         "FIRE_OF_NOTE_INDCTR": 1,
         "FIRE_NOTE_ENG": "Yes",
         "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 0,
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756068202
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68944,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.87646855255156,
+          46.67605959725573
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68944,
+        "FIRE_NUMBER": "2025301",
+        "FIRE_NUMBER_SHORT": "301",
+        "FIRE_NAME": "301",
+        "DEGREES_LAT": 46.67605,
+        "DEGREES_LONG": 64.87647,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756050000000,
+        "FIRE_STAT_DATE": 1756049400000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68945,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.1184989469292,
+          45.85778942809879
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68945,
+        "FIRE_NUMBER": "2025302",
+        "FIRE_NUMBER_SHORT": "302",
+        "FIRE_NAME": "302",
+        "DEGREES_LAT": 45.85778,
+        "DEGREES_LONG": 66.1185,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756044900000,
+        "FIRE_STAT_DATE": 1756056480000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -562,7 +624,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -593,7 +655,7 @@
         "PERCENT_CONTAINED": 50,
         "FIRE_SIZE": 238.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -624,7 +686,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 5.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     },
     {
@@ -655,7 +717,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756063717
+        "FETCHED_FROM_ERD": 1756068202
       }
     }
   ]
