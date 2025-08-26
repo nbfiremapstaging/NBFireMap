@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 30,
         "FIRE_SIZE": 338.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -90,14 +90,14 @@
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
         "TIME_DETECTED": 1755195600000,
-        "FIRE_STAT_DATE": 1756024920000,
+        "FIRE_STAT_DATE": 1756112400000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -221,38 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68943,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.24161869399573,
-          46.991739643825994
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68943,
-        "FIRE_NUMBER": "2025300",
-        "FIRE_NUMBER_SHORT": "300",
-        "FIRE_NAME": "Black River Bridge",
-        "DEGREES_LAT": 46.99173,
-        "DEGREES_LONG": 65.24162,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1756050120000,
-        "FIRE_STAT_DATE": 1756124280000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 2.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -283,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 45.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -314,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -345,7 +314,7 @@
         "PERCENT_CONTAINED": 70,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -376,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -407,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -438,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -469,7 +438,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68943,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.24161869399573,
+          46.991739643825994
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68943,
+        "FIRE_NUMBER": "2025300",
+        "FIRE_NUMBER_SHORT": "300",
+        "FIRE_NAME": "Black River Bridge",
+        "DEGREES_LAT": 46.99173,
+        "DEGREES_LONG": 65.24162,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1756050120000,
+        "FIRE_STAT_DATE": 1756156860000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 50,
+        "FIRE_SIZE": 2.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -500,7 +500,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     },
     {
@@ -531,7 +531,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756165315
+        "FETCHED_FROM_ERD": 1756179190
       }
     }
   ]
