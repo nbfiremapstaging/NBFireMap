@@ -9,33 +9,33 @@
   "features": [
     {
       "type": "Feature",
-      "id": 68585,
+      "id": 68307,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -66.47325912622763,
-          46.99121961546927
+          -65.43247876838464,
+          47.15278966673053
         ]
       },
       "properties": {
-        "OBJECTID": 68585,
-        "FIRE_NUMBER": "2025256",
-        "FIRE_NUMBER_SHORT": "256",
-        "FIRE_NAME": "Beaver Lake Stream",
-        "DEGREES_LAT": 46.991209999999995,
-        "DEGREES_LONG": 66.47326,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755166920000,
-        "FIRE_STAT_DATE": 1756194540000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 30,
-        "FIRE_SIZE": 456.0,
+        "OBJECTID": 68307,
+        "FIRE_NUMBER": "2025208",
+        "FIRE_NUMBER_SHORT": "208",
+        "FIRE_NAME": "Old Field Road",
+        "DEGREES_LAT": 47.15278,
+        "DEGREES_LONG": 65.43248,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1754492640000,
+        "FIRE_STAT_DATE": 1756194960000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
+        "FETCHED_FROM_ERD": 1756240984
       }
     },
     {
@@ -66,69 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68943,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.24161869399573,
-          46.991739643825994
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68943,
-        "FIRE_NUMBER": "2025300",
-        "FIRE_NUMBER_SHORT": "300",
-        "FIRE_NAME": "Black River Bridge",
-        "DEGREES_LAT": 46.99173,
-        "DEGREES_LONG": 65.24162,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1756050120000,
-        "FIRE_STAT_DATE": 1756201260000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 2.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68307,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.43247876838464,
-          47.15278966673053
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68307,
-        "FIRE_NUMBER": "2025208",
-        "FIRE_NUMBER_SHORT": "208",
-        "FIRE_NAME": "Old Field Road",
-        "DEGREES_LAT": 47.15278,
-        "DEGREES_LONG": 65.43248,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1754492640000,
-        "FIRE_STAT_DATE": 1756194960000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1403.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
+        "FETCHED_FROM_ERD": 1756240984
       }
     },
     {
@@ -159,162 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68683,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.06299862619747,
-          46.86900962663136
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68683,
-        "FIRE_NUMBER": "2025278",
-        "FIRE_NUMBER_SHORT": "278",
-        "FIRE_NAME": "278",
-        "DEGREES_LAT": 46.869,
-        "DEGREES_LONG": 65.063,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755356580000,
-        "FIRE_STAT_DATE": 1756195260000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68947,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.02667857506903,
-          46.00410947769449
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68947,
-        "FIRE_NUMBER": "2025304",
-        "FIRE_NUMBER_SHORT": "304",
-        "FIRE_NAME": "304",
-        "DEGREES_LAT": 46.0041,
-        "DEGREES_LONG": 65.02668,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756053300000,
-        "FIRE_STAT_DATE": 1756200120000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68428,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.7507684860412,
-          46.167529512378984
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68428,
-        "FIRE_NUMBER": "2025230",
-        "FIRE_NUMBER_SHORT": "230",
-        "FIRE_NAME": "115 Pit",
-        "DEGREES_LAT": 46.167519999999996,
-        "DEGREES_LONG": 64.75077,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1754835300000,
-        "FIRE_STAT_DATE": 1756198800000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 45.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68664,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.97327897348978,
-          47.45153970498518
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68664,
-        "FIRE_NUMBER": "2025273",
-        "FIRE_NUMBER_SHORT": "273",
-        "FIRE_NAME": "273",
-        "DEGREES_LAT": 47.45153,
-        "DEGREES_LONG": 65.97328,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755281640000,
-        "FIRE_STAT_DATE": 1756195200000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 3.7,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68902,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.85462855631792,
-          46.96142964655422
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68902,
-        "FIRE_NUMBER": "2025295",
-        "FIRE_NUMBER_SHORT": "295",
-        "FIRE_NAME": "Peatmoss Piles",
-        "DEGREES_LAT": 46.96142,
-        "DEGREES_LONG": 64.85463,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755994500000,
-        "FIRE_STAT_DATE": 1756198800000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
+        "FETCHED_FROM_ERD": 1756240984
       }
     },
     {
@@ -345,7 +128,131 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68947,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.02667857506903,
+          46.00410947769449
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68947,
+        "FIRE_NUMBER": "2025304",
+        "FIRE_NUMBER_SHORT": "304",
+        "FIRE_NAME": "304",
+        "DEGREES_LAT": 46.0041,
+        "DEGREES_LONG": 65.02668,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756053300000,
+        "FIRE_STAT_DATE": 1756200120000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68902,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.85462855631792,
+          46.96142964655422
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68902,
+        "FIRE_NUMBER": "2025295",
+        "FIRE_NUMBER_SHORT": "295",
+        "FIRE_NAME": "Peatmoss Piles",
+        "DEGREES_LAT": 46.96142,
+        "DEGREES_LONG": 64.85463,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755994500000,
+        "FIRE_STAT_DATE": 1756198800000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68943,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.24161869399573,
+          46.991739643825994
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68943,
+        "FIRE_NUMBER": "2025300",
+        "FIRE_NUMBER_SHORT": "300",
+        "FIRE_NAME": "Black River Bridge",
+        "DEGREES_LAT": 46.99173,
+        "DEGREES_LONG": 65.24162,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1756050120000,
+        "FIRE_STAT_DATE": 1756201260000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 2.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68585,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.47325912622763,
+          46.99121961546927
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68585,
+        "FIRE_NUMBER": "2025256",
+        "FIRE_NUMBER_SHORT": "256",
+        "FIRE_NAME": "Beaver Lake Stream",
+        "DEGREES_LAT": 46.991209999999995,
+        "DEGREES_LONG": 66.47326,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755166920000,
+        "FIRE_STAT_DATE": 1756194540000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 30,
+        "FIRE_SIZE": 456.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
       }
     },
     {
@@ -376,7 +283,69 @@
         "PERCENT_CONTAINED": 80,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756236526
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68664,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.97327897348978,
+          47.45153970498518
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68664,
+        "FIRE_NUMBER": "2025273",
+        "FIRE_NUMBER_SHORT": "273",
+        "FIRE_NAME": "273",
+        "DEGREES_LAT": 47.45153,
+        "DEGREES_LONG": 65.97328,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755281640000,
+        "FIRE_STAT_DATE": 1756195200000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 3.7,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68683,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.06299862619747,
+          46.86900962663136
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68683,
+        "FIRE_NUMBER": "2025278",
+        "FIRE_NUMBER_SHORT": "278",
+        "FIRE_NAME": "278",
+        "DEGREES_LAT": 46.869,
+        "DEGREES_LONG": 65.063,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755356580000,
+        "FIRE_STAT_DATE": 1756195260000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756240984
       }
     }
   ]
