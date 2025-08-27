@@ -1,0 +1,40 @@
+{
+  "source": "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf",
+  "fetched_utc": 1756324647,
+  "pages": 1,
+  "tables": [],
+  "text": [
+    {
+      "page": 1,
+      "lines": [
+        "Wildland Fire Reporting System (WFRS) 2025-08-27",
+        "Activity Summary 2025-08-27 12:54 PM Page 1 of 1",
+        "Natural Resources and Energy Development",
+        "Pers = Fire Fighters; Eng = Engines; Tend = Tenders; Trac = Tractors; Air = Air Tankers; Heli = Helicopters; Ovr = Overhead",
+        "Status # Fire Name Updated Latitude Longitude Size Pers Eng Tend Trac Air Heli Ovr",
+        "East Region",
+        "Out of Control 256 Beaver Lake Stream Aug-27 46.99121 66.47326 456.0 60 0 2 10 0 0 6",
+        "Out of Control 281 Rocky Brook Aug-27 47.70233 66.28783 204.0 19 0 3 3 0 0 5",
+        "Contained 208 Old Field Road Aug-27 47.15278 65.43248 1,403.0 24 0 0 9 0 0 5",
+        "Contained 250 Chief's Aug-27 47.29720 66.11490 218.0 15 0 0 5 0 0 5",
+        "Contained 300 Black River Bridge Aug-27 46.99173 65.24162 2.0 7 1 0 0 0 0 1",
+        "Being Patrolled 269 Moose Brook 2 Aug-27 47.35838 65.30058 8.8 0 0 0 0 0 0 0",
+        "Being Patrolled 273 273 Aug-27 47.45153 65.97328 3.7 0 0 0 0 0 0 0",
+        "Being Patrolled 276 276 Aug-27 47.35488 66.62692 0.8 4 0 0 0 0 0 1",
+        "Being Patrolled 295 Peatmoss Piles Aug-27 46.96142 64.85463 1.0 8 0 0 0 0 0 1",
+        "Out 230 115 Pit Aug-27 46.16752 64.75077 45.0 0 0 0 0 0 0 0",
+        "Out 278 278 Aug-27 46.86900 65.06300 1.2 0 0 0 0 0 0 0",
+        "Out 299 Cemetery Aug-26 46.58460 66.01335 0.1 0 0 0 0 0 0 0",
+        "Total for East Region 2,343.6 137 1 5 27 0 0 24",
+        "West Region",
+        "Being Patrolled 304 304 Aug-27 46.00410 65.02668 0.2 0 0 0 0 0 0 1",
+        "Out 272 Newtown Aug-27 45.83105 65.44742 1.5 0 0 0 0 0 0 0",
+        "Out 286 286 Aug-27 46.07315 65.20527 0.1 0 0 0 0 0 0 0",
+        "Out 302 302 Aug-26 45.85778 66.11850 0.1 0 0 0 0 0 0 0",
+        "Out 306 306 Aug-26 46.06080 67.08703 0.1 0 0 0 0 0 0 0",
+        "Total for West Region 2.0 0 0 0 0 0 0 1",
+        "Total for Province 2,345.6 137 1 5 27 0 0 25"
+      ]
+    }
+  ]
+}
