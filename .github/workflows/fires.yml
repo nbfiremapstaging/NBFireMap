@@ -17,7 +17,6 @@ jobs:
       ACTIVE_FIRES_FILE: "active_fires.geojson"
       OUT_FIRES_FILE: "out_fires.geojson"
       SUMS_TABLE_FILE: "sums_table.json"
-      GNB_SUM_FILE: "GNBfireActSum.json"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -142,6 +141,21 @@ jobs:
                   raise RuntimeError("GeoJSON did not contain a FeatureCollection")
               return data
 
+          def fetch_attributes(url):
+              """Get full attributes via f=json (no geometry) so nothing is dropped."""
+              params = {
+                  "where": "1=1",
+                  "outFields": "*",
+                  "returnGeometry": "false",
+                  "f": "json",
+              }
+              r = arcgis_get(url, params)
+              data = r.json()
+              if isinstance(data, dict) and data.get("error"):
+                  raise RuntimeError(f"ArcGIS error (json attrs): {data['error']}")
+              feats = data.get("features", [])
+              return data, { (f.get("attributes") or {}).get: None }  # placeholder (replaced below)
+
           def attributes_index_by_oid(attrs_json, oid_field):
               index = {}
               for f in attrs_json.get("features", []):
@@ -251,3 +265,62 @@ jobs:
                       count, sig = table_to_signature(data)
                       sigs.append((count, sig))
                       log(f"{kind}: copy {i+1}/{copies} -> rows={count} sig={sig[:12]}")
+                      time.sleep(1)
+
+                  ok = all(sigs[0] == s for s in sigs[1:])
+                  if not ok:
+                      log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
+                      continue
+
+                  ts = int(time.time())
+                  final = add_timestamp_to_table(payloads[0], ts)
+                  with open(outfile, "w", encoding="utf-8") as f:
+                      json.dump(final, f, ensure_ascii=False, indent=2)
+                  log(f"{kind}: wrote {outfile} (rows={sigs[0][0]})")
+                  return True
+
+              log(f"{kind}: FAILED after {max_attempts} attempts")
+              return False
+
+          # ---------- Run all three ----------
+          success_all = True
+          success_all &= attempt_fetch_geojson_with_full_attrs(
+              kind="active_fires (layer 0)",
+              url=os.environ["ACTIVE_FIRES_URL"],
+              outfile=os.environ["ACTIVE_FIRES_FILE"]
+          )
+          success_all &= attempt_fetch_geojson_with_full_attrs(
+              kind="out_fires (layer 1)",
+              url=os.environ["OUT_FIRES_URL"],
+              outfile=os.environ["OUT_FIRES_FILE"]
+          )
+          success_all &= attempt_fetch_table_json(
+              kind="sums_table (layer 2)",
+              url=os.environ["SUMS_TABLE_URL"],
+              outfile=os.environ["SUMS_TABLE_FILE"]
+          )
+
+          if not success_all:
+              log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
+          else:
+              log("All datasets fetched and validated successfully.")
+
+          PYCODE
+
+      - name: Commit and push (if changed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain
+          CHANGED="$(git status --porcelain)"
+          if [ -n "$CHANGED" ]; then
+            echo "Changes detected; committing…"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" || true
+            git commit -m "Update ERD fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+            echo "Pushed updates."
+          else
+            echo "No changes to commit."
+          fi
