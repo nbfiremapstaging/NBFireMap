@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          python -u - << 'PYCODE'
+          python -u - <<'PYCODE'
           import os, time, json, hashlib
           import requests
 
@@ -86,7 +86,6 @@ jobs:
               return [f["name"] for f in meta.get("fields", []) if "name" in f]
 
           # ---------- Signatures for stability ----------
-          import hashlib
           def features_to_signature(feature_collection):
               feats = feature_collection.get("features", [])
               def feature_key(f):
@@ -270,7 +269,6 @@ jobs:
               log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
           else:
               log("All datasets fetched and validated successfully.")
-
           PYCODE
 
       - name: Fetch & parse Activity Summary PDF → GNBfireActSum.json
@@ -279,96 +277,90 @@ jobs:
           set -euo pipefail
           echo "Downloading and parsing ${GNB_PDF_URL} → ${GNB_SUM_FILE}"
           python - <<'PYCODE'
-import os, io, time, json, re
-import requests
-import pdfplumber
+          import os, io, time, json, re
+          import requests
+          import pdfplumber
 
-pdf_url = os.environ["GNB_PDF_URL"]
-out_json = os.environ["GNB_SUM_FILE"]
-ts = int(time.time())
+          pdf_url = os.environ["GNB_PDF_URL"]
+          out_json = os.environ["GNB_SUM_FILE"]
+          ts = int(time.time())
 
-def clean(s):
-    if s is None: return ""
-    return re.sub(r"\s+", " ", str(s)).strip()
+          def clean(s):
+              if s is None: return ""
+              return re.sub(r"\s+", " ", str(s)).strip()
 
-result = {
-    "source": pdf_url,
-    "fetched_utc": ts,
-    "pages": 0,
-    "tables": [],
-    # only include `text` if no tables are extracted to keep file small
-}
+          result = {
+              "source": pdf_url,
+              "fetched_utc": ts,
+              "pages": 0,
+              "tables": [],
+          }
 
-try:
-    r = requests.get(pdf_url, timeout=90)
-    r.raise_for_status()
-    data = io.BytesIO(r.content)
+          try:
+              r = requests.get(pdf_url, timeout=90)
+              r.raise_for_status()
+              data = io.BytesIO(r.content)
 
-    with pdfplumber.open(data) as pdf:
-        result["pages"] = len(pdf.pages)
-        for pnum, page in enumerate(pdf.pages, start=1):
-            # Heuristic table extraction settings
-            tables = page.extract_tables(
-                table_settings={
-                    "vertical_strategy": "lines",
-                    "horizontal_strategy": "lines",
-                    "intersection_y_tolerance": 2,
-                    "intersection_x_tolerance": 2,
-                    "snap_tolerance": 3,
-                    "min_words_vertical": 1,
-                    "min_words_horizontal": 1,
-                    "text_x_tolerance": 2,
-                    "text_y_tolerance": 2,
-                    "join_tolerance": 3,
-                }
-            )
-            for t in (tables or []):
-                if not t or len(t) < 2:
-                    continue
-                header = [clean(x) for x in t[0]]
-                rows = []
-                for row in t[1:]:
-                    row_clean = [clean(x) for x in row]
-                    # pad/truncate to header length
-                    if len(row_clean) < len(header):
-                        row_clean += [""] * (len(header) - len(row_clean))
-                    elif len(row_clean) > len(header):
-                        row_clean = row_clean[:len(header)]
-                    rows.append(dict(zip(header, row_clean)))
-                # discard empty tables
-                nonempty = any(any(v for v in d.values()) for d in rows)
-                if nonempty:
-                    result["tables"].append({
-                        "page": pnum,
-                        "headers": header,
-                        "rows": rows
-                    })
+              with pdfplumber.open(data) as pdf:
+                  result["pages"] = len(pdf.pages)
+                  for pnum, page in enumerate(pdf.pages, start=1):
+                      tables = page.extract_tables(
+                          table_settings={
+                              "vertical_strategy": "lines",
+                              "horizontal_strategy": "lines",
+                              "intersection_y_tolerance": 2,
+                              "intersection_x_tolerance": 2,
+                              "snap_tolerance": 3,
+                              "min_words_vertical": 1,
+                              "min_words_horizontal": 1,
+                              "text_x_tolerance": 2,
+                              "text_y_tolerance": 2,
+                              "join_tolerance": 3,
+                          }
+                      )
+                      for t in (tables or []):
+                          if not t or len(t) < 2:
+                              continue
+                          header = [clean(x) for x in t[0]]
+                          rows = []
+                          for row in t[1:]:
+                              row_clean = [clean(x) for x in row]
+                              if len(row_clean) < len(header):
+                                  row_clean += [""] * (len(header) - len(row_clean))
+                              elif len(row_clean) > len(header):
+                                  row_clean = row_clean[:len(header)]
+                              rows.append(dict(zip(header, row_clean)))
+                          nonempty = any(any(v for v in d.values()) for d in rows)
+                          if nonempty:
+                              result["tables"].append({
+                                  "page": pnum,
+                                  "headers": header,
+                                  "rows": rows
+                              })
 
-        # If nothing table-like was found, include per-page text fallback
-        if not result["tables"]:
-            text_pages = []
-            for pnum, page in enumerate(pdf.pages, start=1):
-                text = page.extract_text() or ""
-                lines = [clean(x) for x in text.splitlines() if clean(x)]
-                text_pages.append({"page": pnum, "lines": lines})
-            result["text"] = text_pages
+                  if not result["tables"]:
+                      text_pages = []
+                      for pnum, page in enumerate(pdf.pages, start=1):
+                          text = page.extract_text() or ""
+                          lines = [clean(x) for x in text.splitlines() if clean(x)]
+                          text_pages.append({"page": pnum, "lines": lines})
+                      result["text"] = text_pages
 
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+              with open(out_json, "w", encoding="utf-8") as f:
+                  json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups")
-except Exception as e:
-    # Fail-soft: write a small error payload so downstream code can handle gracefully
-    err = {
-        "source": pdf_url,
-        "fetched_utc": ts,
-        "error": str(e),
-        "tables": []
-    }
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(err, f, ensure_ascii=False, indent=2)
-    print(f"Error parsing PDF → JSON: {e}; wrote minimal {out_json}")
-PYCODE
+              print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups")
+          except Exception as e:
+              err = {
+                  "source": pdf_url,
+                  "fetched_utc": ts,
+                  "error": str(e),
+                  "tables": []
+              }
+              with open(out_json, "w", encoding="utf-8") as f:
+                  json.dump(err, f, ensure_ascii=False, indent=2)
+              print(f"Error parsing PDF → JSON: {e}; wrote minimal {out_json}")
+          PYCODE
 
       - name: Commit and push (if changed)
         shell: bash
