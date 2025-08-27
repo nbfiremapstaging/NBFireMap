@@ -1182,7 +1182,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         const y0 = Math.round(padT + innerH/2);                              // baseline
         const yUp = v => Math.round(y0 - (v/maxBar) * (innerH/2 - 4));       // bars up
         const yDn = v => Math.round(y0 + (v/maxBar) * (innerH/2 - 4));       // bars down
-        const yAct= v => Math.round(padT + innerH - (v/maxAct)*(innerH - 4));// line (0..maxAct)
+        const yAct = v => yUp(v); // line aligned to same 0 baseline as bars
         // Bars
         const bw = Math.max(2, Math.floor(xStep*0.55));
         let bars='';
@@ -1203,6 +1203,21 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
             labels += `<text x="${cx(i)}" y="${H-4}" font-size="10" text-anchor="middle" fill="#6b7280">${weekLabel(weeks[i])}</text>`;
           }
         }
+        
+        // Left-side numeric axis + faint grid lines
+        let axisLabels = '';
+        let gridLines = '';
+        const step = Math.max(1, Math.ceil(maxBar/4));
+        for (let v=0; v<=maxBar; v+=step){
+          const y = y0 - (v/maxBar) * (innerH/2 - 4);
+          axisLabels += `<text x="0" y="${y+4}" font-size="10" text-anchor="start" fill="#6b7280">${v}</text>`;
+          gridLines += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#e5e7eb" stroke-width="0.5" />`;
+        }
+        for (let v=step; v<=maxBar; v+=step){
+          const y = y0 + (v/maxBar) * (innerH/2 - 4);
+          axisLabels += `<text x="0" y="${y+4}" font-size="10" text-anchor="start" fill="#6b7280">-${v}</text>`;
+          gridLines += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#e5e7eb" stroke-width="0.5" />`;
+        }
         // Transparent hover bands with SVG-native <title> tooltips
         let hovers='';
         for(let i=0;i<weeks.length;i++){
@@ -1212,7 +1227,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
           hovers += `
             <g class="hover-zone" aria-label="${lbl}">
               <rect x="${x}" y="0" width="${xStep}" height="${H}" fill="transparent"/>
-              <title>${tip}</title>
+              <desc class="tip">${tip}</desc>
             </g>`;
         }
                 return `
@@ -1222,11 +1237,14 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
             </div>
             <svg viewBox="0 0 ${W} ${H}" role="img">
               ${caps}
+              ${gridLines}
               ${bars}
               <path class="line-active" d="${path}"/>
+              ${axisLabels}
               ${labels}
               ${hovers}
             </svg>
+            <div class="fs-tip" style="position:absolute;display:none;left:0;top:0;transform:translate(0,0);font-size:12px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-soft);border-radius:6px;padding:6px 8px;pointer-events:none;z-index:3;max-width:220px;white-space:pre-line"></div>
           </div>`;
       }
 
@@ -1379,9 +1397,44 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         fsBody.innerHTML = buildSummaryHTML();
         wireSummaryClicks();
         wirePieLegendClicks();
+        wireTrendHover();
       }
 
-      function ensureStatusEnabled(statusKey){
+      
+      function wireTrendHover(){
+        const wrap = $('.fs-mini-chart');
+        if(!wrap) return;
+        const tip = wrap.querySelector('.fs-tip');
+        if(!tip) return;
+        const zones = wrap.querySelectorAll('.hover-zone rect');
+        zones.forEach((r) => {
+          const g = r.parentElement;
+          const desc = g.querySelector('desc.tip');
+          const text = desc ? desc.textContent : '';
+          const show = (ev) => {
+            const b = wrap.getBoundingClientRect();
+            const clientX = (ev.touches && ev.touches[0] ? ev.touches[0].clientX : ev.clientX);
+            const clientY = (ev.touches && ev.touches[0] ? ev.touches[0].clientY : ev.clientY);
+            tip.style.display = 'block';
+            tip.textContent = text;
+            let x = clientX - b.left + 10;
+            let y = clientY - b.top + 10;
+            if (x + tip.offsetWidth > b.width - 8) x = b.width - tip.offsetWidth - 8;
+            if (y + tip.offsetHeight > b.height - 8) y = b.height - tip.offsetHeight - 8;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+          };
+          const hide = () => { tip.style.display = 'none'; };
+          r.addEventListener('mouseenter', show);
+          r.addEventListener('mousemove', show);
+          r.addEventListener('mouseleave', hide);
+          r.addEventListener('touchstart', show, {passive:true});
+          r.addEventListener('touchmove', show, {passive:true});
+          r.addEventListener('touchend', hide);
+          r.addEventListener('touchcancel', hide);
+        });
+      }
+    function ensureStatusEnabled(statusKey){
         const target = norm(statusKey);
         const cbs = $$('.fire-filter-block input[type="checkbox"]'); if (!cbs.length) return;
         let changed = false;
@@ -1589,6 +1642,17 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
     for(let v=0; v<=maxBar; v+=step){
       const yv = y0 - (v/maxBar) * (innerH/2 - 4*scale);
       ctx.beginPath(); ctx.moveTo(padL, yv); ctx.lineTo(W-padR, yv); ctx.stroke();
+          // X-axis week labels (every 4th + last)
+          ctx.fillStyle = '#6b7280'; ctx.font = `${10*scale}px Inter, Arial`;
+          for(let i=0;i<weeks.length;i++){
+            if(i%4===0 || i===weeks.length-1){
+              const lbl = weekLabel(weeks[i]);
+              const tx = cx(i);
+              const ty = padT + innerH + 14*scale;
+              const tw = ctx.measureText(lbl).width;
+              ctx.fillText(lbl, tx - tw/2, ty);
+            }
+          }
       ctx.fillText(String(v), 8*scale, yv+4*scale);
     }
     for(let v=step; v<=maxBar; v+=step){
