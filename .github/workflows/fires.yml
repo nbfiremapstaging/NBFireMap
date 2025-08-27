@@ -92,6 +92,7 @@ jobs:
                       for key in ("OBJECTID","ObjectID","objectid"):
                           if key in props:
                               return (0, props[key])
+                  import hashlib, json
                   return (1, hashlib.sha256(json.dumps(props, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest())
               norm = []
               for f in feats:
@@ -102,6 +103,7 @@ jobs:
                           strings.append(v)
                   strings.sort()
                   norm.append(("".join(strings), feature_key(f)))
+              import hashlib
               norm.sort(key=lambda t: t[1])
               concat = "|".join(s for s, _ in norm)
               return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
@@ -118,6 +120,7 @@ jobs:
                   strings.sort()
                   rows.append("".join(strings))
               rows.sort()
+              import hashlib
               concat = "|".join(rows)
               return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
 
@@ -140,259 +143,4 @@ jobs:
               return index
 
           def merge_geojson_with_attrs(geojson_obj, attrs_by_oid, all_fields, oid_field):
-              for f in geojson_obj.get("features", []):
-                  props = f.get("properties")
-                  if props is None or not isinstance(props, dict):
-                      props = {}
-                      f["properties"] = props
-                  oid_val = props.get(oid_field)
-                  source = attrs_by_oid.get(oid_val, {})
-                  for name in all_fields:
-                      if name not in props or props[name] is None:
-                          if name in source:
-                              props[name] = source[name]
-                          else:
-                              if name not in props:
-                                  props[name] = None
-              return geojson_obj
-
-          def add_timestamp_to_geojson(data, timestamp):
-              feats = data.get("features", [])
-              for f in feats:
-                  if "properties" not in f or not isinstance(f["properties"], dict):
-                      f["properties"] = {}
-                  f["properties"]["FETCHED_FROM_ERD"] = int(timestamp)
-              return data
-
-          def add_timestamp_to_table(data, timestamp):
-              feats = data.get("features", [])
-              for f in feats:
-                  attrs = f.get("attributes")
-                  if attrs is None or not isinstance(attrs, dict):
-                      f["attributes"] = {}
-                      attrs = f["attributes"]
-                  attrs["FETCHED_FROM_ERD"] = int(timestamp)
-              return data
-
-          def attempt_fetch_geojson_with_full_attrs(kind, url, outfile, max_attempts=5, copies=4):
-              meta = fetch_layer_meta(url)
-              oid_field = get_oid_field(meta)
-              all_fields = get_all_field_names(meta)
-              log(f"{kind}: OID field='{oid_field}', fields={len(all_fields)}")
-
-              for attempt in range(1, max_attempts + 1):
-                  log(f"=== {kind}: attempt {attempt}/{max_attempts} ===")
-                  payloads = []
-                  sigs = []
-                  for i in range(copies):
-                      base_geo = fetch_geojson(url)
-                      attrs_json_resp = arcgis_get(url, {"where":"1=1","outFields":"*","returnGeometry":"false","f":"json"}).json()
-                      attrs_by_oid = attributes_index_by_oid(attrs_json_resp, oid_field)
-                      merged = merge_geojson_with_attrs(base_geo, attrs_by_oid, all_fields, oid_field)
-                      count, sig = features_to_signature(merged)
-                      payloads.append(merged)
-                      sigs.append((count, sig))
-                      log(f"{kind}: copy {i+1}/{copies} -> features={count} sig={sig[:12]}")
-                      time.sleep(1)
-
-                  ok = all(sigs[0] == s for s in sigs[1:])
-                  if not ok:
-                      log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
-                      continue
-
-                  ts = int(time.time())
-                  final = add_timestamp_to_geojson(payloads[0], ts)
-                  with open(outfile, "w", encoding="utf-8") as f:
-                      json.dump(final, f, ensure_ascii=False, indent=2)
-                  log(f"{kind}: wrote {outfile} (features={sigs[0][0]})")
-                  return True
-
-              log(f"{kind}: FAILED after {max_attempts} attempts")
-              return False
-
-          def attempt_fetch_table_json(kind, url, outfile, max_attempts=5, copies=4):
-              for attempt in range(1, max_attempts + 1):
-                  log(f"=== {kind}: attempt {attempt}/{max_attempts} ===")
-                  payloads = []
-                  sigs = []
-                  for i in range(copies):
-                      params = {"where":"1=1","outFields":"*","returnGeometry":"false","f":"json"}
-                      r = arcgis_get(url, params)
-                      data = r.json()
-                      if isinstance(data, dict) and data.get("error"):
-                          raise RuntimeError(f"ArcGIS error for {kind}: {data['error']}")
-                      payloads.append(data)
-                      count, sig = table_to_signature(data)
-                      sigs.append((count, sig))
-                      log(f"{kind}: copy {i+1}/{copies} -> rows={count} sig={sig[:12]}")
-                      time.sleep(1)
-
-                  ok = all(sigs[0] == s for s in sigs[1:])
-                  if not ok:
-                      log(f"{kind}: copies mismatch on attempt {attempt}; retrying …")
-                      continue
-
-                  ts = int(time.time())
-                  final = add_timestamp_to_table(payloads[0], ts)
-                  with open(outfile, "w", encoding="utf-8") as f:
-                      json.dump(final, f, ensure_ascii=False, indent=2)
-                  log(f"{kind}: wrote {outfile} (rows={sigs[0][0]})")
-                  return True
-
-              log(f"{kind}: FAILED after {max_attempts} attempts")
-              return False
-
-          success_all = True
-          success_all &= attempt_fetch_geojson_with_full_attrs(
-              kind="active_fires (layer 0)",
-              url=os.environ["ACTIVE_FIRES_URL"],
-              outfile=os.environ["ACTIVE_FIRES_FILE"]
-          )
-          success_all &= attempt_fetch_geojson_with_full_attrs(
-              kind="out_fires (layer 1)",
-              url=os.environ["OUT_FIRES_URL"],
-              outfile=os.environ["OUT_FIRES_FILE"]
-          )
-          success_all &= attempt_fetch_table_json(
-              kind="sums_table (layer 2)",
-              url=os.environ["SUMS_TABLE_URL"],
-              outfile=os.environ["SUMS_TABLE_FILE"]
-          )
-
-          if not success_all:
-              log("One or more datasets failed to stabilize across copies; not failing the job, but commit will include only successful files (if any).")
-          else:
-              log("All datasets fetched and validated successfully.")
-          PYCODE
-
-      - name: Fetch & parse Activity Summary PDF → GNBfireActSum.json (rows as objects)
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Downloading and parsing ${GNB_PDF_URL} → ${GNB_SUM_FILE}"
-          python - <<'PYCODE'
-          import os, io, time, json, re
-          import requests
-          import pdfplumber
-
-          pdf_url = os.environ["GNB_PDF_URL"]
-          out_json = os.environ["GNB_SUM_FILE"]
-          ts = int(time.time())
-
-          def clean(s):
-              if s is None: return ""
-              return re.sub(r"\s+", " ", str(s)).strip()
-
-          def clean_header(h):
-              # keep readable keys; remove extra punctuation/whitespace
-              h = clean(h)
-              # don't force to snake_case unless you want it; leaving readable
-              return h
-
-          result = {
-              "source": pdf_url,
-              "fetched_utc": ts,
-              "pages": 0,
-              "tables": []   # each: { page, headers, rows: [ {col:val,...}, ... ] }
-          }
-
-          try:
-              r = requests.get(pdf_url, timeout=90)
-              r.raise_for_status()
-              data = io.BytesIO(r.content)
-
-              with pdfplumber.open(data) as pdf:
-                  result["pages"] = len(pdf.pages)
-                  for pnum, page in enumerate(pdf.pages, start=1):
-                      tables = page.extract_tables(
-                          table_settings={
-                              "vertical_strategy": "lines",
-                              "horizontal_strategy": "lines",
-                              "intersection_y_tolerance": 2,
-                              "intersection_x_tolerance": 2,
-                              "snap_tolerance": 3,
-                              "min_words_vertical": 1,
-                              "min_words_horizontal": 1,
-                              "text_x_tolerance": 2,
-                              "text_y_tolerance": 2,
-                              "join_tolerance": 3,
-                          }
-                      ) or []
-
-                      for t in tables:
-                          if not t or len(t) < 2:
-                              continue
-
-                          # Header row
-                          raw_header = [clean_header(x) for x in t[0]]
-                          # Drop completely empty header cells and remember their indexes
-                          keep_idx = [i for i, h in enumerate(raw_header) if h]
-                          header = [raw_header[i] for i in keep_idx]
-                          if not header:
-                              continue
-
-                          rows_obj = []
-                          for row in t[1:]:
-                              row = row or []
-                              row_clean = [clean(x) for x in row]
-                              # align to kept columns
-                              row_keep = []
-                              for i in keep_idx:
-                                  row_keep.append(row_clean[i] if i < len(row_clean) else "")
-                              # pad/truncate to header length
-                              if len(row_keep) < len(header):
-                                  row_keep += [""] * (len(header) - len(row_keep))
-                              elif len(row_keep) > len(header):
-                                  row_keep = row_keep[:len(header)]
-                              rows_obj.append(dict(zip(header, row_keep)))
-
-                          # discard empty tables
-                          if any(any(v for v in r.values()) for r in rows_obj):
-                              result["tables"].append({
-                                  "page": pnum,
-                                  "headers": header,
-                                  "rows": rows_obj
-                              })
-
-                  # If nothing table-like found, fall back to text (still structured by page)
-                  if not result["tables"]:
-                      text_pages = []
-                      for pnum, page in enumerate(pdf.pages, start=1):
-                          text = page.extract_text() or ""
-                          lines = [clean(x) for x in text.splitlines() if clean(x)]
-                          text_pages.append({"page": pnum, "lines": lines})
-                      result["text"] = text_pages
-
-              with open(out_json, "w", encoding="utf-8") as f:
-                  json.dump(result, f, ensure_ascii=False, indent=2)
-
-              print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups (rows as objects).")
-          except Exception as e:
-              err = {
-                  "source": pdf_url,
-                  "fetched_utc": ts,
-                  "error": str(e),
-                  "tables": []
-              }
-              with open(out_json, "w", encoding="utf-8") as f:
-                  json.dump(err, f, ensure_ascii=False, indent=2)
-              print(f"Error parsing PDF → JSON: {e}; wrote minimal {out_json}")
-          PYCODE
-
-      - name: Commit and push (if changed)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git status --porcelain
-          CHANGED="$(git status --porcelain)"
-          if [ -n "$CHANGED" ]; then
-            echo "Changes detected; committing…"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" "${GNB_SUM_FILE}" || true
-            git commit -m "Update ERD fire datasets (incl. Activity Summary PDF → JSON as row objects)" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            git push
-            echo "Pushed updates."
-          else
-            echo "No changes to commit."
-          fi
+              for f in geojson_obj.get("feature_
