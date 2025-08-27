@@ -1,4 +1,4 @@
-name: Fetch ERD Fire Datasets
+name: ERD Fire Data
 
 on:
   schedule:
@@ -17,6 +17,9 @@ jobs:
       ACTIVE_FIRES_FILE: "active_fires.geojson"
       OUT_FIRES_FILE: "out_fires.geojson"
       SUMS_TABLE_FILE: "sums_table.json"
+      # New: PDF → JSON
+      GNB_PDF_URL: "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf"
+      GNB_SUM_FILE: "GNBfireActSum.json"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install requests pdfplumber
 
       - name: Fetch ERD layers, validate, and write files
         shell: bash
@@ -61,7 +64,6 @@ jobs:
 
           # ---------- Schema helpers ----------
           def fetch_layer_meta(url):
-              """Fetch layer metadata (fields, objectIdField, etc.)."""
               meta_url = url.rsplit("/query", 1)[0]
               r = arcgis_get(meta_url, {"f": "json"})
               meta = r.json()
@@ -70,7 +72,6 @@ jobs:
               return meta
 
           def get_oid_field(meta):
-              # Prefer 'objectIdField', else find the field with type esriFieldTypeOID, else common fallbacks
               if isinstance(meta.get("objectIdField"), str):
                   return meta["objectIdField"]
               for f in meta.get("fields", []):
@@ -79,13 +80,13 @@ jobs:
               for cand in ("OBJECTID","ObjectID","objectid"):
                   if any(cand == f.get("name") for f in meta.get("fields", [])):
                       return cand
-              # last resort
               return "OBJECTID"
 
           def get_all_field_names(meta):
               return [f["name"] for f in meta.get("fields", []) if "name" in f]
 
           # ---------- Signatures for stability ----------
+          import hashlib
           def features_to_signature(feature_collection):
               feats = feature_collection.get("features", [])
               def feature_key(f):
@@ -125,14 +126,7 @@ jobs:
 
           # ---------- Fetchers ----------
           def fetch_geojson(url):
-              """Get ArcGIS's own GeoJSON (keeps geometry shape identical to before)."""
-              params = {
-                  "where": "1=1",
-                  "outFields": "*",
-                  "outSR": "4326",
-                  "returnGeometry": "true",
-                  "f": "geojson",
-              }
+              params = {"where":"1=1","outFields":"*","outSR":"4326","returnGeometry":"true","f":"geojson"}
               r = arcgis_get(url, params)
               data = r.json()
               if isinstance(data, dict) and data.get("error"):
@@ -140,21 +134,6 @@ jobs:
               if data.get("type") != "FeatureCollection":
                   raise RuntimeError("GeoJSON did not contain a FeatureCollection")
               return data
-
-          def fetch_attributes(url):
-              """Get full attributes via f=json (no geometry) so nothing is dropped."""
-              params = {
-                  "where": "1=1",
-                  "outFields": "*",
-                  "returnGeometry": "false",
-                  "f": "json",
-              }
-              r = arcgis_get(url, params)
-              data = r.json()
-              if isinstance(data, dict) and data.get("error"):
-                  raise RuntimeError(f"ArcGIS error (json attrs): {data['error']}")
-              feats = data.get("features", [])
-              return data, { (f.get("attributes") or {}).get: None }  # placeholder (replaced below)
 
           def attributes_index_by_oid(attrs_json, oid_field):
               index = {}
@@ -173,13 +152,11 @@ jobs:
                       f["properties"] = props
                   oid_val = props.get(oid_field)
                   source = attrs_by_oid.get(oid_val, {})
-                  # Ensure all fields exist; fill if missing or None
                   for name in all_fields:
                       if name not in props or props[name] is None:
                           if name in source:
                               props[name] = source[name]
                           else:
-                              # still ensure the key exists for consistency
                               if name not in props:
                                   props[name] = None
               return geojson_obj
@@ -214,15 +191,9 @@ jobs:
                   payloads = []
                   sigs = []
                   for i in range(copies):
-                      base_geo = fetch_geojson(url)                     # geometry + some attrs
-                      attrs_json_resp = arcgis_get(url, {
-                          "where": "1=1",
-                          "outFields": "*",
-                          "returnGeometry": "false",
-                          "f": "json",
-                      }).json()                                         # full attrs only
+                      base_geo = fetch_geojson(url)
+                      attrs_json_resp = arcgis_get(url, {"where":"1=1","outFields":"*","returnGeometry":"false","f":"json"}).json()
                       attrs_by_oid = attributes_index_by_oid(attrs_json_resp, oid_field)
-
                       merged = merge_geojson_with_attrs(base_geo, attrs_by_oid, all_fields, oid_field)
                       count, sig = features_to_signature(merged)
                       payloads.append(merged)
@@ -251,12 +222,7 @@ jobs:
                   payloads = []
                   sigs = []
                   for i in range(copies):
-                      params = {
-                          "where": "1=1",
-                          "outFields": "*",
-                          "returnGeometry": "false",
-                          "f": "json"
-                      }
+                      params = {"where":"1=1","outFields":"*","returnGeometry":"false","f":"json"}
                       r = arcgis_get(url, params)
                       data = r.json()
                       if isinstance(data, dict) and data.get("error"):
@@ -307,6 +273,103 @@ jobs:
 
           PYCODE
 
+      - name: Fetch & parse Activity Summary PDF → GNBfireActSum.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Downloading and parsing ${GNB_PDF_URL} → ${GNB_SUM_FILE}"
+          python - <<'PYCODE'
+import os, io, time, json, re
+import requests
+import pdfplumber
+
+pdf_url = os.environ["GNB_PDF_URL"]
+out_json = os.environ["GNB_SUM_FILE"]
+ts = int(time.time())
+
+def clean(s):
+    if s is None: return ""
+    return re.sub(r"\s+", " ", str(s)).strip()
+
+result = {
+    "source": pdf_url,
+    "fetched_utc": ts,
+    "pages": 0,
+    "tables": [],
+    # only include `text` if no tables are extracted to keep file small
+}
+
+try:
+    r = requests.get(pdf_url, timeout=90)
+    r.raise_for_status()
+    data = io.BytesIO(r.content)
+
+    with pdfplumber.open(data) as pdf:
+        result["pages"] = len(pdf.pages)
+        for pnum, page in enumerate(pdf.pages, start=1):
+            # Heuristic table extraction settings
+            tables = page.extract_tables(
+                table_settings={
+                    "vertical_strategy": "lines",
+                    "horizontal_strategy": "lines",
+                    "intersection_y_tolerance": 2,
+                    "intersection_x_tolerance": 2,
+                    "snap_tolerance": 3,
+                    "min_words_vertical": 1,
+                    "min_words_horizontal": 1,
+                    "text_x_tolerance": 2,
+                    "text_y_tolerance": 2,
+                    "join_tolerance": 3,
+                }
+            )
+            for t in (tables or []):
+                if not t or len(t) < 2:
+                    continue
+                header = [clean(x) for x in t[0]]
+                rows = []
+                for row in t[1:]:
+                    row_clean = [clean(x) for x in row]
+                    # pad/truncate to header length
+                    if len(row_clean) < len(header):
+                        row_clean += [""] * (len(header) - len(row_clean))
+                    elif len(row_clean) > len(header):
+                        row_clean = row_clean[:len(header)]
+                    rows.append(dict(zip(header, row_clean)))
+                # discard empty tables
+                nonempty = any(any(v for v in d.values()) for d in rows)
+                if nonempty:
+                    result["tables"].append({
+                        "page": pnum,
+                        "headers": header,
+                        "rows": rows
+                    })
+
+        # If nothing table-like was found, include per-page text fallback
+        if not result["tables"]:
+            text_pages = []
+            for pnum, page in enumerate(pdf.pages, start=1):
+                text = page.extract_text() or ""
+                lines = [clean(x) for x in text.splitlines() if clean(x)]
+                text_pages.append({"page": pnum, "lines": lines})
+            result["text"] = text_pages
+
+    with open(out_json, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+
+    print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups")
+except Exception as e:
+    # Fail-soft: write a small error payload so downstream code can handle gracefully
+    err = {
+        "source": pdf_url,
+        "fetched_utc": ts,
+        "error": str(e),
+        "tables": []
+    }
+    with open(out_json, "w", encoding="utf-8") as f:
+        json.dump(err, f, ensure_ascii=False, indent=2)
+    print(f"Error parsing PDF → JSON: {e}; wrote minimal {out_json}")
+PYCODE
+
       - name: Commit and push (if changed)
         shell: bash
         run: |
@@ -317,8 +380,8 @@ jobs:
             echo "Changes detected; committing…"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" || true
-            git commit -m "Update ERD fire datasets" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" "${GNB_SUM_FILE}" || true
+            git commit -m "Update ERD fire datasets (incl. Activity Summary PDF → JSON)" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             git push
             echo "Pushed updates."
           else
