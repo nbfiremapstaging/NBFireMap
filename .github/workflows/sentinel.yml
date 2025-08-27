@@ -1,4 +1,4 @@
-name: Sentinel-2 weekly COGs (NB, Canada)
+name: Sentinel-2 weekly COGs (Saint John 10km)
 
 on:
   schedule:
@@ -6,32 +6,23 @@ on:
     - cron: "0 6 * * MON"
   workflow_dispatch: {}
 
-# allow pushing back to the repo
 permissions:
   contents: write
 
 env:
-  # ---- CONFIG YOU CAN TWEAK ----
-  AOI_NAME: "NewBrunswick_CA"
-  # Approximate bbox for New Brunswick, Canada (minx, miny, maxx, maxy) in EPSG:4326
-  NB_BBOX: "-69.1,44.55,-63.7,48.1"
-  # Backfill start date (ISO 8601). First run will process weeks from here to last complete week.
+  AOI_NAME: "SaintJohn10km_CA"
+  # 10x10 km square around Saint John, NB
+  NB_BBOX: "-66.124,45.225,-65.996,45.315"
   START_DATE: "2025-03-01"
-  # STAC endpoint (Element84 Earth Search)
   STAC_URL: "https://earth-search.aws.element84.com/v1"
-  # Max cloud cover (%) per scene; we still use data_mask for cloud rejection
   MAX_SCENE_CLOUD: "70"
-  # Target projection for output COGs (use a web-friendly CRS)
   TARGET_EPSG: "3857"
-  # Output root
   OUT_DIR: "cogs"
-  # Bands for visible composite
-  VISIBLE_BANDS: "B04,B03,B02" # R,G,B
+  VISIBLE_BANDS: "B04,B03,B02"
 
 jobs:
   build-cogs:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,7 +37,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Lightweight scientific stack + geospatial
           pip install \
             numpy==1.26.* \
             pandas==2.2.* \
@@ -60,272 +50,194 @@ jobs:
             pyproj==3.*
 
       - name: Create processor script
-        shell: bash
         run: |
           mkdir -p scripts "${OUT_DIR}"
           cat > scripts/process_weeks.py << 'PYCODE'
-          import os, sys, json, math, datetime as dt
+          import os, sys, datetime as dt
           from pathlib import Path
-
           import numpy as np
-          import xarray as xr
-          import rioxarray  # noqa: F401
           import rasterio as rio
-          from rasterio.transform import from_bounds
-          from rasterio.enums import Resampling
           from rasterio.io import MemoryFile
           from rio_cogeo.cogeo import cog_translate
           from rio_cogeo.profiles import cog_profiles
-
           from pystac_client import Client
           import stackstac
+          import xarray as xr
+          import rioxarray  # noqa: F401
 
-          # --- Config from env ---
           STAC_URL = os.environ["STAC_URL"]
-          VISIBLE_BANDS = os.environ["VISIBLE_BANDS"].split(",")  # ["B04","B03","B02"]
+          VISIBLE_BANDS = os.environ["VISIBLE_BANDS"].split(",")
           MAX_SCENE_CLOUD = float(os.environ.get("MAX_SCENE_CLOUD", "70"))
-          OUT_DIR = Path(os.environ.get("OUT_DIR", "cogs"))
-          AOI_NAME = os.environ.get("AOI_NAME", "AOI")
-          TARGET_EPSG = int(os.environ.get("TARGET_EPSG", "3857"))
-          NB_BBOX = [float(v) for v in os.environ["NB_BBOX"].split(",")]  # lon/lat bbox in EPSG:4326
+          OUT_DIR = Path(os.environ["OUT_DIR"])
+          AOI_NAME = os.environ["AOI_NAME"]
+          TARGET_EPSG = int(os.environ["TARGET_EPSG"])
+          NB_BBOX = [float(v) for v in os.environ["NB_BBOX"].split(",")]
           START_DATE = dt.date.fromisoformat(os.environ["START_DATE"])
 
-          # --- Utility: get ISO week label ---
           def iso_week_label(d: dt.date):
-            iso = d.isocalendar()  # (year, week, weekday)
-            return f"{iso.year}-W{iso.week:02d}"
+              iso = d.isocalendar()
+              return f"{iso.year}-W{iso.week:02d}"
 
-          # --- Determine weeks to run: from START_DATE to last complete (Mon..Sun) week ---
-          today_utc = dt.datetime.utcnow().date()
-          # "Last complete week" ends on Sunday before today
-          last_sunday = today_utc - dt.timedelta(days=(today_utc.weekday() + 1) % 7)
-          # Start from the Monday of START_DATE's week
-          start_monday = START_DATE - dt.timedelta(days=(START_DATE.weekday()))
+          today = dt.datetime.utcnow().date()
+          last_sunday = today - dt.timedelta(days=(today.weekday() + 1) % 7)
+          start_monday = START_DATE - dt.timedelta(days=START_DATE.weekday())
           weeks = []
           cur = start_monday
           while cur <= last_sunday - dt.timedelta(days=6):
-            wk_start = cur
-            wk_end = cur + dt.timedelta(days=6)
-            weeks.append((wk_start, wk_end))
-            cur += dt.timedelta(days=7)
+              weeks.append((cur, cur + dt.timedelta(days=6)))
+              cur += dt.timedelta(days=7)
 
           if not weeks:
-            print("No complete weeks to process.")
-            sys.exit(0)
+              print("No complete weeks to process")
+              sys.exit(0)
 
-          # Ensure output root exists
           OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-          # Connect STAC
           client = Client.open(STAC_URL)
-
-          # AOI bbox in EPSG:4326
-          bbox_4326 = NB_BBOX  # [minx, miny, maxx, maxy]
-
-          # COG profile
           cog_profile = cog_profiles.get("deflate")
           cog_profile.update(dict(BLOCKSIZE=512, BIGTIFF="IF_SAFER"))
 
-          # --- Core processing per week ---
-          def build_weekly_visible_cog(wk_start: dt.date, wk_end: dt.date, out_path: Path):
-            # Search Sentinel-2 L2A
-            search = client.search(
-                collections=["sentinel-2-l2a"],
-                bbox=bbox_4326,
-                datetime=f"{wk_start.isoformat()}T00:00:00Z/{(wk_end + dt.timedelta(days=1)).isoformat()}T00:00:00Z",
-                query={"eo:cloud_cover": {"lt": MAX_SCENE_CLOUD}},
-            )
-            items = list(search.get_items())
-            if len(items) == 0:
-                return None  # nothing to do
+          def build_weekly_visible_cog(wk_start, wk_end, out_path):
+              search = client.search(
+                  collections=["sentinel-2-l2a"],
+                  bbox=NB_BBOX,
+                  datetime=f"{wk_start}T00:00:00Z/{wk_end+dt.timedelta(days=1)}T00:00:00Z",
+                  query={"eo:cloud_cover": {"lt": MAX_SCENE_CLOUD}},
+              )
+              items = list(search.items())
+              if not items:
+                  return None
 
-            # Stack requested bands and the data_mask for cloud masking
-            # stackstac reads scale/offset from STAC metadata (reflectance 0..1)
-            arr = stackstac.stack(
-                items,
-                assets=VISIBLE_BANDS + ["data_mask"],
-                chunksize=2048,
-                dtype="float32",
-                resolution=None,  # native
-                fill_value=np.nan,
-            )
+              arr = stackstac.stack(
+                  items,
+                  assets=VISIBLE_BANDS + ["data_mask"],
+                  epsg=TARGET_EPSG,
+                  resolution=10,
+                  bounds=NB_BBOX,
+                  bounds_latlon=True,
+                  fill_value=np.nan,
+                  dtype="float32",
+                  chunksize=1024,
+              )
 
-            # Rename bands and split out data_mask
-            # dims: (time, band, y, x)
-            band_index = {b: i for i, b in enumerate(arr["band"].values)}
-            dm = arr.isel(band=band_index["data_mask"])
-            rgb = arr.isel(band=[band_index[b] for b in VISIBLE_BANDS])
+              band_index = {b: i for i, b in enumerate(arr["band"].values)}
+              dm = arr.isel(band=band_index["data_mask"])
+              rgb = arr.isel(band=[band_index[b] for b in VISIBLE_BANDS])
 
-            # Cloud mask: keep pixels where data_mask==1 across scenes; mask others
-            rgb = rgb.where(dm > 0.5)
+              rgb = rgb.where(dm > 0.5)
+              comp = rgb.median(dim="time", skipna=True).transpose("band", "y", "x")
 
-            # Temporal reduce: median to suppress residual clouds
-            comp = rgb.median(dim="time", skipna=True)
+              scaled = (np.clip(comp.values, 0.0, 1.0) * 10000).astype("uint16")
+              height, width = scaled.shape[-2], scaled.shape[-1]
+              transform = comp.rio.transform()
+              crs = comp.rio.crs
 
-            # Reorder to (band, y, x)
-            comp = comp.transpose("band", "y", "x")
+              with MemoryFile() as mem:
+                  with mem.open(
+                      driver="GTiff",
+                      height=height,
+                      width=width,
+                      count=3,
+                      dtype="uint16",
+                      crs=crs,
+                      transform=transform,
+                      nodata=0,
+                  ) as dst:
+                      for i in range(3):
+                          dst.write(scaled[i, :, :], i + 1)
+                      dst.set_band_description(1, "red")
+                      dst.set_band_description(2, "green")
+                      dst.set_band_description(3, "blue")
 
-            # Project to target CRS with ~10 m pixel size (in meters for EPSG:3857)
-            # Heuristic: 10 m Sentinel-2
-            comp = comp.rio.write_crs(arr.rio.crs or "EPSG:4326")
-            comp3857 = comp.rio.reproject(
-                f"EPSG:{TARGET_EPSG}",
-                resolution=10,
-                resampling=rio.enums.Resampling.bilinear,
-            )
+                  mem.seek(0)
+                  cog_translate(mem, out_path, cog_profile, in_memory=False, quiet=True)
+              return out_path
 
-            # Scale to 0..10000 uint16 for compact COG (preserve dynamic range), clamp
-            scaled = (np.clip(comp3857.values, 0.0, 1.0) * 10000.0).astype("uint16")
-            # Build metadata for rasterio
-            height, width = scaled.shape[-2], scaled.shape[-1]
-            transform = comp3857.rio.transform()
-            with MemoryFile() as mem:
-                with mem.open(
-                    driver="GTiff",
-                    height=height,
-                    width=width,
-                    count=3,
-                    dtype="uint16",
-                    crs=comp3857.rio.crs,
-                    transform=transform,
-                    nodata=0,
-                ) as dst:
-                    for i in range(3):
-                        dst.write(scaled[i, :, :], i + 1)
-                    dst.set_band_description(1, "red")
-                    dst.set_band_description(2, "green")
-                    dst.set_band_description(3, "blue")
+          def build_change_cog(curr_path, prev_path, out_path):
+              if not prev_path.exists():
+                  return None
+              with rio.open(curr_path) as cur, rio.open(prev_path) as prv:
+                  if (prv.crs != cur.crs) or (prv.transform != cur.transform):
+                      data_prev = np.zeros((3, cur.height, cur.width), dtype=np.float32)
+                      for i in range(1, 4):
+                          rio.warp.reproject(
+                              source=rio.band(prv, i),
+                              destination=data_prev[i-1],
+                              src_transform=prv.transform,
+                              src_crs=prv.crs,
+                              dst_transform=cur.transform,
+                              dst_crs=cur.crs,
+                              resampling=rio.enums.Resampling.bilinear,
+                          )
+                  else:
+                      data_prev = prv.read(out_dtype=np.float32)
 
-                # Translate to COG on disk
-                mem.seek(0)
-                cog_translate(
-                    mem,
-                    out_path,
-                    cog_profile,
-                    in_memory=False,
-                    quiet=True,
-                    web_optimized=False,
-                )
+                  data_cur = cur.read(out_dtype=np.float32)
+                  cur_ref = np.clip(data_cur / 10000, 0, 1)
+                  prv_ref = np.clip(data_prev / 10000, 0, 1)
+                  diff = np.sqrt(((cur_ref - prv_ref)**2).sum(axis=0)).astype("float32")
+                  diff_u16 = np.clip((diff / np.sqrt(3)) * 10000, 0, 10000).astype("uint16")
 
-            return out_path
+                  with MemoryFile() as mem:
+                      with mem.open(
+                          driver="GTiff",
+                          height=cur.height,
+                          width=cur.width,
+                          count=1,
+                          dtype="uint16",
+                          crs=cur.crs,
+                          transform=cur.transform,
+                          nodata=0,
+                      ) as dst:
+                          dst.write(diff_u16, 1)
+                          dst.set_band_description(1, "rgb_change_magnitude")
 
-          def build_change_cog(curr_path: Path, prev_path: Path, out_path: Path):
-            if not prev_path.exists():
-                return None
-            with rio.open(curr_path) as cur, rio.open(prev_path) as prv:
-                # Reproject previous to current grid if needed
-                if (prv.crs != cur.crs) or (prv.transform != cur.transform) or (prv.width != cur.width) or (prv.height != cur.height):
-                    data_prev = np.zeros((3, cur.height, cur.width), dtype=np.float32)
-                    for i in range(1, 4):
-                        rio.warp.reproject(
-                            source=rio.band(prv, i),
-                            destination=data_prev[i-1],
-                            src_transform=prv.transform,
-                            src_crs=prv.crs,
-                            dst_transform=cur.transform,
-                            dst_crs=cur.crs,
-                            resampling=Resampling.bilinear,
-                        )
-                else:
-                    data_prev = prv.read(out_dtype=np.float32)
+                      mem.seek(0)
+                      cog_translate(mem, out_path, cog_profile, in_memory=False, quiet=True)
+              return out_path
 
-                data_cur = cur.read(out_dtype=np.float32)
-
-                # Convert back to 0..1 reflectance
-                cur_ref = np.clip(data_cur / 10000.0, 0.0, 1.0)
-                prv_ref = np.clip(data_prev / 10000.0, 0.0, 1.0)
-
-                # Simple per-pixel Euclidean RGB difference (0..sqrt(3))
-                diff = np.sqrt(((cur_ref - prv_ref) ** 2).sum(axis=0)).astype("float32")
-
-                # Scale to uint16 0..10000 for COG
-                diff_uint16 = np.clip((diff / np.sqrt(3)) * 10000.0, 0, 10000).astype("uint16")
-
-                with MemoryFile() as mem:
-                    with mem.open(
-                        driver="GTiff",
-                        height=cur.height,
-                        width=cur.width,
-                        count=1,
-                        dtype="uint16",
-                        crs=cur.crs,
-                        transform=cur.transform,
-                        nodata=0,
-                    ) as dst:
-                        dst.write(diff_uint16, 1)
-                        dst.set_band_description(1, "rgb_change_magnitude")
-
-                    mem.seek(0)
-                    cog_translate(
-                        mem,
-                        out_path,
-                        cog_profile,
-                        in_memory=False,
-                        quiet=True,
-                        web_optimized=False,
-                    )
-            return out_path
-
-          # --- Run over all weeks, skipping ones we already produced ---
           produced = 0
-          weeks_sorted = sorted(weeks, key=lambda w: w[0])
-          for wk_start, wk_end in weeks_sorted:
-            label = iso_week_label(wk_start)
-            week_dir = OUT_DIR / f"{wk_start.isocalendar().year}-W{wk_start.isocalendar().week:02d}"
-            week_dir.mkdir(parents=True, exist_ok=True)
-            visible_path = week_dir / f"{AOI_NAME}_{label}_visible.tif"
-            change_path  = week_dir / f"{AOI_NAME}_{label}_change.tif"
+          for wk_start, wk_end in sorted(weeks):
+              label = iso_week_label(wk_start)
+              week_dir = OUT_DIR / label
+              week_dir.mkdir(parents=True, exist_ok=True)
+              vis_path = week_dir / f"{AOI_NAME}_{label}_visible.tif"
+              chg_path = week_dir / f"{AOI_NAME}_{label}_change.tif"
+              if vis_path.exists() and chg_path.exists():
+                  print(f"[SKIP] {label} already exists")
+                  continue
 
-            if visible_path.exists() and change_path.exists():
-              # already done; skip
-              print(f"[SKIP] {label} already exists.")
-              continue
+              prev_label = iso_week_label(wk_start - dt.timedelta(days=7))
+              prev_path = OUT_DIR / prev_label / f"{AOI_NAME}_{prev_label}_visible.tif"
 
-            prev_week_start = wk_start - dt.timedelta(days=7)
-            prev_label = iso_week_label(prev_week_start)
-            prev_week_dir = OUT_DIR / f"{prev_week_start.isocalendar().year}-W{prev_week_start.isocalendar().week:02d}"
-            prev_visible_path = prev_week_dir / f"{AOI_NAME}_{prev_label}_visible.tif"
+              print(f"[PROCESS] {label}")
+              vis = build_weekly_visible_cog(wk_start, wk_end, vis_path)
+              if vis is None:
+                  print(f"[INFO] No imagery for {label}")
+                  continue
 
-            print(f"[PROCESS] {label}: {wk_start}..{wk_end}")
-            vis = build_weekly_visible_cog(wk_start, wk_end, visible_path)
-            if vis is None:
-              print(f"[INFO] No imagery found for {label}.")
-              # If nothing, clean empty dir
-              try:
-                if not any(week_dir.iterdir()):
-                  week_dir.rmdir()
-              except Exception:
-                pass
-              continue
+              if prev_path.exists():
+                  chg = build_change_cog(vis_path, prev_path, chg_path)
+                  if chg:
+                      print(f"[OK] Change COG: {chg}")
+              else:
+                  print(f"[INFO] No prev week for {label}")
 
-            # Build change COG only if previous exists
-            if prev_visible_path.exists():
-              chg = build_change_cog(visible_path, prev_visible_path, change_path)
-              if chg:
-                print(f"[OK] change COG: {chg}")
-            else:
-              print(f"[INFO] No previous week ({prev_label}); change skipped.")
+              produced += 1
 
-            produced += 1
-
-          print(f"Done. Produced/updated {produced} weeks.")
+          print(f"Done. Produced {produced} weeks")
           PYCODE
 
-      - name: Run processor (backfill + current)
-        run: |
-          python scripts/process_weeks.py
+      - name: Run processor
+        run: python scripts/process_weeks.py
 
       - name: Commit and push new COGs
-        if: ${{ success() }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Stage only new/changed COGs
           git add -A cogs || true
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No new COGs"
           else
-            msg="Sentinel-2 weekly COGs: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            git commit -m "$msg"
+            git commit -m "Sentinel-2 weekly COGs $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             git push
           fi
