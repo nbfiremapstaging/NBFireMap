@@ -1,4 +1,4 @@
-name: Sentinel-2 weekly COGs (Saint John 10km)
+name: Sentinel-2 weekly COGs (NB)
 
 on:
   schedule:
@@ -9,19 +9,33 @@ permissions:
   contents: write
 
 env:
-  AOI_NAME: "SaintJohn10km_CA"
-  # 10×10 km square around Saint John, NB (WGS84 lon/lat)
-  NB_BBOX: "-66.124,45.225,-65.996,45.315"
+  # ----- TOGGLE -----
+  # false  -> small 10x10 km Saint John bbox (fast test)
+  # true   -> use full NB polygon from AOI_GEOJSON
+  USE_FULL_NB: "false"
+  AOI_GEOJSON: "data/new_brunswick_boundary.geojson"
+
+  # Test AOI (WGS84 lon,lat). ~10x10 km around Saint John, NB
+  TEST_BBOX: "-66.124,45.225,-65.996,45.315"
+
+  # Backfill start date: first run will process complete ISO weeks from here to last Sunday
   START_DATE: "2025-03-01"
+
+  # STAC + processing config
   STAC_URL: "https://earth-search.aws.element84.com/v1"
   MAX_SCENE_CLOUD: "70"
   TARGET_EPSG: "3857"
   OUT_DIR: "cogs"
   VISIBLE_BANDS: "B04,B03,B02"
 
+  # Names for output files
+  AOI_NAME_TEST: "SaintJohn10km_CA"
+  AOI_NAME_FULL: "NewBrunswick_CA"
+
 jobs:
   build-cogs:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,7 +66,7 @@ jobs:
         run: |
           mkdir -p scripts "${OUT_DIR}"
           cat > scripts/process_weeks.py << 'PYCODE'
-          import os, sys, datetime as dt
+          import os, sys, json, datetime as dt
           from pathlib import Path
           import numpy as np
           import rasterio as rio
@@ -63,22 +77,45 @@ jobs:
           import stackstac
           import xarray as xr
           import rioxarray  # noqa: F401
-          from pyproj import Transformer
+          from shapely.geometry import shape, box, mapping
+          from shapely.ops import transform as shp_transform
+          from pyproj import Transformer, CRS
 
+          # ---- env ----
           STAC_URL = os.environ["STAC_URL"]
           VISIBLE_BANDS = os.environ["VISIBLE_BANDS"].split(",")
           MAX_SCENE_CLOUD = float(os.environ.get("MAX_SCENE_CLOUD", "70"))
           OUT_DIR = Path(os.environ["OUT_DIR"])
-          AOI_NAME = os.environ["AOI_NAME"]
           TARGET_EPSG = int(os.environ["TARGET_EPSG"])
-          NB_BBOX = [float(v) for v in os.environ["NB_BBOX"].split(",")]  # lon/lat
           START_DATE = dt.date.fromisoformat(os.environ["START_DATE"])
 
+          USE_FULL_NB = os.environ.get("USE_FULL_NB", "false").lower() == "true"
+          AOI_GEOJSON = os.environ.get("AOI_GEOJSON", "").strip()
+          TEST_BBOX = [float(v) for v in os.environ["TEST_BBOX"].split(",")]
+          AOI_NAME = os.environ["AOI_NAME_FULL"] if USE_FULL_NB else os.environ["AOI_NAME_TEST"]
+
+          # ---- helpers ----
           def iso_week_label(d: dt.date):
               iso = d.isocalendar()
               return f"{iso.year}-W{iso.week:02d}"
 
-          # Build list of complete ISO weeks from START_DATE to last Sunday
+          def load_aoi():
+              """Return (search_geom_lonlat, bounds_epsg) for stackstac."""
+              if USE_FULL_NB and AOI_GEOJSON and Path(AOI_GEOJSON).exists():
+                  gj = json.loads(Path(AOI_GEOJSON).read_text())
+                  geom_ll = shape(gj["features"][0]["geometry"] if "features" in gj else gj["geometry"])
+              else:
+                  # fallback: test bbox polygon in lon/lat
+                  minx, miny, maxx, maxy = TEST_BBOX
+                  geom_ll = box(minx, miny, maxx, maxy)
+
+              # bounds for stackstac in target CRS
+              t = Transformer.from_crs(4326, TARGET_EPSG, always_xy=True)
+              geom_epsg = shp_transform(lambda x, y, z=None: t.transform(x, y), geom_ll)
+              b = geom_epsg.bounds  # minx, miny, maxx, maxy
+              return mapping(geom_ll), list(b)
+
+          # ---- week list (complete weeks only) ----
           today = dt.datetime.utcnow().date()
           last_sunday = today - dt.timedelta(days=(today.weekday() + 1) % 7)
           start_monday = START_DATE - dt.timedelta(days=START_DATE.weekday())
@@ -95,19 +132,13 @@ jobs:
           cog_profile = cog_profiles.get("deflate")
           cog_profile.update(dict(BLOCKSIZE=512, BIGTIFF="IF_SAFER"))
 
-          def bbox_to_epsg(bbox_lonlat, epsg):
-              minx, miny, maxx, maxy = bbox_lonlat
-              t = Transformer.from_crs(4326, epsg, always_xy=True)
-              x0, y0 = t.transform(minx, miny)
-              x1, y1 = t.transform(maxx, maxy)
-              # ensure min/max ordering
-              return [min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1)]
+          search_geom_ll, bounds_epsg = load_aoi()
 
           def build_weekly_visible_cog(wk_start, wk_end, out_path):
-              # Search scenes in the small AOI/time window
+              # Search by geometry in lon/lat
               search = client.search(
                   collections=["sentinel-2-l2a"],
-                  bbox=NB_BBOX,  # search in lon/lat
+                  intersects=search_geom_ll,
                   datetime=f"{wk_start}T00:00:00Z/{wk_end+dt.timedelta(days=1)}T00:00:00Z",
                   query={"eo:cloud_cover": {"lt": MAX_SCENE_CLOUD}},
               )
@@ -115,38 +146,46 @@ jobs:
               if not items:
                   return None
 
-              # Transform AOI bounds to target EPSG; give bounds only (no bounds_latlon)
-              bounds_epsg = bbox_to_epsg(NB_BBOX, TARGET_EPSG)
-
+              # Stack R,G,B + SCL; reproject to target grid and clip to AOI bounds
               arr = stackstac.stack(
                   items,
-                  assets=VISIBLE_BANDS + ["data_mask"],
+                  assets=VISIBLE_BANDS + ["SCL"],
                   epsg=TARGET_EPSG,
-                  resolution=10,          # meters
-                  bounds=bounds_epsg,     # in TARGET_EPSG
-                  fill_value=np.float32(np.nan),
+                  resolution=10,                    # meters
+                  bounds=bounds_epsg,               # in target CRS
                   dtype="float32",
+                  fill_value=np.float32(np.nan),
                   chunksize=1024,
               )
 
               # dims: (time, band, y, x)
               bidx = {b: i for i, b in enumerate(arr["band"].values)}
-              dm = arr.isel(band=bidx["data_mask"])
+              scl = arr.isel(band=bidx["SCL"])
               rgb = arr.isel(band=[bidx[b] for b in VISIBLE_BANDS])
 
-              rgb = rgb.where(dm > 0.5)  # mask clouds
+              # Mask using SCL classes (0,1,3,8,9,10,11 => bad)
+              bad = xr.apply_ufunc(
+                  lambda x: np.isin(x, [0, 1, 3, 8, 9, 10, 11]),
+                  scl,
+                  dask="parallelized",
+                  output_dtypes=[bool],
+              )
+              rgb = rgb.where(~bad)
+
+              # Weekly median
               comp = rgb.median(dim="time", skipna=True).transpose("band", "y", "x")
 
+              # Scale reflectance to uint16 0..10000 and write COG
               scaled = (np.clip(comp.values, 0.0, 1.0) * 10000).astype("uint16")
-              height, width = scaled.shape[-2], scaled.shape[-1]
+              h, w = scaled.shape[-2], scaled.shape[-1]
               transform = comp.rio.transform()
               crs = comp.rio.crs
 
               with MemoryFile() as mem:
                   with mem.open(
                       driver="GTiff",
-                      height=height,
-                      width=width,
+                      height=h,
+                      width=w,
                       count=3,
                       dtype="uint16",
                       crs=crs,
@@ -211,6 +250,7 @@ jobs:
               label = iso_week_label(wk_start)
               week_dir = OUT_DIR / label
               week_dir.mkdir(parents=True, exist_ok=True)
+
               vis_path = week_dir / f"{AOI_NAME}_{label}_visible.tif"
               chg_path = week_dir / f"{AOI_NAME}_{label}_change.tif"
 
