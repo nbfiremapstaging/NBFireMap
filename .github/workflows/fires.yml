@@ -17,7 +17,7 @@ jobs:
       ACTIVE_FIRES_FILE: "active_fires.geojson"
       OUT_FIRES_FILE: "out_fires.geojson"
       SUMS_TABLE_FILE: "sums_table.json"
-      # New: PDF → JSON
+      # PDF → JSON
       GNB_PDF_URL: "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf"
       GNB_SUM_FILE: "GNBfireActSum.json"
     steps:
@@ -62,7 +62,6 @@ jobs:
                   time.sleep(1)
               raise RuntimeError(f"Failed after {attempts} attempts: {url}")
 
-          # ---------- Schema helpers ----------
           def fetch_layer_meta(url):
               meta_url = url.rsplit("/query", 1)[0]
               r = arcgis_get(meta_url, {"f": "json"})
@@ -85,7 +84,6 @@ jobs:
           def get_all_field_names(meta):
               return [f["name"] for f in meta.get("fields", []) if "name" in f]
 
-          # ---------- Signatures for stability ----------
           def features_to_signature(feature_collection):
               feats = feature_collection.get("features", [])
               def feature_key(f):
@@ -123,7 +121,6 @@ jobs:
               concat = "|".join(rows)
               return len(feats), hashlib.sha256(concat.encode("utf-8")).hexdigest()
 
-          # ---------- Fetchers ----------
           def fetch_geojson(url):
               params = {"where":"1=1","outFields":"*","outSR":"4326","returnGeometry":"true","f":"geojson"}
               r = arcgis_get(url, params)
@@ -142,7 +139,6 @@ jobs:
                       index[attrs[oid_field]] = attrs
               return index
 
-          # ---------- Merge ----------
           def merge_geojson_with_attrs(geojson_obj, attrs_by_oid, all_fields, oid_field):
               for f in geojson_obj.get("features", []):
                   props = f.get("properties")
@@ -178,7 +174,6 @@ jobs:
                   attrs["FETCHED_FROM_ERD"] = int(timestamp)
               return data
 
-          # ---------- Orchestrated fetch with stability check ----------
           def attempt_fetch_geojson_with_full_attrs(kind, url, outfile, max_attempts=5, copies=4):
               meta = fetch_layer_meta(url)
               oid_field = get_oid_field(meta)
@@ -247,7 +242,6 @@ jobs:
               log(f"{kind}: FAILED after {max_attempts} attempts")
               return False
 
-          # ---------- Run all three ----------
           success_all = True
           success_all &= attempt_fetch_geojson_with_full_attrs(
               kind="active_fires (layer 0)",
@@ -271,7 +265,7 @@ jobs:
               log("All datasets fetched and validated successfully.")
           PYCODE
 
-      - name: Fetch & parse Activity Summary PDF → GNBfireActSum.json
+      - name: Fetch & parse Activity Summary PDF → GNBfireActSum.json (rows as objects)
         shell: bash
         run: |
           set -euo pipefail
@@ -289,11 +283,17 @@ jobs:
               if s is None: return ""
               return re.sub(r"\s+", " ", str(s)).strip()
 
+          def clean_header(h):
+              # keep readable keys; remove extra punctuation/whitespace
+              h = clean(h)
+              # don't force to snake_case unless you want it; leaving readable
+              return h
+
           result = {
               "source": pdf_url,
               "fetched_utc": ts,
               "pages": 0,
-              "tables": [],
+              "tables": []   # each: { page, headers, rows: [ {col:val,...}, ... ] }
           }
 
           try:
@@ -317,27 +317,44 @@ jobs:
                               "text_y_tolerance": 2,
                               "join_tolerance": 3,
                           }
-                      )
-                      for t in (tables or []):
+                      ) or []
+
+                      for t in tables:
                           if not t or len(t) < 2:
                               continue
-                          header = [clean(x) for x in t[0]]
-                          rows = []
+
+                          # Header row
+                          raw_header = [clean_header(x) for x in t[0]]
+                          # Drop completely empty header cells and remember their indexes
+                          keep_idx = [i for i, h in enumerate(raw_header) if h]
+                          header = [raw_header[i] for i in keep_idx]
+                          if not header:
+                              continue
+
+                          rows_obj = []
                           for row in t[1:]:
+                              row = row or []
                               row_clean = [clean(x) for x in row]
-                              if len(row_clean) < len(header):
-                                  row_clean += [""] * (len(header) - len(row_clean))
-                              elif len(row_clean) > len(header):
-                                  row_clean = row_clean[:len(header)]
-                              rows.append(dict(zip(header, row_clean)))
-                          nonempty = any(any(v for v in d.values()) for d in rows)
-                          if nonempty:
+                              # align to kept columns
+                              row_keep = []
+                              for i in keep_idx:
+                                  row_keep.append(row_clean[i] if i < len(row_clean) else "")
+                              # pad/truncate to header length
+                              if len(row_keep) < len(header):
+                                  row_keep += [""] * (len(header) - len(row_keep))
+                              elif len(row_keep) > len(header):
+                                  row_keep = row_keep[:len(header)]
+                              rows_obj.append(dict(zip(header, row_keep)))
+
+                          # discard empty tables
+                          if any(any(v for v in r.values()) for r in rows_obj):
                               result["tables"].append({
                                   "page": pnum,
                                   "headers": header,
-                                  "rows": rows
+                                  "rows": rows_obj
                               })
 
+                  # If nothing table-like found, fall back to text (still structured by page)
                   if not result["tables"]:
                       text_pages = []
                       for pnum, page in enumerate(pdf.pages, start=1):
@@ -349,7 +366,7 @@ jobs:
               with open(out_json, "w", encoding="utf-8") as f:
                   json.dump(result, f, ensure_ascii=False, indent=2)
 
-              print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups")
+              print(f"Wrote {out_json} with {len(result.get('tables', []))} table groups (rows as objects).")
           except Exception as e:
               err = {
                   "source": pdf_url,
@@ -373,7 +390,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add "${ACTIVE_FIRES_FILE}" "${OUT_FIRES_FILE}" "${SUMS_TABLE_FILE}" "${GNB_SUM_FILE}" || true
-            git commit -m "Update ERD fire datasets (incl. Activity Summary PDF → JSON)" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git commit -m "Update ERD fire datasets (incl. Activity Summary PDF → JSON as row objects)" -m "Run: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             git push
             echo "Pushed updates."
           else
