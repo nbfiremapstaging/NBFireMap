@@ -2,8 +2,7 @@ name: Sentinel-2 weekly COGs (Saint John 10km)
 
 on:
   schedule:
-    # Every Monday at 06:00 UTC
-    - cron: "0 6 * * MON"
+    - cron: "0 6 * * MON"   # Mondays 06:00 UTC
   workflow_dispatch: {}
 
 permissions:
@@ -11,7 +10,7 @@ permissions:
 
 env:
   AOI_NAME: "SaintJohn10km_CA"
-  # 10x10 km square around Saint John, NB
+  # 10×10 km square around Saint John, NB (WGS84 lon/lat)
   NB_BBOX: "-66.124,45.225,-65.996,45.315"
   START_DATE: "2025-03-01"
   STAC_URL: "https://earth-search.aws.element84.com/v1"
@@ -64,6 +63,7 @@ jobs:
           import stackstac
           import xarray as xr
           import rioxarray  # noqa: F401
+          from pyproj import Transformer
 
           STAC_URL = os.environ["STAC_URL"]
           VISIBLE_BANDS = os.environ["VISIBLE_BANDS"].split(",")
@@ -71,13 +71,14 @@ jobs:
           OUT_DIR = Path(os.environ["OUT_DIR"])
           AOI_NAME = os.environ["AOI_NAME"]
           TARGET_EPSG = int(os.environ["TARGET_EPSG"])
-          NB_BBOX = [float(v) for v in os.environ["NB_BBOX"].split(",")]
+          NB_BBOX = [float(v) for v in os.environ["NB_BBOX"].split(",")]  # lon/lat
           START_DATE = dt.date.fromisoformat(os.environ["START_DATE"])
 
           def iso_week_label(d: dt.date):
               iso = d.isocalendar()
               return f"{iso.year}-W{iso.week:02d}"
 
+          # Build list of complete ISO weeks from START_DATE to last Sunday
           today = dt.datetime.utcnow().date()
           last_sunday = today - dt.timedelta(days=(today.weekday() + 1) % 7)
           start_monday = START_DATE - dt.timedelta(days=START_DATE.weekday())
@@ -86,20 +87,27 @@ jobs:
           while cur <= last_sunday - dt.timedelta(days=6):
               weeks.append((cur, cur + dt.timedelta(days=6)))
               cur += dt.timedelta(days=7)
-
           if not weeks:
-              print("No complete weeks to process")
-              sys.exit(0)
+              print("No complete weeks to process"); sys.exit(0)
 
           OUT_DIR.mkdir(parents=True, exist_ok=True)
           client = Client.open(STAC_URL)
           cog_profile = cog_profiles.get("deflate")
           cog_profile.update(dict(BLOCKSIZE=512, BIGTIFF="IF_SAFER"))
 
+          def bbox_to_epsg(bbox_lonlat, epsg):
+              minx, miny, maxx, maxy = bbox_lonlat
+              t = Transformer.from_crs(4326, epsg, always_xy=True)
+              x0, y0 = t.transform(minx, miny)
+              x1, y1 = t.transform(maxx, maxy)
+              # ensure min/max ordering
+              return [min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1)]
+
           def build_weekly_visible_cog(wk_start, wk_end, out_path):
+              # Search scenes in the small AOI/time window
               search = client.search(
                   collections=["sentinel-2-l2a"],
-                  bbox=NB_BBOX,
+                  bbox=NB_BBOX,  # search in lon/lat
                   datetime=f"{wk_start}T00:00:00Z/{wk_end+dt.timedelta(days=1)}T00:00:00Z",
                   query={"eo:cloud_cover": {"lt": MAX_SCENE_CLOUD}},
               )
@@ -107,23 +115,26 @@ jobs:
               if not items:
                   return None
 
+              # Transform AOI bounds to target EPSG; give bounds only (no bounds_latlon)
+              bounds_epsg = bbox_to_epsg(NB_BBOX, TARGET_EPSG)
+
               arr = stackstac.stack(
                   items,
                   assets=VISIBLE_BANDS + ["data_mask"],
                   epsg=TARGET_EPSG,
-                  resolution=10,
-                  bounds=NB_BBOX,
-                  bounds_latlon=True,
+                  resolution=10,          # meters
+                  bounds=bounds_epsg,     # in TARGET_EPSG
                   fill_value=np.nan,
                   dtype="float32",
                   chunksize=1024,
               )
 
-              band_index = {b: i for i, b in enumerate(arr["band"].values)}
-              dm = arr.isel(band=band_index["data_mask"])
-              rgb = arr.isel(band=[band_index[b] for b in VISIBLE_BANDS])
+              # dims: (time, band, y, x)
+              bidx = {b: i for i, b in enumerate(arr["band"].values)}
+              dm = arr.isel(band=bidx["data_mask"])
+              rgb = arr.isel(band=[bidx[b] for b in VISIBLE_BANDS])
 
-              rgb = rgb.where(dm > 0.5)
+              rgb = rgb.where(dm > 0.5)  # mask clouds
               comp = rgb.median(dim="time", skipna=True).transpose("band", "y", "x")
 
               scaled = (np.clip(comp.values, 0.0, 1.0) * 10000).astype("uint16")
@@ -156,7 +167,7 @@ jobs:
               if not prev_path.exists():
                   return None
               with rio.open(curr_path) as cur, rio.open(prev_path) as prv:
-                  if (prv.crs != cur.crs) or (prv.transform != cur.transform):
+                  if (prv.crs != cur.crs) or (prv.transform != cur.transform) or (prv.width != cur.width) or (prv.height != cur.height):
                       data_prev = np.zeros((3, cur.height, cur.width), dtype=np.float32)
                       for i in range(1, 4):
                           rio.warp.reproject(
@@ -174,7 +185,7 @@ jobs:
                   data_cur = cur.read(out_dtype=np.float32)
                   cur_ref = np.clip(data_cur / 10000, 0, 1)
                   prv_ref = np.clip(data_prev / 10000, 0, 1)
-                  diff = np.sqrt(((cur_ref - prv_ref)**2).sum(axis=0)).astype("float32")
+                  diff = np.sqrt(((cur_ref - prv_ref) ** 2).sum(axis=0)).astype("float32")
                   diff_u16 = np.clip((diff / np.sqrt(3)) * 10000, 0, 10000).astype("uint16")
 
                   with MemoryFile() as mem:
@@ -202,9 +213,9 @@ jobs:
               week_dir.mkdir(parents=True, exist_ok=True)
               vis_path = week_dir / f"{AOI_NAME}_{label}_visible.tif"
               chg_path = week_dir / f"{AOI_NAME}_{label}_change.tif"
+
               if vis_path.exists() and chg_path.exists():
-                  print(f"[SKIP] {label} already exists")
-                  continue
+                  print(f"[SKIP] {label} already exists"); continue
 
               prev_label = iso_week_label(wk_start - dt.timedelta(days=7))
               prev_path = OUT_DIR / prev_label / f"{AOI_NAME}_{prev_label}_visible.tif"
@@ -212,13 +223,11 @@ jobs:
               print(f"[PROCESS] {label}")
               vis = build_weekly_visible_cog(wk_start, wk_end, vis_path)
               if vis is None:
-                  print(f"[INFO] No imagery for {label}")
-                  continue
+                  print(f"[INFO] No imagery for {label}"); continue
 
               if prev_path.exists():
                   chg = build_change_cog(vis_path, prev_path, chg_path)
-                  if chg:
-                      print(f"[OK] Change COG: {chg}")
+                  if chg: print(f"[OK] Change COG: {chg}")
               else:
                   print(f"[INFO] No prev week for {label}")
 
