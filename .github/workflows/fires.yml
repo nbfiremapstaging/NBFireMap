@@ -1,4 +1,4 @@
-name: ERD Fire Data
+name: Fetch ERD Fire Datasets
 
 on:
   schedule:
