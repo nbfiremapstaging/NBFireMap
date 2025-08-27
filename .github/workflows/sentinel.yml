@@ -124,7 +124,7 @@ jobs:
                   epsg=TARGET_EPSG,
                   resolution=10,          # meters
                   bounds=bounds_epsg,     # in TARGET_EPSG
-                  fill_value=np.nan,
+                  fill_value=np.float32(np.nan),
                   dtype="float32",
                   chunksize=1024,
               )
