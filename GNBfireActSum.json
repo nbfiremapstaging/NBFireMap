@@ -1,6 +1,6 @@
 {
   "source": "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf",
-  "fetched_utc": 1756371124,
+  "fetched_utc": 1756374187,
   "pages": 1,
   "tables": [
     {
@@ -48,11 +48,11 @@
           "Updated": "Aug-27",
           "Latitude": "47.70233",
           "Longitude": "66.28783",
-          "Size": "204.0",
+          "Size": "207.4",
           "Pers": "19",
           "Eng": "0",
-          "Tend": "3",
-          "Trac": "3",
+          "Tend": "0",
+          "Trac": "0",
           "Air": "0",
           "Heli": "0",
           "Ovr": "5"
@@ -82,7 +82,7 @@
           "Updated": "Aug-27",
           "Latitude": "47.29720",
           "Longitude": "66.11490",
-          "Size": "218.0",
+          "Size": "193.6",
           "Pers": "15",
           "Eng": "0",
           "Tend": "0",
@@ -229,23 +229,6 @@
         },
         {
           "Region": "West",
-          "Status": "Being Patrolled",
-          "Number": "304",
-          "Fire Name": "304",
-          "Updated": "Aug-27",
-          "Latitude": "46.00410",
-          "Longitude": "65.02668",
-          "Size": "0.2",
-          "Pers": "0",
-          "Eng": "0",
-          "Tend": "0",
-          "Trac": "0",
-          "Air": "0",
-          "Heli": "0",
-          "Ovr": "1"
-        },
-        {
-          "Region": "West",
           "Status": "Out",
           "Number": "272",
           "Fire Name": "Newtown",
@@ -294,6 +277,23 @@
           "Air": "0",
           "Heli": "0",
           "Ovr": "0"
+        },
+        {
+          "Region": "West",
+          "Status": "Out",
+          "Number": "304",
+          "Fire Name": "304",
+          "Updated": "Aug-27",
+          "Latitude": "46.00410",
+          "Longitude": "65.02668",
+          "Size": "0.2",
+          "Pers": "0",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "1"
         },
         {
           "Region": "West",
