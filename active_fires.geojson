@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -114,7 +114,7 @@
         "OBJECTID": 69042,
         "FIRE_NUMBER": "2025309",
         "FIRE_NUMBER_SHORT": "309",
-        "FIRE_NAME": "Portage",
+        "FIRE_NAME": "309",
         "DEGREES_LAT": 47.45108,
         "DEGREES_LONG": 66.58003,
         "FIRE_STAT_ID": 1,
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 0,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     },
     {
@@ -314,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756493347
+        "FETCHED_FROM_ERD": 1756495607
       }
     }
   ]
