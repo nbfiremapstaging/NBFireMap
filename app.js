@@ -317,7 +317,7 @@
 
         const html = `
           <div style="font:14px/1.45 Inter,system-ui,Segoe UI,Arial;min-width:240px;color:var(--text)">
-            <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">${props.FIRE_NAME || props.FIRE_ID || 'Unnamed Fire'}</div>
+            <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">#${props.FIRE_NUMBER_SHORT} ${props.FIRE_NAME || props.FIRE_ID || 'Unnamed Fire'}</div>
             <div style="margin:6px 0 10px">
               <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.12)">
                 <span class="dot" style="background:${statusColor(status)}"></span>${status}
@@ -1352,13 +1352,14 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
             const label = k==='other' ? 'Other' : k.replace(/\b\w/g, c=>c.toUpperCase());
             const list = byStatus.get(k).map((it) => {
               const p=it.props||{};
+              const fireNumShort = p.FIRE_NUMBER_SHORT || '';
               const name = p.FIRE_NAME || p.FIRE_ID || 'Unnamed Fire';
               const size = toNum(sizeOf(p),1);
               const det  = fmtDateTZ(getDetectedMs(p));
               const extra = (k==='extinguished') ? ` • Out: ${fmtDateTZ(getExtinguishedMs(p))}` : '';
               return `<li style="margin:4px 0;">
                 <a href="#" data-fireid="${it.id}">
-                  <span style="font-weight:700">${name}</span>&nbsp;—&nbsp;${size} ha
+                  <span style="font-weight:700">${fireNumShort} • ${name}</span>&nbsp; • &nbsp;${size} ha
                   <span style="opacity:.8">• ${label}</span>
                   <span style="opacity:.8">• Detected: ${det}${extra}</span>
                 </a>
@@ -1486,7 +1487,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         const bounds = L.latLngBounds(latlngs);
         const padX = Math.round(innerWidth * 0.06);
         const padY = Math.round(innerHeight * 0.06);
-        map.fitBounds(bounds, { paddingTopLeft:[padX,padY], paddingBottomRight:[padX,padY], animate:true });
+        map.fitBounds(bounds, { paddingTopLeft: [padX,padY], paddingBottomRight: [padX,padY], animate:true });
       }
 
       function wirePieLegendClicks(){
@@ -1753,6 +1754,21 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
   }
 
   // ---------- Charts (titles: bold & slightly larger, extra gap above images) ----------
+
+  // ---------- Show "Generated At" at top in Atlantic time ----------
+  const atlanticDate = new Date(stats.generatedAt).toLocaleString('en-CA', {
+    timeZone: 'America/Moncton',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text(`Generated At: ${atlanticDate}`, marginX, y);
+  y += 18;
+
   const titleFont = 14;
   const titleGap  = 16; // space between title and image
 
@@ -1771,7 +1787,6 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
   // ---------- Stats table ----------
   const statEntries = [];
   const baseStats = {
-    'Generated At (UTC)': stats.generatedAt,
     'Total Fires': stats.totalFires,
     'Active Fires': stats.activeFires,
     'Extinguished Fires': stats.extinguishedFires,
@@ -1779,7 +1794,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
     'Detected Yesterday': stats.detectedYesterday,
     'Out Today': stats.outToday,
     'Out Yesterday': stats.outYesterday,
-    'Area Burned (ha)': stats.areaHaTotal
+    'Area Burned (ha)': stats.areaHaTotal.toFixed(1)
   };
   for(const [k,v] of Object.entries(baseStats)){ statEntries.push([k, String(v ?? '')]); }
   doc.autoTable({
@@ -1791,35 +1806,57 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
   });
   y = doc.lastAutoTable.finalY + 16;
 
+  // ---------- Sums Table ----------
+  if (typeof SUMS_BENCH === 'object' && SUMS_BENCH !== null) {
+    const sumsEntries = [
+      ['10-year Avg YTD Fires', SUMS_BENCH.avg10Fires ?? ''],
+      ['10-year Avg YTD Area Burned', SUMS_BENCH.avg10Burn != null ? SUMS_BENCH.avg10Burn + ' ha' : ''],
+      ['Last Year YTD Fires', SUMS_BENCH.lastCount ?? ''],
+      ['Last Year YTD Area Burned', SUMS_BENCH.lastBurn != null ? SUMS_BENCH.lastBurn + ' ha' : ''],
+      ['YTD Fires', SUMS_BENCH.thisCount ?? ''],
+      ['YTD Area Burned', SUMS_BENCH.thisBurn != null ? SUMS_BENCH.thisBurn + ' ha' : '']
+    ];
+    doc.autoTable({
+      head: [['Historic/Season Benchmarks', 'Value']],
+      body: sumsEntries,
+      startY: y,
+      styles: { fontSize: 9, cellPadding: 4 },
+      headStyles: { fontStyle: 'bold' }
+    });
+    y = doc.lastAutoTable.finalY + 16;
+  }
+
   // ---------- Fires table ----------
   const fireBody = rows.map(r => {
-    const shortNum = r.FireNumberShort ?? r.FIRE_NUMBER_SHORT ?? '';
-    const fireName = r.FireName ?? r.FIRE_NAME ?? (r.FireID ?? '');
-    return [
-      shortNum,
-      fireName,
-      r.Status,
-      Number.isFinite(r.Size_ha) ? r.Size_ha : '',
-      r.Detected_at ? r.Detected_at.slice(0,10) : '',
-      r.Extinguished_at ? r.Extinguished_at.slice(0,10) : '',
-      r.X ?? '',
-      r.Y ?? ''
-    ];
-  });
-  doc.autoTable({
-    startY: y,
-    head: [['Fire Number', 'Fire Name', 'Status', 'Size (ha)', 'Detected', 'Out', 'X', 'Y']],
-    body: fireBody,
-    styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fontStyle:'bold' },
-    columnStyles: { 3: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
-    didDrawPage: (data) => {
-      const pageSize = doc.internal.pageSize;
-      const str = `Page ${doc.internal.getNumberOfPages()}`;
-      doc.setFontSize(8);
-      doc.text(str, pageSize.getWidth() - marginX, pageSize.getHeight() - 14, { align: 'right' });
-    }
-  });
+  const shortNum = r.FireNumberShort ?? r.FIRE_NUMBER_SHORT ?? '';
+  const fireName = r.FireName ?? r.FIRE_NAME ?? (r.FireID ?? '');
+  const containedPct = r.PERCENT_CONTAINED != null ? r.PERCENT_CONTAINED : (r.Contained_pct != null ? r.Contained_pct : '');
+  return [
+    shortNum,
+    fireName,
+    r.Status,
+    Number.isFinite(r.Size_ha) ? r.Size_ha : '',
+    containedPct !== '' ? `${containedPct}%` : '',
+    r.Detected_at ? r.Detected_at.slice(0,10) : '',
+    r.Extinguished_at ? r.Extinguished_at.slice(0,10) : '',
+    r.X ?? '',
+    r.Y ?? ''
+  ];
+});
+doc.autoTable({
+  startY: y,
+  head: [['Fire Number', 'Fire Name', 'Status', 'Size (ha)', 'Contained (%)', 'Detected', 'Out', 'X', 'Y']],
+  body: fireBody,
+  styles: { fontSize: 8, cellPadding: 3 },
+  headStyles: { fontStyle:'bold' },
+  columnStyles: { 3: { halign: 'right' }, 4: { halign: 'right' }, 7: { halign: 'right' }, 8: { halign: 'right' } },
+  didDrawPage: (data) => {
+    const pageSize = doc.internal.pageSize;
+    const str = `Page ${doc.internal.getNumberOfPages()}`;
+    doc.setFontSize(8);
+    doc.text(str, pageSize.getWidth() - marginX, pageSize.getHeight() - 14, { align: 'right' });
+  }
+});
 
   // ---------- Save ----------
   const filename = `NB_Fire_Summary_${new Date().toISOString().slice(0,10)}.pdf`;
@@ -2015,7 +2052,7 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
           // Keep the city above the panel
           const pad = Math.round(Math.min(innerWidth, innerHeight) * 0.08);
           const pb = nearbyPanelHeight();
-          map.flyTo(cityLatLng, Math.max(map.getZoom(), 9), { duration: 0.5 });
+          map.flyTo(cityLatLng, Math.max(map.getZoom(), 9), { duration:.6 });
           map.once('moveend', () => {
             map.fitBounds(L.latLngBounds([cityLatLng]), {
               paddingTopLeft: [pad, pad],
