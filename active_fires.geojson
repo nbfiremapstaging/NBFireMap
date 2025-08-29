@@ -35,38 +35,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
       "type": "Feature",
-      "id": 68642,
+      "id": 69042,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -65.30057873187947,
-          47.3583897040808
+          -66.5896691894025,
+          47.430459686919214
         ]
       },
       "properties": {
-        "OBJECTID": 68642,
-        "FIRE_NUMBER": "2025269",
-        "FIRE_NUMBER_SHORT": "269",
-        "FIRE_NAME": "Moose Brook 2",
-        "DEGREES_LAT": 47.35838,
-        "DEGREES_LONG": 65.30058,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755195600000,
-        "FIRE_STAT_DATE": 1756461000000,
+        "OBJECTID": 69042,
+        "FIRE_NUMBER": "2025309",
+        "FIRE_NUMBER_SHORT": "309",
+        "FIRE_NAME": "309",
+        "DEGREES_LAT": 47.43045,
+        "DEGREES_LONG": 66.58967,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1756477920000,
+        "FIRE_STAT_DATE": 1756485420000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 8.8,
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -97,38 +97,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
       "type": "Feature",
-      "id": 69042,
+      "id": 69062,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -66.58002918657078,
-          47.4510896899179
+          -65.53236877892324,
+          46.62403957479472
         ]
       },
       "properties": {
-        "OBJECTID": 69042,
-        "FIRE_NUMBER": "2025309",
-        "FIRE_NUMBER_SHORT": "309",
-        "FIRE_NAME": "309",
-        "DEGREES_LAT": 47.45108,
-        "DEGREES_LONG": 66.58003,
+        "OBJECTID": 69062,
+        "FIRE_NUMBER": "2025310",
+        "FIRE_NUMBER_SHORT": "310",
+        "FIRE_NAME": "310",
+        "DEGREES_LAT": 46.62403,
+        "DEGREES_LONG": 65.53237,
         "FIRE_STAT_ID": 1,
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1756477920000,
-        "FIRE_STAT_DATE": 1756481400000,
+        "TIME_DETECTED": 1756487400000,
+        "FIRE_STAT_DATE": 1756488480000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 0,
-        "FIRE_SIZE": 0.5,
+        "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.7,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     },
     {
@@ -314,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756495607
+        "FETCHED_FROM_ERD": 1756499986
       }
     }
   ]
