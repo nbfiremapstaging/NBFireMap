@@ -9,130 +9,6 @@
   "features": [
     {
       "type": "Feature",
-      "id": 68902,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.85462855631792,
-          46.96142964655422
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68902,
-        "FIRE_NUMBER": "2025295",
-        "FIRE_NUMBER_SHORT": "295",
-        "FIRE_NAME": "Peatmoss Piles",
-        "DEGREES_LAT": 46.96142,
-        "DEGREES_LONG": 64.85463,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755994500000,
-        "FIRE_STAT_DATE": 1756458000000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68529,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.11489901540172,
-          47.29720967591014
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68529,
-        "FIRE_NUMBER": "2025250",
-        "FIRE_NUMBER_SHORT": "250",
-        "FIRE_NAME": "Chief's",
-        "DEGREES_LAT": 47.297200000000004,
-        "DEGREES_LONG": 66.1149,
-        "FIRE_STAT_ID": 3,
-        "FIRE_STAT_DESC_E": "Under Control",
-        "FIRE_STAT_DESC_F": "Maîtrisé ",
-        "TIME_DETECTED": 1755108480000,
-        "FIRE_STAT_DATE": 1756459980000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 218.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68664,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.97327897348978,
-          47.45153970498518
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68664,
-        "FIRE_NUMBER": "2025273",
-        "FIRE_NUMBER_SHORT": "273",
-        "FIRE_NAME": "273",
-        "DEGREES_LAT": 47.45153,
-        "DEGREES_LONG": 65.97328,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1755281640000,
-        "FIRE_STAT_DATE": 1756461000000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 3.7,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68687,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.28782909653758,
-          47.7023397388585
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68687,
-        "FIRE_NUMBER": "2025281",
-        "FIRE_NUMBER_SHORT": "281",
-        "FIRE_NAME": "Rocky Brook",
-        "DEGREES_LAT": 47.702329999999996,
-        "DEGREES_LONG": 66.28783,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1755359340000,
-        "FIRE_STAT_DATE": 1756459920000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 204.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
-      }
-    },
-    {
-      "type": "Feature",
       "id": 68943,
       "geometry": {
         "type": "Point",
@@ -159,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
+        "FETCHED_FROM_ERD": 1756493347
       }
     },
     {
@@ -190,7 +66,69 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 8.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
+        "FETCHED_FROM_ERD": 1756493347
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68902,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.85462855631792,
+          46.96142964655422
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68902,
+        "FIRE_NUMBER": "2025295",
+        "FIRE_NUMBER_SHORT": "295",
+        "FIRE_NAME": "Peatmoss Piles",
+        "DEGREES_LAT": 46.96142,
+        "DEGREES_LONG": 64.85463,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755994500000,
+        "FIRE_STAT_DATE": 1756458000000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756493347
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69042,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.58002918657078,
+          47.4510896899179
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69042,
+        "FIRE_NUMBER": "2025309",
+        "FIRE_NUMBER_SHORT": "309",
+        "FIRE_NAME": "Portage",
+        "DEGREES_LAT": 47.45108,
+        "DEGREES_LONG": 66.58003,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1756477920000,
+        "FIRE_STAT_DATE": 1756481400000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 0,
+        "FIRE_SIZE": 0.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756493347
       }
     },
     {
@@ -221,7 +159,100 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
+        "FETCHED_FROM_ERD": 1756493347
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68687,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.28782909653758,
+          47.7023397388585
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68687,
+        "FIRE_NUMBER": "2025281",
+        "FIRE_NUMBER_SHORT": "281",
+        "FIRE_NAME": "Rocky Brook",
+        "DEGREES_LAT": 47.702329999999996,
+        "DEGREES_LONG": 66.28783,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1755359340000,
+        "FIRE_STAT_DATE": 1756459920000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 204.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756493347
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68529,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.11489901540172,
+          47.29720967591014
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68529,
+        "FIRE_NUMBER": "2025250",
+        "FIRE_NUMBER_SHORT": "250",
+        "FIRE_NAME": "Chief's",
+        "DEGREES_LAT": 47.297200000000004,
+        "DEGREES_LONG": 66.1149,
+        "FIRE_STAT_ID": 3,
+        "FIRE_STAT_DESC_E": "Under Control",
+        "FIRE_STAT_DESC_F": "Maîtrisé ",
+        "TIME_DETECTED": 1755108480000,
+        "FIRE_STAT_DATE": 1756459980000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 218.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756493347
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68664,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.97327897348978,
+          47.45153970498518
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68664,
+        "FIRE_NUMBER": "2025273",
+        "FIRE_NUMBER_SHORT": "273",
+        "FIRE_NAME": "273",
+        "DEGREES_LAT": 47.45153,
+        "DEGREES_LONG": 65.97328,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1755281640000,
+        "FIRE_STAT_DATE": 1756461000000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 3.7,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756493347
       }
     },
     {
@@ -252,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
+        "FETCHED_FROM_ERD": 1756493347
       }
     },
     {
@@ -283,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756489179
+        "FETCHED_FROM_ERD": 1756493347
       }
     }
   ]
