@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -117,18 +117,18 @@
         "FIRE_NAME": "310",
         "DEGREES_LAT": 46.62403,
         "DEGREES_LONG": 65.53237,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
         "TIME_DETECTED": 1756487400000,
-        "FIRE_STAT_DATE": 1756488480000,
+        "FIRE_STAT_DATE": 1756538400000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 0,
+        "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     },
     {
@@ -307,14 +307,14 @@
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
         "TIME_DETECTED": 1756494300000,
-        "FIRE_STAT_DATE": 1756535472000,
+        "FIRE_STAT_DATE": 1756539527000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": null,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756546275
+        "FETCHED_FROM_ERD": 1756550330
       }
     }
   ]
