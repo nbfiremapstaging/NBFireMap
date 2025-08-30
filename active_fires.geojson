@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -159,7 +159,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69102,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.62110845095783,
+          46.41288955700648
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69102,
+        "FIRE_NUMBER": "2025312",
+        "FIRE_NUMBER_SHORT": "312",
+        "FIRE_NAME": "312",
+        "DEGREES_LAT": 46.41288,
+        "DEGREES_LONG": 64.62111,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756552200000,
+        "FIRE_STAT_DATE": 1756554540000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -190,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -221,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -252,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -283,7 +314,7 @@
         "PERCENT_CONTAINED": 70,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     },
     {
@@ -314,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756564618
+        "FETCHED_FROM_ERD": 1756567891
       }
     }
   ]
