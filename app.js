@@ -1894,7 +1894,7 @@ doc.autoTable({
   const layersHTML = `
     <ul>
       <li><b>Smoke (Surface)</b> — NOAA surface smoke forecast. When enabled, a timeline appears under the layer to scrub/play. Source:
-        <a href="https://www.weather.gov/sti/smoke" target="_blank" rel="noopener">NOAA</a>.
+        <a href="https://www.arl.noaa.gov/hysplit/smoke-forecasting/" target="_blank" rel="noopener">NOAA</a>.
       </li>
       <li><b>CWFIS Hotspots — Last 24 hours</b> — Thermal anomalies (VIIRS/MODIS). Source:
         <a href="https://cwfis.cfs.nrcan.gc.ca/ha/hotspots" target="_blank" rel="noopener">CWFIS</a>,
