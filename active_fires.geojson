@@ -9,6 +9,37 @@
   "features": [
     {
       "type": "Feature",
+      "id": 69142,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.40686940798999,
+          46.174239451988456
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69142,
+        "FIRE_NUMBER": "2025315",
+        "FIRE_NUMBER_SHORT": "315",
+        "FIRE_NAME": "Cape Road",
+        "DEGREES_LAT": 46.17423,
+        "DEGREES_LONG": 67.40687,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1756580400000,
+        "FIRE_STAT_DATE": 1756637280000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756651039
+      }
+    },
+    {
+      "type": "Feature",
       "id": 69042,
       "geometry": {
         "type": "Point",
@@ -35,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -52,13 +83,13 @@
         "OBJECTID": 69162,
         "FIRE_NUMBER": "2025316",
         "FIRE_NUMBER_SHORT": "316",
-        "FIRE_NAME": "McGowan's",
+        "FIRE_NAME": "316",
         "DEGREES_LAT": 45.87833,
         "DEGREES_LONG": 66.28144999999999,
         "FIRE_STAT_ID": 4,
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756578600000,
+        "TIME_DETECTED": 1756577700000,
         "FIRE_STAT_DATE": 1756627380000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
@@ -66,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -97,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -128,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -159,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -190,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -221,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -252,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -283,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -314,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -345,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -376,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -407,7 +438,7 @@
         "PERCENT_CONTAINED": 50,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     },
     {
@@ -438,38 +469,7 @@
         "PERCENT_CONTAINED": 75,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69142,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -67.40686940798999,
-          46.174239451988456
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69142,
-        "FIRE_NUMBER": "2025315",
-        "FIRE_NUMBER_SHORT": "315",
-        "FIRE_NAME": "Cape Road",
-        "DEGREES_LAT": 46.17423,
-        "DEGREES_LONG": 67.40687,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1756580400000,
-        "FIRE_STAT_DATE": 1756636180000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": null,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756646983
+        "FETCHED_FROM_ERD": 1756651039
       }
     }
   ]
