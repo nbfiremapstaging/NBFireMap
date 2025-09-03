@@ -9,37 +9,6 @@
   "features": [
     {
       "type": "Feature",
-      "id": 68585,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.47542912698799,
-          46.99147961517266
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68585,
-        "FIRE_NUMBER": "2025256",
-        "FIRE_NUMBER_SHORT": "256",
-        "FIRE_NAME": "Beaver Lake Stream",
-        "DEGREES_LAT": 46.99147,
-        "DEGREES_LONG": 66.47543,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755166920000,
-        "FIRE_STAT_DATE": 1756888260000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 85,
-        "FIRE_SIZE": 456.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
-      }
-    },
-    {
-      "type": "Feature",
       "id": 69122,
       "geometry": {
         "type": "Point",
@@ -66,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
+        "FETCHED_FROM_ERD": 1756914119
       }
     },
     {
@@ -97,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
+        "FETCHED_FROM_ERD": 1756914119
       }
     },
     {
@@ -128,69 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69062,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.53236877892324,
-          46.62403957479472
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69062,
-        "FIRE_NUMBER": "2025310",
-        "FIRE_NUMBER_SHORT": "310",
-        "FIRE_NAME": "310",
-        "DEGREES_LAT": 46.62403,
-        "DEGREES_LONG": 65.53237,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756487400000,
-        "FIRE_STAT_DATE": 1756887540000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69222,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.77726890369833,
-          47.447349708665726
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69222,
-        "FIRE_NUMBER": "2025319",
-        "FIRE_NUMBER_SHORT": "319",
-        "FIRE_NAME": "319",
-        "DEGREES_LAT": 47.44734,
-        "DEGREES_LONG": 65.77727,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1756830900000,
-        "FIRE_STAT_DATE": 1756890420000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.2,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
+        "FETCHED_FROM_ERD": 1756914119
       }
     },
     {
@@ -221,69 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68307,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.43247876838464,
-          47.15278966673053
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68307,
-        "FIRE_NUMBER": "2025208",
-        "FIRE_NUMBER_SHORT": "208",
-        "FIRE_NAME": "Old Field Road",
-        "DEGREES_LAT": 47.15278,
-        "DEGREES_LONG": 65.43248,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1754492640000,
-        "FIRE_STAT_DATE": 1756888860000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1403.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69202,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.68991886925059,
-          47.37405969774617
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69202,
-        "FIRE_NUMBER": "2025318",
-        "FIRE_NUMBER_SHORT": "318",
-        "FIRE_NAME": "318",
-        "DEGREES_LAT": 47.37405,
-        "DEGREES_LONG": 65.68992,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756717200000,
-        "FIRE_STAT_DATE": 1756890540000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
+        "FETCHED_FROM_ERD": 1756914119
       }
     },
     {
@@ -314,7 +159,100 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1756910728
+        "FETCHED_FROM_ERD": 1756914119
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69222,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.77726890369833,
+          47.447349708665726
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69222,
+        "FIRE_NUMBER": "2025319",
+        "FIRE_NUMBER_SHORT": "319",
+        "FIRE_NAME": "319",
+        "DEGREES_LAT": 47.44734,
+        "DEGREES_LONG": 65.77727,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756830900000,
+        "FIRE_STAT_DATE": 1756901100000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.2,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756914119
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68585,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.47542912698799,
+          46.99147961517266
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68585,
+        "FIRE_NUMBER": "2025256",
+        "FIRE_NUMBER_SHORT": "256",
+        "FIRE_NAME": "Beaver Lake Stream",
+        "DEGREES_LAT": 46.99147,
+        "DEGREES_LONG": 66.47543,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755166920000,
+        "FIRE_STAT_DATE": 1756888260000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 85,
+        "FIRE_SIZE": 456.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756914119
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68307,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.43247876838464,
+          47.15278966673053
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68307,
+        "FIRE_NUMBER": "2025208",
+        "FIRE_NUMBER_SHORT": "208",
+        "FIRE_NAME": "Old Field Road",
+        "DEGREES_LAT": 47.15278,
+        "DEGREES_LONG": 65.43248,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1754492640000,
+        "FIRE_STAT_DATE": 1756888860000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1403.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1756914119
       }
     }
   ]
