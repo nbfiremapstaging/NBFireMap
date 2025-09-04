@@ -1,6 +1,6 @@
 {
   "source": "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf",
-  "fetched_utc": 1757011808,
+  "fetched_utc": 1757013984,
   "pages": 1,
   "tables": [
     {
@@ -327,7 +327,7 @@
           "Trac": "0",
           "Air": "0",
           "Heli": "0",
-          "Ovr": "1"
+          "Ovr": "0"
         },
         {
           "Region": "West",
