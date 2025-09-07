@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.3,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 95,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -221,7 +221,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 5,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -314,7 +314,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -345,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -376,7 +376,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -393,7 +393,7 @@
         "OBJECTID": 69363,
         "FIRE_NUMBER": "2025328",
         "FIRE_NUMBER_SHORT": "328",
-        "FIRE_NAME": "Fire Road Bog",
+        "FIRE_NAME": "328",
         "DEGREES_LAT": 45.902,
         "DEGREES_LONG": 65.67567,
         "FIRE_STAT_ID": 4,
@@ -407,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -438,7 +438,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     },
     {
@@ -469,7 +469,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757263338
+        "FETCHED_FROM_ERD": 1757266232
       }
     }
   ]
