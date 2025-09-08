@@ -9,64 +9,33 @@
   "features": [
     {
       "type": "Feature",
-      "id": 68585,
+      "id": 69282,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -66.47542912698799,
-          46.99147961517266
+          -67.05599926743214,
+          45.78950939380331
         ]
       },
       "properties": {
-        "OBJECTID": 68585,
-        "FIRE_NUMBER": "2025256",
-        "FIRE_NUMBER_SHORT": "256",
-        "FIRE_NAME": "Beaver Lake Stream",
-        "DEGREES_LAT": 46.99147,
-        "DEGREES_LONG": 66.47543,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1755166920000,
-        "FIRE_STAT_DATE": 1757322120000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 95,
-        "FIRE_SIZE": 456.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 68943,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.24161869399573,
-          46.991739643825994
-        ]
-      },
-      "properties": {
-        "OBJECTID": 68943,
-        "FIRE_NUMBER": "2025300",
-        "FIRE_NUMBER_SHORT": "300",
-        "FIRE_NAME": "Black River Bridge",
-        "DEGREES_LAT": 46.99173,
-        "DEGREES_LONG": 65.24162,
+        "OBJECTID": 69282,
+        "FIRE_NUMBER": "2025322",
+        "FIRE_NUMBER_SHORT": "322",
+        "FIRE_NAME": "322",
+        "DEGREES_LAT": 45.789500000000004,
+        "DEGREES_LONG": 67.056,
         "FIRE_STAT_ID": 4,
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756050120000,
-        "FIRE_STAT_DATE": 1757322600000,
-        "FIRE_OF_NOTE_INDCTR": 1,
-        "FIRE_NOTE_ENG": "Yes",
-        "FIRE_NOTE_FR": "Oui",
+        "TIME_DETECTED": 1756909500000,
+        "FIRE_STAT_DATE": 1757320680000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
       }
     },
     {
@@ -97,69 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69422,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.74724848279622,
-          46.11869950352868
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69422,
-        "FIRE_NUMBER": "2025332",
-        "FIRE_NUMBER_SHORT": "332",
-        "FIRE_NAME": "332",
-        "DEGREES_LAT": 46.11869,
-        "DEGREES_LONG": 64.74725,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1757188800000,
-        "FIRE_STAT_DATE": 1757322480000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 1.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69282,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -67.05599926743214,
-          45.78950939380331
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69282,
-        "FIRE_NUMBER": "2025322",
-        "FIRE_NUMBER_SHORT": "322",
-        "FIRE_NAME": "322",
-        "DEGREES_LAT": 45.789500000000004,
-        "DEGREES_LONG": 67.056,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1756909500000,
-        "FIRE_STAT_DATE": 1757320680000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 2.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
       }
     },
     {
@@ -190,7 +97,69 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69422,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.74724848279622,
+          46.11869950352868
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69422,
+        "FIRE_NUMBER": "2025332",
+        "FIRE_NUMBER_SHORT": "332",
+        "FIRE_NAME": "332",
+        "DEGREES_LAT": 46.11869,
+        "DEGREES_LONG": 64.74725,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1757188800000,
+        "FIRE_STAT_DATE": 1757322480000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1757374304
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68943,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.24161869399573,
+          46.991739643825994
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68943,
+        "FIRE_NUMBER": "2025300",
+        "FIRE_NUMBER_SHORT": "300",
+        "FIRE_NAME": "Black River Bridge",
+        "DEGREES_LAT": 46.99173,
+        "DEGREES_LONG": 65.24162,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1756050120000,
+        "FIRE_STAT_DATE": 1757322600000,
+        "FIRE_OF_NOTE_INDCTR": 1,
+        "FIRE_NOTE_ENG": "Yes",
+        "FIRE_NOTE_FR": "Oui",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 2.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1757374304
       }
     },
     {
@@ -221,7 +190,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 68585,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -66.47542912698799,
+          46.99147961517266
+        ]
+      },
+      "properties": {
+        "OBJECTID": 68585,
+        "FIRE_NUMBER": "2025256",
+        "FIRE_NUMBER_SHORT": "256",
+        "FIRE_NAME": "Beaver Lake Stream",
+        "DEGREES_LAT": 46.99147,
+        "DEGREES_LONG": 66.47543,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1755166920000,
+        "FIRE_STAT_DATE": 1757322120000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 95,
+        "FIRE_SIZE": 456.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1757374304
       }
     },
     {
@@ -252,7 +252,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
       }
     },
     {
@@ -283,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757371225
+        "FETCHED_FROM_ERD": 1757374304
       }
     }
   ]
