@@ -1,6 +1,6 @@
 {
   "source": "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf",
-  "fetched_utc": 1757515472,
+  "fetched_utc": 1757518415,
   "pages": 1,
   "tables": [
     {
@@ -84,23 +84,6 @@
           "Longitude": "66.11490",
           "Size": "218.0",
           "Pers": "2",
-          "Eng": "1",
-          "Tend": "0",
-          "Trac": "0",
-          "Air": "0",
-          "Heli": "0",
-          "Ovr": "1"
-        },
-        {
-          "Region": "East",
-          "Status": "Being Patrolled",
-          "Number": "333",
-          "Fire Name": "Pokemouche Slash",
-          "Updated": "Sep-09",
-          "Latitude": "47.64078",
-          "Longitude": "64.86328",
-          "Size": "0.1",
-          "Pers": "0",
           "Eng": "1",
           "Tend": "0",
           "Trac": "0",
@@ -245,6 +228,40 @@
           "Ovr": "1"
         },
         {
+          "Region": "East",
+          "Status": "Out",
+          "Number": "333",
+          "Fire Name": "Pokemouche Slash",
+          "Updated": "Sep-09",
+          "Latitude": "47.64078",
+          "Longitude": "64.86328",
+          "Size": "0.1",
+          "Pers": "1",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "0"
+        },
+        {
+          "Region": "East",
+          "Status": "Out",
+          "Number": "335",
+          "Fire Name": "335",
+          "Updated": "Sep-09",
+          "Latitude": "47.21795",
+          "Longitude": "65.11913",
+          "Size": "0.1",
+          "Pers": "0",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "0"
+        },
+        {
           "Region": "West",
           "Status": "Being Patrolled",
           "Number": "322",
@@ -254,23 +271,6 @@
           "Longitude": "67.05600",
           "Size": "2.0",
           "Pers": "3",
-          "Eng": "0",
-          "Tend": "0",
-          "Trac": "0",
-          "Air": "0",
-          "Heli": "0",
-          "Ovr": "1"
-        },
-        {
-          "Region": "West",
-          "Status": "Being Patrolled",
-          "Number": "328",
-          "Fire Name": "328",
-          "Updated": "Sep-09",
-          "Latitude": "45.90200",
-          "Longitude": "65.67567",
-          "Size": "0.5",
-          "Pers": "0",
           "Eng": "0",
           "Tend": "0",
           "Trac": "0",
@@ -294,6 +294,23 @@
           "Air": "0",
           "Heli": "0",
           "Ovr": "1"
+        },
+        {
+          "Region": "West",
+          "Status": "Out",
+          "Number": "328",
+          "Fire Name": "328",
+          "Updated": "Sep-09",
+          "Latitude": "45.90200",
+          "Longitude": "65.67567",
+          "Size": "0.5",
+          "Pers": "0",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "0"
         }
       ]
     }
