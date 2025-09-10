@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 218.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757522485
+        "FETCHED_FROM_ERD": 1757525485
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 2.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757522485
+        "FETCHED_FROM_ERD": 1757525485
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757522485
+        "FETCHED_FROM_ERD": 1757525485
       }
     },
     {
@@ -117,9 +117,9 @@
         "FIRE_NAME": "Rocky Brook",
         "DEGREES_LAT": 47.702329999999996,
         "DEGREES_LONG": 66.28783,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
         "TIME_DETECTED": 1755359340000,
         "FIRE_STAT_DATE": 1757497380000,
         "FIRE_OF_NOTE_INDCTR": 0,
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 204.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757522485
+        "FETCHED_FROM_ERD": 1757525485
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 95,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1757522485
+        "FETCHED_FROM_ERD": 1757525485
       }
     }
   ]
