@@ -1,6 +1,6 @@
 {
   "source": "https://www3.gnb.ca/public/fire-feu/activitysum_e.pdf",
-  "fetched_utc": 1757662196,
+  "fetched_utc": 1757666421,
   "pages": 1,
   "tables": [
     {
@@ -107,6 +107,40 @@
           "Air": "0",
           "Heli": "0",
           "Ovr": "1"
+        },
+        {
+          "Region": "West",
+          "Status": "Out",
+          "Number": "334",
+          "Fire Name": "334",
+          "Updated": "Sep-11",
+          "Latitude": "46.10233",
+          "Longitude": "67.70300",
+          "Size": "0.2",
+          "Pers": "0",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "0"
+        },
+        {
+          "Region": "West",
+          "Status": "Out",
+          "Number": "336",
+          "Fire Name": "336",
+          "Updated": "Sep-11",
+          "Latitude": "45.94933",
+          "Longitude": "67.12099",
+          "Size": "0.1",
+          "Pers": "0",
+          "Eng": "0",
+          "Tend": "0",
+          "Trac": "0",
+          "Air": "0",
+          "Heli": "0",
+          "Ovr": "0"
         },
         {
           "Region": "West",
