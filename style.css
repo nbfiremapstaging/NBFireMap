@@ -435,3 +435,21 @@
 @media (max-width: 340px){
   .map-header .map-btn span:not(.icon){ font-size: 0.7em; }
 }
+
+/* Webcams popup styles (from webcams.html parity) */
+.popup h3 { margin: 0 0 .25rem; font-size: 1rem; }
+.popup .meta { font-size: .85rem; color: #555; margin-bottom: .5rem; }
+.views { display: grid; grid-template-columns: 1fr; gap: .5rem; }
+.view { border: 1px solid #ddd; border-radius: .5rem; padding: .5rem; background: #fff; }
+.view a { text-decoration: none; }
+.view img {
+  display: block;
+  width: 360px; max-width: 100%;
+  height: auto;
+  border-radius: .25rem;
+  border: 1px solid #eee;
+}
+.badge { display:inline-block; padding:.15rem .4rem; font-size:.75rem; border-radius:.4rem; background:#eef; margin-left:.4rem; }
+.disabled { background:#fee; }
+.error { color:#b00020; font-size:.85rem; }
+.webcam-icon { filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }

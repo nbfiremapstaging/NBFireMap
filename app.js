@@ -77,7 +77,7 @@
         ['extinguished',   { color: '#0000FF',   sev: -1 }],
       ]);
       const norm = (s) => (s || '').toString().trim().toLowerCase();
-      const statusColor   = (s) => STATUS.get(norm(s))?.color ?? '#0000FF';
+      const statusColor1   = (s) => STATUS.get(norm(s))?.color ?? '#0000FF';
       const severityRank  = (s) => STATUS.get(norm(s))?.sev   ?? -1;
 
       // Formatting helpers
@@ -275,7 +275,7 @@
               const sev = Number.isFinite(m.options._severity) ? m.options._severity : severityRank(k);
               if(sev > worstSev){ worstSev = sev; worstKey = k; }
             }
-            const ring = statusColor(worstKey);
+            const ring = statusColor1(worstKey);
             const count = cluster.getChildCount();
             return L.divIcon({
               className:'fire-cluster-icon',
@@ -320,7 +320,7 @@
             <div style="font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px">#${props.FIRE_NUMBER_SHORT} ${props.FIRE_NAME || props.FIRE_ID || 'Unnamed Fire'}</div>
             <div style="margin:6px 0 10px">
               <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.12)">
-                <span class="dot" style="background:${statusColor(status)}"></span>${status}
+                <span class="dot" style="background:${statusColor1(status)}"></span>${status}
               </span>
             </div>
             <div><b>Area:</b> ${toNum(props.FIRE_SIZE ?? props.SIZE_HA ?? props.AREA,1)} ha</div>
@@ -346,7 +346,7 @@
           pane: 'firesPane',
           icon: L.divIcon({
             className:'fire-badge-icon',
-            html:`<div class="marker-badge" style="--ring:${statusColor(statusKey)}"><i class="fa-solid fa-fire"></i></div>`,
+            html:`<div class="marker-badge" style="--ring:${statusColor1(statusKey)}"><i class="fa-solid fa-fire"></i></div>`,
             iconSize:[38,38],iconAnchor:[19,26],popupAnchor:[0,-22]
           }),
           keyboard:false
@@ -985,7 +985,343 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
       cityClusters.addTo(map);
 
       // ---- Overlays & control ----------------------------------------------
-      const overlays = {
+      
+// ==== NB External Layers (OFF by default; lazy-loaded) ====
+const ferriesLayer = L.markerClusterGroup({ pane: 'firesPane',
+  disableClusteringAtZoom: 10,
+  spiderfyOnMaxZoom: true,
+  zoomToBoundsOnClick: true,
+  showCoverageOnHover: false,
+  iconCreateFunction: (cluster) => {
+    const markers = cluster.getAllChildMarkers();
+    // Compute worst status among children: red > orange > green
+    let worst = -1, color = '#27ae60'; // default green
+    for (const m of markers) {
+      const sev = Number.isFinite(m.options._fSeverity) ? m.options._fSeverity : 0;
+      if (sev > worst) worst = sev;
+    }
+    if (worst >= 2) color = '#e74c3c'; else if (worst === 1) color = '#f39c12';
+    const count = markers.length;
+    return L.divIcon({
+      className: 'ferry-cluster-icon',
+      html: `<div class="marker-badge" style="--ring:${color};position:relative"><i class="fa-solid fa-ferry"></i><b style="position:absolute;right:-6px;bottom:-6px;font:700 12px/1 Inter,system-ui,sans-serif;background:#fff;border:2px solid var(--ring);padding:2px 5px;border-radius:999px;min-width:20px;text-align:center">${count}</b></div>`,
+      iconSize: [38, 38],
+      iconAnchor: [22, 28]
+    });
+  }
+});
+const webcamsLayer = L.markerClusterGroup({
+  pane: 'firesPane',
+  disableClusteringAtZoom: 11,
+  spiderfyOnMaxZoom: true,
+  zoomToBoundsOnClick: true,
+  showCoverageOnHover: false,
+  iconCreateFunction: (cluster) => {
+    const count = cluster.getChildCount();
+    const color = '#1f6feb';
+    return L.divIcon({
+      className: 'webcam-cluster-icon',
+      html: `<div class="marker-badge" style="--ring:${color};position:relative"><i class="fa-solid fa-camera"></i><b style="position:absolute;right:-6px;bottom:-6px;font:700 12px/1 Inter,system-ui,sans-serif;background:#fff;border:2px solid var(--ring);padding:2px 5px;border-radius:999px;min-width:20px;text-align:center">${count}</b></div>`,
+      iconSize: [38, 38],
+      iconAnchor: [19, 26]
+    });
+  }
+});
+const eventsPointLayer = L.layerGroup({ pane: 'firesPane' });
+const eventsLineLayer = L.layerGroup({ pane: 'firesPane' });
+const eventsDetourLayer = L.layerGroup({ pane: 'firesPane' });
+const eventsCombined = L.layerGroup({ pane: 'firesPane' });
+const winterRoadsLayer = L.layerGroup({ pane: 'radarPane' });
+
+function statusColor(status){
+  if (!status) return '#666';
+  const s = status.toLowerCase();
+  if (s.includes('reduced') || s.includes('delayed')) return '#f39c12';
+  if (s.includes('out of service') || s.includes('closed')) return '#e74c3c';
+  return '#27ae60';
+}
+
+function ferryIcon(color = '#27ae60') {
+  // Font Awesome ferry inside our circular badge; color controlled by --ring CSS var
+  return L.divIcon({
+    className: 'ferry-badge-icon',
+    html: `<div class="marker-badge" style="--ring:${color}"><i class="fa-solid fa-ferry"></i></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 26],
+    popupAnchor: [0, -22]
+  });
+}
+
+
+
+
+function makeWebcamIcon(color = '#1f6feb') {
+  // Font Awesome camera inside our circular badge; color controlled by --ring CSS var
+  return L.divIcon({
+    className: 'webcam-badge-icon',
+    html: `<div class="marker-badge" style="--ring:${color}"><i class="fa-solid fa-camera"></i></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 26],
+    popupAnchor: [0, -22]
+  });
+}
+const webcamIcon = makeWebcamIcon();
+const POINT_COLORS = {
+  closures: '#e11d48',       // red
+  restrictions: '#f59e0b',   // amber
+  incidents: '#f97316',      // orange
+  construction: '#8e44ad',   // purple
+  other: '#1f6feb',          // blue
+  default: '#1f6feb'         // fallback
+};
+const WINTER_COLORS = {
+  'Bare Dry':'#2ecc71','Bare Wet':'#3498db','Slushy':'#8e44ad','Snow Covered':'#e67e22',
+  'Compacted Snow':'#d35400','Ice Covered':'#e74c3c','Partly Covered':'#f1c40f','Closed':'#7f8c8d','Unknown':'#95a5a6'
+};
+function colorForType(t){
+  const k = (t||'').toString().trim().toLowerCase();
+  if (POINT_COLORS[k]) return POINT_COLORS[k];
+  if (k.includes('clos')) return POINT_COLORS.closures;
+  if (k.includes('restrict') || k.includes('delay') || k.includes('reduc')) return POINT_COLORS.restrictions;
+  if (k.includes('incident') || k.includes('accident')) return POINT_COLORS.incidents;
+  if (k.includes('construct') || k.includes('mainten') || k.includes('work')) return POINT_COLORS.construction;
+  return POINT_COLORS.default;
+}
+let _ferriesLoaded=false, _webcamsLoaded=false, _eventsLoaded=false, _winterLoaded=false;
+
+function escHTML(s){ return (s??'').toString().replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function epochToLocal(sec){ if(sec==null) return '—'; const d=new Date(sec*1000); return isNaN(d)?'—':d.toLocaleString(); }
+
+async function loadFerries(){
+
+  if (_ferriesLoaded) return;
+  try {
+    const r = await fetch('ferries.json',{cache:'no-store'});
+    const ferries = await r.json();
+    (ferries||[]).forEach(f => {
+      const color = statusColor(f.Status);
+      const sev = (()=>{ const s=(f.Status||'').toLowerCase(); if (s.includes('out of service')||s.includes('closed')) return 2; if (s.includes('reduced')||s.includes('delayed')) return 1; return 0; })();
+      const marker = L.marker([f.Latitude, f.Longitude], { icon: ferryIcon(color), title: f.Name, _fSeverity: sev });
+      const html = [
+        '<div class="popup">',
+        '<h3>'+escHTML(f.Name||'Ferry')+'</h3>',
+        '<div class="meta"><span class="badge">'+escHTML(f.Area||'')+'</span></div>',
+        '<div><strong>Status:</strong> '+escHTML(f.Status||'—')+'</div>',
+        '<div><strong>Delays:</strong> '+escHTML(f.Delays||'—')+'</div>',
+        '<div><strong>Service Disruption:</strong> '+escHTML(f.ServiceDisruption||'—')+'</div>',
+        '<div style="margin-top:6px;color:#555;font-size:12px"><em>Last updated:</em> '+epochToLocal(f.LastUpdated)+'</div>',
+        '</div>'
+      ].join('');
+      marker.bindPopup(html).addTo(ferriesLayer);
+    });
+    _ferriesLoaded = true;
+  } catch(e) { console.error('Ferries layer load failed', e); }
+
+}
+async function loadWebcams(){
+
+  if (_webcamsLoaded) return;
+  try {
+    const r = await fetch('webcams.json',{cache:'no-store'});
+    const cams = await r.json();
+    const withCB = (u) => { const hasQ=(u||'').includes('?'); const ts=Date.now(); return (u||'')+(hasQ?'&':'?')+'_ts='+ts; };
+    
+function buildViewHTML(v){
+  const enabled = (v.Status || '').toLowerCase() === 'enabled';
+  const badge = '<span class="badge ' + (enabled ? '' : 'disabled') + '">' + (enabled ? 'Enabled' : 'Disabled') + '</span>';
+  const id    = (v.Id ?? '').toString();
+  const imgId = 'img_' + Math.random().toString(36).slice(2);
+  const errId = 'err_' + Math.random().toString(36).slice(2);
+
+  return [
+    '<div class="view" data-viewid="'+id+'" data-url="'+encodeURIComponent(v.Url || '')+'" data-imgid="'+imgId+'" data-errid="'+errId+'">',
+      '<div class="meta"><strong>View '+id+'</strong> '+badge+' · <a href="'+(v.Url||'#')+'" target="_blank" rel="noopener">Open live feed</a></div>',
+      (enabled ? '<img id="'+imgId+'" alt="Webcam view '+id+'" referrerpolicy="no-referrer" loading="lazy" />' : ''),
+      (v.Description && v.Description !== 'N/A' ? '<div class="meta">'+escHTML(v.Description)+'</div>' : ''),
+      '<div id="'+errId+'" class="error" style="display:none"></div>',
+    '</div>'
+  ].join('');
+}
+    function initPopupImages(container){
+      const views = container.querySelectorAll('.view');
+      views.forEach(v => {
+        const original = decodeURIComponent(v.dataset.url || '');
+        const img = document.getElementById(v.dataset.imgid);
+        const err = document.getElementById(v.dataset.errid);
+        if (!original || !img) return;
+        const finalURL = withCB(original);
+        err.style.display='none'; img.style.display='block';
+        img.onload = () => { err.style.display='none'; };
+        img.onerror = () => { img.style.display='none'; err.textContent='Could not load inline image (host may block embedding). Use the link above.'; err.style.display='block'; };
+        img.src = finalURL;
+      });
+    }
+    (cams||[]).forEach(cam => {
+      const m = L.marker([cam.Latitude, cam.Longitude], { icon: (typeof webcamIcon !== 'undefined' ? webcamIcon : makeWebcamIcon()), title: cam.Name||'Webcam' });
+      const title = cam.Name || 'Webcam';
+      const road = cam.Road ? ' · '+cam.Road : '';
+      const src = cam.Source ? ('Source: '+cam.Source) : '';
+      const dir = cam.Direction && cam.Direction!=='Unknown' ? ' • '+cam.Direction : '';
+      const viewsHTML = (cam.Views||[]).map(buildViewHTML).join('');
+      const html = [
+        '<div class="popup">',
+        '<h3>'+escHTML(title)+road+dir+'</h3>',
+        '<div class="meta">'+escHTML(src)+'</div>',
+        '<div class="views">'+(viewsHTML || '<em>No views listed.</em>')+'</div>',
+        '</div>'
+      ].join('');
+      m.bindPopup(html).on('popupopen', (e)=>{ initPopupImages(e.popup.getElement()); }).addTo(webcamsLayer);
+    });
+    _webcamsLoaded = true;
+    if (!window._webcamRefreshTimer) {
+      window._webcamRefreshTimer = setInterval(() => {
+        const openPopup = document.querySelector('.leaflet-popup-content');
+        if (openPopup) initPopupImages(openPopup);
+      }, 30_000);
+    }
+  } catch(e) { console.error('Webcams layer load failed', e); }
+
+}
+async function loadEvents(){
+
+  if (_eventsLoaded) return;
+  try {
+    const r = await fetch('events.json',{cache:'no-store'});
+    const data = await r.json();
+
+    function buildPopup(e){
+      const restrictions = e.Restrictions || {};
+      const parts = [
+        '<div class="popup">',
+        '<h3>'+escHTML(e.Description || 'Event')+'</h3>',
+        '<div class="muted">'+escHTML(e.RoadwayName || '')+' · '+escHTML(e.DirectionOfTravel || '')+'</div>',
+        '<table>',
+        '<tr><td class="label">Type</td><td>'+escHTML(e.EventType)+(e.EventSubType? ' · '+escHTML(e.EventSubType):'')+'</td></tr>',
+        '<tr><td class="label">Closure?</td><td>'+(e.IsFullClosure? 'Yes':'No')+'</td></tr>',
+        '<tr><td class="label">Severity</td><td>'+escHTML(e.Severity || '—')+'</td></tr>',
+        '<tr><td class="label">Reported</td><td>'+epochToLocal(e.Reported)+'</td></tr>',
+        '<tr><td class="label">Updated</td><td>'+epochToLocal(e.LastUpdated)+'</td></tr>',
+        '<tr><td class="label">Starts</td><td>'+epochToLocal(e.StartDate)+'</td></tr>',
+        '<tr><td class="label">Planned End</td><td>'+epochToLocal(e.PlannedEndDate)+'</td></tr>',
+        (e.DetourInstructions && e.DetourInstructions.length ? '<tr><td class="label">Detour</td><td>'+escHTML(Array.isArray(e.DetourInstructions)? e.DetourInstructions.join(' ') : e.DetourInstructions)+'</td></tr>' : ''),
+        `<tr><td class="label">Restrictions</td><td>${
+          [
+            restrictions.Lanes ? ("Lanes: " + restrictions.Lanes) : "",
+            restrictions.AllowedVehicles ? ("Allowed: " + restrictions.AllowedVehicles) : "",
+            restrictions.HeavyVehicles ? ("Heavy: " + restrictions.HeavyVehicles) : "",
+            restrictions.Width ? ("Width: " + restrictions.Width) : "",
+            restrictions.Height ? ("Height: " + restrictions.Height) : "",
+            restrictions.Length ? ("Length: " + restrictions.Length) : "",
+            restrictions.Weight ? ("Weight: " + restrictions.Weight) : "",
+            restrictions.Speed != null ? ("Speed: " + restrictions.Speed + " km/h") : ""
+          ].filter(Boolean).join(" · ") || "—"
+        }</td></tr>`,
+        '</table>' +
+        (e.Comment ? '<div style="margin-top:6px">' + escHTML(e.Comment) + '</div>' : '') +
+        '</div>'];
+      return parts.join('');
+    }
+
+    function addPoint(e){
+      if (typeof e.Latitude !== 'number' || typeof e.Longitude !== 'number') return;
+      const marker = L.circleMarker([e.Latitude, e.Longitude], {
+        radius: 6, color: '#111827', weight: 1,
+        fillColor: colorForType(e.EventType), fillOpacity: 0.9
+      }).bindPopup(buildPopup(e));
+      marker.addTo(eventsPointLayer).addTo(eventsCombined);
+      if (typeof e.LatitudeSecondary==='number' && typeof e.LongitudeSecondary==='number'){
+        const sec = L.circleMarker([e.LatitudeSecondary, e.LongitudeSecondary], {
+          radius:5, color:'#6b7280', fillColor:'#9ca3af', fillOpacity: 0.7
+        }).bindPopup('<b>Secondary location</b>');
+        sec.addTo(eventsPointLayer).addTo(eventsCombined);
+        L.polyline([[e.Latitude,e.Longitude],[e.LatitudeSecondary,e.LongitudeSecondary]],{color:'#6b7280', dashArray:'4,4', weight:2, opacity: .8}).addTo(eventsLineLayer).addTo(eventsCombined);
+      }
+    }
+
+    
+const LINE_STYLES = {
+  encoded: { color: '#111827', weight: 4, opacity: 0.8 },      // event geometry (matches events.html)
+  detour:  { color: '#8b5cf6', weight: 3, dashArray: '6,6', opacity: 0.9 } // detours (matches events.html)
+};
+function addEncodedLine(encoded, bindPopupHtml){
+      try{
+        const coords = polyline.decode(encoded).map(([lat, lng]) => [lat, lng]);
+        if (coords && coords.length){
+          const pl = L.polyline(coords, LINE_STYLES.encoded);
+          if (bindPopupHtml) pl.bindPopup(bindPopupHtml);
+          pl.addTo(eventsLineLayer).addTo(eventsCombined);
+        }
+      }catch(e){}
+    }
+
+    function addDetourLine(encoded, bindPopupHtml){
+      try{
+        const coords = polyline.decode(encoded).map(([lat, lng]) => [lat, lng]);
+        if (coords && coords.length){
+          const pl = L.polyline(coords, LINE_STYLES.detour);
+          if (bindPopupHtml) pl.bindPopup('<b>Detour</b><br/>' + bindPopupHtml);
+          pl.addTo(eventsDetourLayer).addTo(eventsCombined);
+        }
+      }catch(e){}
+    }
+
+    (data||[]).forEach(e => {
+      addPoint(e);
+      if (e.EncodedPolyline && e.EncodedPolyline.trim()) addEncodedLine(e.EncodedPolyline.trim(), buildPopup(e));
+      if (e.DetourPolyline && e.DetourPolyline.trim()) addDetourLine(e.DetourPolyline.trim(), buildPopup(e));
+    });
+    _eventsLoaded = true;
+  } catch(e) { console.error('Events layer load failed', e); }
+
+}
+async function loadWinterRoads(){
+
+  if (_winterLoaded) return;
+  try{
+    const r = await fetch('winterroads.json',{cache:'no-store'});
+    const rows = await r.json();
+    const list = Array.isArray(rows?.features) ? rows.features.map(f => f.properties||f) :
+                 Array.isArray(rows) ? rows : [];
+    list.forEach(row => {
+      const enc = row.EncodedPolyline || row.encodedPolyline || row.polyline;
+      if (!enc || !window.polyline) return;
+      let coords; try{ coords = polyline.decode(enc).map(([lat,lng]) => [lat,lng]); } catch { return; }
+      const cond = row['Primary Condition'] || row.primaryCondition || 'Unknown';
+      const line = L.polyline(coords, { color: (WINTER_COLORS[cond] || WINTER_COLORS['Unknown']), weight: 4, opacity: 0.9 }).addTo(winterRoadsLayer);
+      const secondary = (row['Secondary Conditions'] || row.secondaryConditions || []).join(', ') || '—';
+      const road = row.RoadwayName || row.roadwayName || '—';
+      const area = row.AreaName || row.areaName || '—';
+      const vis = row.Visibility || row.visibility || '—';
+      const desc = row.LocationDescription || row.locationDescription || '';
+      const time = row.LastUpdated ? new Date(row.LastUpdated*1000).toLocaleString() : '—';
+      const html = [
+        '<div style="min-width:220px">',
+        '<div class="cond">'+escHTML(cond)+'</div>',
+        '<div>'+escHTML(road)+'</div>',
+        '<div style="color:#555">'+escHTML(area)+'</div>',
+        (desc ? '<div style="margin-top:6px">'+escHTML(desc)+'</div>' : ''),
+        '<hr style="border:none;border-top:1px solid #0001;margin:8px 0" />',
+        '<div><b>Secondary:</b> '+escHTML(secondary)+'</div>',
+        '<div><b>Visibility:</b> '+escHTML(vis)+'</div>',
+        '<div><b>Updated:</b> '+escHTML(time)+'</div>',
+        '</div>'
+      ].join('');
+      line.bindPopup(html);
+    });
+    _winterLoaded = true;
+  }catch(e){ console.error('Winter roads layer load failed', e); }
+
+}
+// Lazy-load on first enable
+if (typeof map !== 'undefined' && map && map.on){
+  map.on('overlayadd', (e)=>{
+    if (e.layer === ferriesLayer) loadFerries();
+    if (e.layer === webcamsLayer) loadWebcams();
+    if (e.layer === eventsCombined || e.layer === eventsPointLayer || e.layer === eventsLineLayer || e.layer === eventsDetourLayer) loadEvents();
+    if (e.layer === winterRoadsLayer) loadWinterRoads();
+  });
+}
+const overlays = {
         Smoke: smokeLayer,
             'Fire Risk': riskLayer,
     'Fire Weather': fwiLayer,
@@ -994,6 +1330,11 @@ const legendURLForLayer = (fullyQualifiedLayer)=>{
         'CWFIS Hotspots — Last 7 days': cwfis7,
         'Fire Perimeters': activePerimeters,
         'Cities & Towns': cityClusters,
+        // ——— External NB layers ———
+        'Ferries': ferriesLayer,
+        'Road Webcams': webcamsLayer,
+        'Road Events': eventsCombined,
+        'Road Conditions': winterRoadsLayer,
         Aircraft: planesLayer,
         'Weather Stations': weatherStations,
         'AQHI Risk': aqhiLayer,
@@ -2176,7 +2517,118 @@ doc.autoTable({
       }
 
       
-  /* ===================== Inline mount + logic for CWFIS controls ===================== */
+  
+      // === Inline legend for "Road Conditions" ==============================
+      const WINTER_LABEL = 'Road Conditions';
+      let winterLegendEl = null;
+
+      function buildWinterLegendEl(){
+        if (winterLegendEl) return winterLegendEl;
+        const wrap = document.createElement('div');
+        wrap.className = 'winter-legend inline';
+        wrap.setAttribute('aria-live','polite');
+        wrap.style.display = 'none';
+
+        const rowsHtml = Object.entries(WINTER_COLORS).map(([label, col]) => `
+          <div class="wl-row" style="display:flex;align-items:center;gap:8px;margin:2px 0">
+            <span class="wl-swatch" style="width:12px;height:12px;border-radius:3px;border:1px solid var(--border);background:${col}"></span>
+            <span>${label}</span>
+          </div>
+        `).join('');
+
+        wrap.innerHTML = `
+          <div style="font-weight:800;margin:6px 0 4px">Road Conditions</div>
+          ${rowsHtml}
+        `;
+        winterLegendEl = wrap;
+        return wrap;
+      }
+
+      function mountWinterLegendInline(){
+        const row = findOverlayLabelRow(WINTER_LABEL);
+        if (!row) return;
+        const el = buildWinterLegendEl();
+        if (el.parentElement !== row.parentElement || el.previousElementSibling !== row){
+          row.after(el);
+        }
+      }
+
+      map.on('overlayadd',   (e) => {
+        if (e.layer === winterRoadsLayer){
+          mountWinterLegendInline();
+          buildWinterLegendEl().style.display = 'block';
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+      map.on('overlayremove',(e) => {
+        if (e.layer === winterRoadsLayer){
+          if (winterLegendEl) winterLegendEl.style.display = 'none';
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+      if (map.hasLayer(winterRoadsLayer)){
+        mountWinterLegendInline();
+        buildWinterLegendEl().style.display = 'block';
+        requestAnimationFrame(sizeLegend);
+      }
+
+      // ----- Inline legend for Road Events (matches events.html) -----
+      const EVENTS_LABEL = 'Road Events';
+
+      function buildEventsLegendEl(){
+        const el = document.createElement('div');
+        el.id = 'eventsLegend';
+        el.className = 'inline-legend';
+        el.style.cssText = [
+          'display:none;margin:6px 0 0 0;padding:6px 8px;',
+          'border:1px solid var(--btn-border);border-radius:8px;background:var(--btn-bg);',
+          'font-size:12px;line-height:1.25'
+        ].join('');
+        el.innerHTML = [
+          '<div style="font-weight:800;margin-bottom:4px">Legend</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:50%;border:1px solid #0003;background:#e11d48;display:inline-block"></span> Closures</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:50%;border:1px solid #0003;background:#f59e0b;display:inline-block"></span> Roadwork</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:50%;border:1px solid #0003;background:#3b82f6;display:inline-block"></span> Incidents</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:50%;border:1px solid #0003;background:#10b981;display:inline-block"></span> Other</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:2px;border:1px solid #0003;background:#111827;display:inline-block"></span> Event geometry</div>',
+          '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;"><span style="width:12px;height:12px;border-radius:2px;border:1px solid #0003;background:#8b5cf6;display:inline-block"></span> Detour</div>'
+        ].join('');
+        return el;
+      }
+
+      function mountEventsLegendInline(){
+        const row = findOverlayLabelRow(EVENTS_LABEL);
+        if (!row) return;
+        if (!document.getElementById('eventsLegend')){
+          const el = buildEventsLegendEl();
+          row.insertAdjacentElement('afterend', el);
+        }
+      }
+
+      function setEventsLegendVisible(show){
+        const el = document.getElementById('eventsLegend');
+        if (el) el.style.display = show ? 'block' : 'none';
+      }
+
+      map.on('overlayadd', (e) => {
+        if (e.layer === eventsCombined){
+          mountEventsLegendInline();
+          setEventsLegendVisible(true);
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+      map.on('overlayremove', (e) => {
+        if (e.layer === eventsCombined){
+          setEventsLegendVisible(false);
+          requestAnimationFrame(sizeLegend);
+        }
+      });
+      if (map.hasLayer(eventsCombined)){
+        mountEventsLegendInline();
+        setEventsLegendVisible(true);
+        requestAnimationFrame(sizeLegend);
+      }
+/* ===================== Inline mount + logic for CWFIS controls ===================== */
   const riskControls = $('#riskControls'), riskTime = $('#riskTime'), riskStamp = $('#riskStamp'), riskLegend = $('#riskLegend'), riskErr = $('#riskErr');
   const fwiControls  = $('#fwiControls'),  fwiTime  = $('#fwiTime'),  fwiStamp  = $('#fwiStamp'),  fwiLegend  = $('#fwiLegend'), fwiErr  = $('#fwiErr'),  fwiComp = $('#fwiComp');
   const fbpControls  = $('#fbpControls'),  fbpTime  = $('#fbpTime'),  fbpStamp  = $('#fbpStamp'),  fbpLegend  = $('#fbpLegend'), fbpErr  = $('#fbpErr'),  fbpMetric = $('#fbpMetric');
