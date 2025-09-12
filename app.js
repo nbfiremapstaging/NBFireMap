@@ -1609,7 +1609,7 @@ const overlays = {
           const start = acc / total * 360;
           const end   = (acc + val) / total * 360;
           acc += val;
-          const color = statusColor(k);
+          const color = statusColor1(k);
           segs.push(`${color} ${start}deg ${end}deg`);
           legend.push(`
             <div class="legend-item" role="button" tabindex="0" data-status-key="${k}">
@@ -2062,11 +2062,11 @@ const overlays = {
     const ctx = canvas.getContext('2d'); ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
 
     const statusColorMap = {
-      'out of control': statusColor('out of control'),
-      'being monitored': statusColor('being monitored'),
-      'contained': statusColor('contained'),
-      'under control': statusColor('under control'),
-      'being patrolled': statusColor('being patrolled')
+      'out of control': statusColor1('out of control'),
+      'being monitored': statusColor1('being monitored'),
+      'contained': statusColor1('contained'),
+      'under control': statusColor1('under control'),
+      'being patrolled': statusColor1('being patrolled')
     };
 
     // Draw pie (true circle)
@@ -2227,7 +2227,7 @@ doc.autoTable({
   // Helper to render an NB status row using the same colors as the Overview
   const st = (label, key, text, abbr='') => `
     <li style="margin:6px 0; display:flex; gap:10px; align-items:flex-start;">
-      <span class="legend-swatch" style="background:${statusColor(key)}; flex:0 0 12px; margin-top:4px"></span>
+      <span class="legend-swatch" style="background:${statusColor1(key)}; flex:0 0 12px; margin-top:4px"></span>
       <div><b>${label}${abbr ? ` (${abbr})` : ''}</b> — ${text}</div>
     </li>`;
 
@@ -2422,7 +2422,7 @@ doc.autoTable({
           const fname = rec.props.FIRE_NAME || rec.props.FIRE_ID || 'Fire';
           const statusKey = norm(rec.statusKey || rec.props?.FIRE_STAT_DESC_E || '—');
           const statusLabel = statusKey.replace(/\b\w/g, c => c.toUpperCase());
-          const color = statusColor(statusKey);
+          const color = statusColor1(statusKey);
           return `<li>
             <a href="#" data-fireid="${rec.id}">
               <span class="dot" style="background:${color}; margin-right:6px"></span>
