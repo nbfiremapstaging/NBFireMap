@@ -9,37 +9,6 @@
   "features": [
     {
       "type": "Feature",
-      "id": 69882,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.78237882555908,
-          45.7571394180102
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69882,
-        "FIRE_NUMBER": "2025372",
-        "FIRE_NUMBER_SHORT": "372",
-        "FIRE_NAME": "East Scotch",
-        "DEGREES_LAT": 45.75713,
-        "DEGREES_LONG": 65.78238,
-        "FIRE_STAT_ID": 3,
-        "FIRE_STAT_DESC_E": "Under Control",
-        "FIRE_STAT_DESC_F": "Maîtrisé ",
-        "TIME_DETECTED": 1758456360000,
-        "FIRE_STAT_DATE": 1758467880000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
       "id": 69863,
       "geometry": {
         "type": "Point",
@@ -66,7 +35,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69882,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.78237882555908,
+          45.7571394180102
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69882,
+        "FIRE_NUMBER": "2025372",
+        "FIRE_NUMBER_SHORT": "372",
+        "FIRE_NAME": "East Scotch",
+        "DEGREES_LAT": 45.75713,
+        "DEGREES_LONG": 65.78238,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1758456360000,
+        "FIRE_STAT_DATE": 1758531060000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -86,18 +86,111 @@
         "FIRE_NAME": "Saint Croix River",
         "DEGREES_LAT": 45.44907,
         "DEGREES_LONG": 67.48161999999999,
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
+        "TIME_DETECTED": 1758387600000,
+        "FIRE_STAT_DATE": 1758531960000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 1.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1758555803
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69864,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.00643861186127,
+          47.00795965164996
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69864,
+        "FIRE_NUMBER": "2025365",
+        "FIRE_NUMBER_SHORT": "365",
+        "FIRE_NAME": "365",
+        "DEGREES_LAT": 47.00795,
+        "DEGREES_LONG": 65.00644,
         "FIRE_STAT_ID": 1,
         "FIRE_STAT_DESC_E": "Out of Control",
         "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1758387600000,
-        "FIRE_STAT_DATE": 1758443400000,
+        "TIME_DETECTED": 1758374820000,
+        "FIRE_STAT_DATE": 1758532080000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 5,
+        "FIRE_SIZE": 40.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1758555803
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69865,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -65.71049881803592,
+          46.12233948363302
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69865,
+        "FIRE_NUMBER": "2025366",
+        "FIRE_NUMBER_SHORT": "366",
+        "FIRE_NAME": "366",
+        "DEGREES_LAT": 46.12233,
+        "DEGREES_LONG": 65.7105,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1758377580000,
+        "FIRE_STAT_DATE": 1758533700000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 1,
-        "FIRE_SIZE": 1.5,
+        "FIRE_SIZE": 50.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69902,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.44277939227904,
+          45.62705935590699
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69902,
+        "FIRE_NUMBER": "2025378",
+        "FIRE_NUMBER_SHORT": "378",
+        "FIRE_NAME": "378",
+        "DEGREES_LAT": 45.62705,
+        "DEGREES_LONG": 67.44278,
+        "FIRE_STAT_ID": 1,
+        "FIRE_STAT_DESC_E": "Out of Control",
+        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "TIME_DETECTED": 1758469500000,
+        "FIRE_STAT_DATE": 1758537360000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 1,
+        "FIRE_SIZE": 0.5,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -128,38 +221,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
       "type": "Feature",
-      "id": 69887,
+      "id": 69870,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -66.75382913093871,
-          45.14364928646821
+          -67.35225939016011,
+          46.18374945551616
         ]
       },
       "properties": {
-        "OBJECTID": 69887,
-        "FIRE_NUMBER": "2025377",
-        "FIRE_NUMBER_SHORT": "377",
-        "FIRE_NAME": "Blueberry",
-        "DEGREES_LAT": 45.14364,
-        "DEGREES_LONG": 66.75383,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1758470400000,
-        "FIRE_STAT_DATE": 1758476520000,
+        "OBJECTID": 69870,
+        "FIRE_NUMBER": "2025371",
+        "FIRE_NUMBER_SHORT": "371",
+        "FIRE_NAME": "371",
+        "DEGREES_LAT": 46.18374,
+        "DEGREES_LONG": 67.35226,
+        "FIRE_STAT_ID": 3,
+        "FIRE_STAT_DESC_E": "Under Control",
+        "FIRE_STAT_DESC_F": "Maîtrisé ",
+        "TIME_DETECTED": 1758376800000,
+        "FIRE_STAT_DATE": 1758544620000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.3,
+        "FIRE_SIZE": 7.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -190,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -214,76 +307,14 @@
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
         "TIME_DETECTED": 1755166920000,
-        "FIRE_STAT_DATE": 1758434280000,
+        "FIRE_STAT_DATE": 1758533580000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69864,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.00643861186127,
-          47.00795965164996
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69864,
-        "FIRE_NUMBER": "2025365",
-        "FIRE_NUMBER_SHORT": "365",
-        "FIRE_NAME": "365",
-        "DEGREES_LAT": 47.00795,
-        "DEGREES_LONG": 65.00644,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1758374820000,
-        "FIRE_STAT_DATE": 1758434460000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 5,
-        "FIRE_SIZE": 10.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69862,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -66.60352914010343,
-          46.391059509537214
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69862,
-        "FIRE_NUMBER": "2025363",
-        "FIRE_NUMBER_SHORT": "363",
-        "FIRE_NAME": "363",
-        "DEGREES_LAT": 46.39105,
-        "DEGREES_LONG": 66.60352999999999,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1758367500000,
-        "FIRE_STAT_DATE": 1758444300000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -307,138 +338,45 @@
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
         "TIME_DETECTED": 1758118200000,
-        "FIRE_STAT_DATE": 1758444300000,
+        "FIRE_STAT_DATE": 1758538140000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.8,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
       "type": "Feature",
-      "id": 69870,
+      "id": 69862,
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -67.35225939016011,
-          46.18374945551616
+          -66.60352914010343,
+          46.391059509537214
         ]
       },
       "properties": {
-        "OBJECTID": 69870,
-        "FIRE_NUMBER": "2025371",
-        "FIRE_NUMBER_SHORT": "371",
-        "FIRE_NAME": "371",
-        "DEGREES_LAT": 46.18374,
-        "DEGREES_LONG": 67.35226,
-        "FIRE_STAT_ID": 2,
-        "FIRE_STAT_DESC_E": "Contained",
-        "FIRE_STAT_DESC_F": "Contenu ",
-        "TIME_DETECTED": 1758376800000,
-        "FIRE_STAT_DATE": 1758524220000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 7.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69865,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.71049881803592,
-          46.12233948363302
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69865,
-        "FIRE_NUMBER": "2025366",
-        "FIRE_NUMBER_SHORT": "366",
-        "FIRE_NAME": "366",
-        "DEGREES_LAT": 46.12233,
-        "DEGREES_LONG": 65.7105,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
-        "TIME_DETECTED": 1758377580000,
-        "FIRE_STAT_DATE": 1758444780000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 1,
-        "FIRE_SIZE": 40.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69866,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.68617877419118,
-          45.32952934414211
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69866,
-        "FIRE_NUMBER": "2025367",
-        "FIRE_NUMBER_SHORT": "367",
-        "FIRE_NAME": "Fairfield",
-        "DEGREES_LAT": 45.329519999999995,
-        "DEGREES_LONG": 65.68618,
+        "OBJECTID": 69862,
+        "FIRE_NUMBER": "2025363",
+        "FIRE_NUMBER_SHORT": "363",
+        "FIRE_NAME": "363",
+        "DEGREES_LAT": 46.39105,
+        "DEGREES_LONG": 66.60352999999999,
         "FIRE_STAT_ID": 4,
         "FIRE_STAT_DESC_E": "Being Patrolled",
         "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1758375900000,
-        "FIRE_STAT_DATE": 1758446880000,
+        "TIME_DETECTED": 1758367500000,
+        "FIRE_STAT_DATE": 1758538260000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69867,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -65.80794881647462,
-          45.34215934375868
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69867,
-        "FIRE_NUMBER": "2025368",
-        "FIRE_NUMBER_SHORT": "368",
-        "FIRE_NAME": "Talyor Lake",
-        "DEGREES_LAT": 45.34215,
-        "DEGREES_LONG": 65.80794999999999,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1758382200000,
-        "FIRE_STAT_DATE": 1758447000000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     },
     {
@@ -469,7 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758540672
+        "FETCHED_FROM_ERD": 1758555803
       }
     }
   ]
