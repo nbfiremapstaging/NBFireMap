@@ -35,7 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -66,7 +66,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -97,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.1,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -128,7 +128,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -159,7 +159,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 0.2,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -190,7 +190,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -221,7 +221,38 @@
         "PERCENT_CONTAINED": 10,
         "FIRE_SIZE": 35.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69925,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -64.92143860852352,
+          47.57556974864164
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69925,
+        "FIRE_NUMBER": "2025383",
+        "FIRE_NUMBER_SHORT": "383",
+        "FIRE_NAME": "Chemin de la Baie",
+        "DEGREES_LAT": 47.575559999999996,
+        "DEGREES_LONG": 64.92144,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1758561300000,
+        "FIRE_STAT_DATE": 1758635160000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 0.1,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -252,7 +283,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 7.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -283,7 +314,7 @@
         "PERCENT_CONTAINED": 1,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -314,7 +345,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 7.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -345,7 +376,7 @@
         "PERCENT_CONTAINED": 30,
         "FIRE_SIZE": 430.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     },
     {
@@ -376,38 +407,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1403.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69925,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -64.92143860852352,
-          47.57556974864164
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69925,
-        "FIRE_NUMBER": "2025383",
-        "FIRE_NUMBER_SHORT": "383",
-        "FIRE_NAME": "Chemin de la Baie",
-        "DEGREES_LAT": 47.575559999999996,
-        "DEGREES_LONG": 64.92144,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1758561300000,
-        "FIRE_STAT_DATE": 1758569220000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 0.1,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1758642222
+        "FETCHED_FROM_ERD": 1758646214
       }
     }
   ]
