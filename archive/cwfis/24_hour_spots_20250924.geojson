@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "24_hour_spots_20250924",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "lat": 46.16375, "lon": -65.680405, "rep_date": "2025-09-24T01:59:06Z", "source": "Eumetsat", "sensor": "SLSTR", "satellite": "S3A", "agency": "NB", "temp": 16.89, "rh": 61, "ws": 10.55, "wd": 39, "pcp": 0.426, "ffmc": 85.807, "dmc": 54.593, "dc": 549.234, "isi": 4.01, "bui": 87.45, "fwi": 15.33, "fuel": "C2", "ros": 4.171, "sfc": 3.171, "tfc": 3.4803724, "bfc": 6.6892295, "hfi": 4355, "cfb": 50, "age": 8, "pcuring": 52, "greenup": 1, "elev": 54, "ecozone": "7", "sfl": null, "cfl": 0.6187449, "frp": 6.449527, "estarea": 0.47628087, "pconif": 100 }, "geometry": { "type": "Point", "coordinates": [ -65.68040466, 46.16374969 ] } },
+{ "type": "Feature", "properties": { "lat": 46.173103, "lon": -65.68498, "rep_date": "2025-09-24T01:59:06Z", "source": "Eumetsat", "sensor": "SLSTR", "satellite": "S3A", "agency": "NB", "temp": 16.83, "rh": 61, "ws": 10.57, "wd": 39, "pcp": 0.439, "ffmc": 85.812, "dmc": 54.49, "dc": 549.138, "isi": 4.018, "bui": 87.32, "fwi": 15.34, "fuel": "M2_50", "ros": 3.183, "sfc": 2.675, "tfc": 2.675, "bfc": 6.6875014, "hfi": 2554, "cfb": 0, "age": 8, "pcuring": 51, "greenup": 1, "elev": 51, "ecozone": "7", "sfl": null, "cfl": 0.17873567, "frp": 5.785836, "estarea": 1.793169, "pconif": 50 }, "geometry": { "type": "Point", "coordinates": [ -65.6849823, 46.17310333 ] } }
+]
+}
