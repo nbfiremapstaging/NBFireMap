@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "24_hour_spots_20250925",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "lat": 46.14909, "lon": -65.67781, "rep_date": "2025-09-25T01:33:16Z", "source": "Eumetsat", "sensor": "SLSTR", "satellite": "S3A", "agency": "NB", "temp": 19.18, "rh": 58, "ws": 9.28, "wd": 18, "pcp": 0.0, "ffmc": 86.356, "dmc": 55.953, "dc": 552.489, "isi": 4.065, "bui": 89.3, "fwi": 15.67, "fuel": "C2", "ros": 4.224, "sfc": 3.209, "tfc": 3.4557805, "bfc": 6.7479053, "hfi": 4379, "cfb": 51, "age": 8, "pcuring": 52, "greenup": 1, "elev": 65, "ecozone": "7", "sfl": null, "cfl": 0.48388314, "frp": 0.709335, "estarea": 1.793169, "pconif": 100 }, "geometry": { "type": "Point", "coordinates": [ -65.67781067, 46.14908981 ] } },
+{ "type": "Feature", "properties": { "lat": 45.66938, "lon": -67.27706, "rep_date": "2025-09-24T16:05:00Z", "source": "NASA10", "sensor": "VIIRS-I", "satellite": "NOAA-21", "agency": "NB", "temp": 17.3, "rh": 62, "ws": 8.37, "wd": 69, "pcp": 0.376, "ffmc": 85.077, "dmc": 35.914, "dc": 413.957, "isi": 3.247, "bui": 59.03, "fwi": 10.31, "fuel": "M2_50", "ros": 2.227, "sfc": 2.096, "tfc": 2.096, "bfc": 4.4042754, "hfi": 1400, "cfb": 0, "age": 14, "pcuring": 48, "greenup": 1, "elev": 128, "ecozone": "7", "sfl": null, "cfl": 0.5312608, "frp": 4.9, "estarea": 5.3693185, "pconif": 50 }, "geometry": { "type": "Point", "coordinates": [ -67.27706146, 45.66938019 ] } }
+]
+}
