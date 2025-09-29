@@ -35,38 +35,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 3.5,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
-      }
-    },
-    {
-      "type": "Feature",
-      "id": 69869,
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -67.48161939661202,
-          45.449079323425835
-        ]
-      },
-      "properties": {
-        "OBJECTID": 69869,
-        "FIRE_NUMBER": "2025370",
-        "FIRE_NUMBER_SHORT": "370",
-        "FIRE_NAME": "Saint Croix River",
-        "DEGREES_LAT": 45.44907,
-        "DEGREES_LONG": 67.48161999999999,
-        "FIRE_STAT_ID": 4,
-        "FIRE_STAT_DESC_E": "Being Patrolled",
-        "FIRE_STAT_DESC_F": "Patrouillé ",
-        "TIME_DETECTED": 1758387600000,
-        "FIRE_STAT_DATE": 1758980160000,
-        "FIRE_OF_NOTE_INDCTR": 0,
-        "FIRE_NOTE_ENG": "No",
-        "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 100,
-        "FIRE_SIZE": 7.0,
-        "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
+        "FETCHED_FROM_ERD": 1759160597
       }
     },
     {
@@ -90,14 +59,14 @@
         "FIRE_STAT_DESC_E": "Under Control",
         "FIRE_STAT_DESC_F": "Maîtrisé ",
         "TIME_DETECTED": 1758374820000,
-        "FIRE_STAT_DATE": 1759049460000,
+        "FIRE_STAT_DATE": 1759138680000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 95.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
+        "FETCHED_FROM_ERD": 1759160597
       }
     },
     {
@@ -128,7 +97,7 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 456.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
+        "FETCHED_FROM_ERD": 1759160597
       }
     },
     {
@@ -148,18 +117,18 @@
         "FIRE_NAME": "366",
         "DEGREES_LAT": 46.12233,
         "DEGREES_LONG": 65.7105,
-        "FIRE_STAT_ID": 1,
-        "FIRE_STAT_DESC_E": "Out of Control",
-        "FIRE_STAT_DESC_F": "Hors contrôle",
+        "FIRE_STAT_ID": 2,
+        "FIRE_STAT_DESC_E": "Contained",
+        "FIRE_STAT_DESC_F": "Contenu ",
         "TIME_DETECTED": 1758377580000,
-        "FIRE_STAT_DATE": 1759045260000,
+        "FIRE_STAT_DATE": 1759133040000,
         "FIRE_OF_NOTE_INDCTR": 0,
         "FIRE_NOTE_ENG": "No",
         "FIRE_NOTE_FR": "Non",
-        "PERCENT_CONTAINED": 90,
+        "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 650.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
+        "FETCHED_FROM_ERD": 1759160597
       }
     },
     {
@@ -190,7 +159,38 @@
         "PERCENT_CONTAINED": 100,
         "FIRE_SIZE": 1.0,
         "SHAPE": null,
-        "FETCHED_FROM_ERD": 1759131699
+        "FETCHED_FROM_ERD": 1759160597
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 69869,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.48161939661202,
+          45.449079323425835
+        ]
+      },
+      "properties": {
+        "OBJECTID": 69869,
+        "FIRE_NUMBER": "2025370",
+        "FIRE_NUMBER_SHORT": "370",
+        "FIRE_NAME": "370",
+        "DEGREES_LAT": 45.44907,
+        "DEGREES_LONG": 67.48161999999999,
+        "FIRE_STAT_ID": 4,
+        "FIRE_STAT_DESC_E": "Being Patrolled",
+        "FIRE_STAT_DESC_F": "Patrouillé ",
+        "TIME_DETECTED": 1758387600000,
+        "FIRE_STAT_DATE": 1759137660000,
+        "FIRE_OF_NOTE_INDCTR": 0,
+        "FIRE_NOTE_ENG": "No",
+        "FIRE_NOTE_FR": "Non",
+        "PERCENT_CONTAINED": 100,
+        "FIRE_SIZE": 7.0,
+        "SHAPE": null,
+        "FETCHED_FROM_ERD": 1759160597
       }
     }
   ]
